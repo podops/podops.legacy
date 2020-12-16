@@ -3,7 +3,7 @@ package metadata
 import (
 	"time"
 
-	"github.com/eduncan911/podcast"
+	"github.com/podops/podops/pkg/feed"
 )
 
 type (
@@ -66,17 +66,17 @@ type (
 	}
 )
 
-func (l *Link) ToAtomLink() *podcast.AtomLink {
-	return &podcast.AtomLink{
+func (l *Link) ToAtomLink() *feed.AtomLink {
+	return &feed.AtomLink{
 		HREF: l.URI,
 		Rel:  l.Rel,
 		Type: l.Type,
 	}
 }
-func (show *Show) ToPodcast() (*podcast.Podcast, error) {
+func (show *Show) ToPodcast() (*feed.Podcast, error) {
 	now := time.Now()
 	// basics
-	p := podcast.New(show.Description.Title, show.Description.Link, show.Description.Summary, &now, &now)
+	p := feed.New(show.Description.Title, show.Description.Link, show.Description.Summary, &now, &now)
 	// details
 	p.AddSubTitle(show.Description.SubTitle)
 	p.AddSummary(show.Description.Summary)
