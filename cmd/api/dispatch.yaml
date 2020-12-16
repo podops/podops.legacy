@@ -1,0 +1,15 @@
+dispatch:
+  - url: "podops.dev/"
+    service: default
+
+  - url: "*/a/1/*"
+    service: api
+
+  - url: "*/_a/*"
+    service: api
+
+  #- url: "*/_w/1/*"
+  #  service: api
+
+  #- url: "cdn.lnkk.host/"
+  #  service: cdn

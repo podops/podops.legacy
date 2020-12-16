@@ -1,0 +1,10 @@
+cron:
+#- description: "Hourly tasks, e.g. statistics, reports etc"
+#  url: /_c/1/hourly
+#  schedule: every 60 minutes synchronized
+#  target: api
+
+#- description: "Daily tasks"
+#  url: /_c/1/daily
+#  schedule: every 24 hours synchronized
+#  target: api

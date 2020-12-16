@@ -1,3 +1,17 @@
+# Configuration files with potentially keys in it
+app.yaml
+credentials.json
+master.key
+.po
+
+# Development environment specific
+.DS_Store
+stuff.md
+/hack
+
+# Binaries
+cmd/token/token
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
