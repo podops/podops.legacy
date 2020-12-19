@@ -78,7 +78,7 @@ func TemplateCommand(c *cli.Context) error {
 				Link: m.Resource{
 					URI: "https://podcast.fm/podcast-name/episode1",
 				},
-				Duration: 1,
+				Duration: 0,
 			},
 			Image: m.Resource{
 				URI: "https://podcast.fm/podcast-name/episode1/episode-coverart.png",
@@ -87,7 +87,8 @@ func TemplateCommand(c *cli.Context) error {
 			Enclosure: m.Resource{
 				URI:  "podcast.fm/podcast-name/episode1/episode1.mp3",
 				Type: "audio/mpeg",
-				Size: 1,
+				Rel:  "external",
+				Size: 0,
 			},
 		}
 

@@ -144,8 +144,14 @@ func setupCommands() []cli.Command {
 			Action:   NoopCommand,
 		},
 		cli.Command{
+			Name:     "produce",
+			Usage:    "Start the production of the podcast feed on the service",
+			Category: showMgmtCmd,
+			Action:   NoopCommand,
+		},
+		cli.Command{
 			Name:     "build",
-			Usage:    "Start the production of the podcast feed",
+			Usage:    "Start the build of the podcast assets locally",
 			Category: showMgmtCmd,
 			Action:   NoopCommand,
 		},

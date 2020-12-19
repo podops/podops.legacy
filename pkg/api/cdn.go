@@ -12,12 +12,12 @@ https://cloud.google.com/cdn/docs/
 */
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/txsvc/commons/pkg/env"
+	"github.com/txsvc/platform/pkg/platform"
 )
 
 var redirectBase string = env.GetString("REDIRECT_URL", "https://storage.googleapis.com/cdn.podops.dev")
@@ -52,10 +52,9 @@ func RedirectToStorageEndpoint(c *gin.Context) {
 		return
 	}
 
-	target := redirectBase + c.Request.URL.Path
-
 	// FIXME: implement analytics here ...
-	fmt.Println(fmt.Sprintf("CDN %s: %v -> %v. Target: %s", c.Request.URL.Path, c.Request.Header, header, target))
+	target := redirectBase + c.Request.URL.Path
+	platform.Log(header)
 
 	// redirect to the CDN of Google's Cloud Storage
 	c.Redirect(http.StatusTemporaryRedirect, target)
