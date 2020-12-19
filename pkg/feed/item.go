@@ -40,14 +40,20 @@ type Item struct {
 	Enclosure        *Enclosure
 
 	// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
-	IAuthor            string `xml:"itunes:author,omitempty"`
-	ISubtitle          string `xml:"itunes:subtitle,omitempty"`
-	ISummary           *ISummary
-	IImage             *IImage
-	IDuration          string `xml:"itunes:duration,omitempty"`
-	IExplicit          string `xml:"itunes:explicit,omitempty"`
-	IIsClosedCaptioned string `xml:"itunes:isClosedCaptioned,omitempty"`
-	IOrder             string `xml:"itunes:order,omitempty"`
+	IAuthor   string `xml:"itunes:author,omitempty"`
+	ISubtitle string `xml:"itunes:subtitle,omitempty"`
+	ISummary  *ISummary
+	IImage    *IImage
+	IDuration string `xml:"itunes:duration,omitempty"`
+	IExplicit string `xml:"itunes:explicit,omitempty"`
+	// ADDED
+	ISeason      string `xml:"itunes:season,omitempty"`
+	IEpisode     string `xml:"itunes:episode,omitempty"`
+	IEpisodeType string `xml:"itunes:episodeType,omitempty"`
+	IBlock       string `xml:"itunes:block,omitempty"`
+
+	// REMOVE IIsClosedCaptioned string `xml:"itunes:isClosedCaptioned,omitempty"`
+	// REMOVE IOrder string `xml:"itunes:order,omitempty"`
 }
 
 // AddEnclosure adds the downloadable asset to the podcast Item.

@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	pVersion = "1.3.1"
+	pVersion = "1.0.0"
 )
 
 // Podcast represents a podcast.
@@ -52,6 +52,9 @@ type Podcast struct {
 	INewFeedURL string  `xml:"itunes:new-feed-url,omitempty"`
 	IOwner      *Author // Author is formatted for itunes as-is
 	ICategories []*ICategory
+	// ADDED
+	ITitle string `xml:"itunes:title,omitempty"`
+	IType  string `xml:"itunes:type,omitempty"`
 
 	Items []*Item
 
@@ -66,9 +69,10 @@ func New(title, link, description string,
 	pubDate, lastBuildDate *time.Time) Podcast {
 	return Podcast{
 		Title:         title,
+		ITitle:        title,
 		Link:          link,
 		Description:   description,
-		Generator:     fmt.Sprintf("go podcast v%s (github.com/eduncan911/podcast)", pVersion),
+		Generator:     fmt.Sprintf("podops v%s (github.com/podops/podops)", pVersion),
 		PubDate:       parseDateRFC1123Z(pubDate),
 		LastBuildDate: parseDateRFC1123Z(lastBuildDate),
 		Language:      "en-us",
@@ -264,7 +268,7 @@ func (p *Podcast) AddImage(url string) {
 //   * For specifications of itunes tags, see:
 //     https://help.apple.com/itc/podcasts_connect/#/itcb54353390
 //
-func (p *Podcast) AddItem(i Item) (int, error) {
+func (p *Podcast) AddItem(i *Item) (int, error) {
 	// initial guards for required fields
 	if len(i.Title) == 0 || len(i.Description) == 0 {
 		return len(p.Items), errors.New("Title and Description are required")
@@ -327,7 +331,7 @@ func (p *Podcast) AddItem(i Item) (int, error) {
 		}
 	}
 
-	p.Items = append(p.Items, &i)
+	p.Items = append(p.Items, i)
 	return len(p.Items), nil
 }
 
