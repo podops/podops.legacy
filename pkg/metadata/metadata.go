@@ -2,6 +2,8 @@ package metadata
 
 import (
 	"time"
+
+	"github.com/txsvc/commons/pkg/util"
 )
 
 const (
@@ -88,7 +90,7 @@ type (
 	EpisodeDescription struct {
 		Title       string   // REQUIRED 'item.title' 'item.itunes.title'
 		Summary     string   // REQUIRED 'item.description'
-		EpisodeText string   // REQUIRED 'item.itunes.summary'
+		EpisodeText string   `yaml:"episodeText,omitempty"` // REQUIRED 'item.itunes.summary'
 		Link        Resource // RECOMMENDED 'item.link'
 		Duration    int      // REQUIRED 'item.itunes.duration'
 	}
@@ -132,6 +134,7 @@ func DefaultShowMetadata() map[string]string {
 	l[LabelType] = ShowTypeEpisodic
 	l[LabelBlock] = "no"
 	l[LabelComplete] = "no"
+	l[LabelGUID], _ = util.ShortUUID()
 
 	return l
 }
@@ -148,7 +151,7 @@ func DefaultEpisodeMetadata() map[string]string {
 
 	l := make(map[string]string)
 
-	l[LabelGUID] = "GUID"
+	l[LabelGUID], _ = util.ShortUUID()
 	l[LabelDate] = time.Now().UTC().Format(time.RFC1123Z)
 	l[LabelSeason] = "1"
 	l[LabelEpisode] = "1"

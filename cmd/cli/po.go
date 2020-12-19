@@ -15,7 +15,7 @@ const (
 	cliName    = "po"
 	cliVersion = "v0.1"
 
-	basicCmd    = "BasicCommands"
+	basicCmd    = "Basic Commands"
 	settingsCmd = "Settings Commands"
 	showCmd     = "Show Commands"
 	showMgmtCmd = "Show Management Commands"
@@ -148,6 +148,13 @@ func setupCommands() []cli.Command {
 			Usage:    "Start the production of the podcast feed",
 			Category: showMgmtCmd,
 			Action:   NoopCommand,
+		},
+		cli.Command{
+			Name:      "template",
+			Usage:     "Create a resource template with all default values",
+			UsageText: "template show | episode",
+			Category:  basicCmd,
+			Action:    cl.TemplateCommand,
 		},
 	}
 	return c
