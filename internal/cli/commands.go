@@ -13,7 +13,7 @@ func AuthCommand(c *cli.Context) error {
 	token := c.Args().First()
 	if token != "" {
 		// FIXME: validate the token first
-		defaultValues.Token = token
+		DefaultValuesCLI.Token = token
 		StoreDefaultValues()
 
 		fmt.Println("\nAuthentication successful")
@@ -29,15 +29,12 @@ func LogoutCommand(c *cli.Context) error {
 		Token:           "",
 		ClientID:        "",
 		DefaultShow:     "",
+		ShowTitle:       "",
+		ShowSummary:     "",
 	}
-	defaultValues = df
+	DefaultValuesCLI = df
 	StoreDefaultValues()
 
 	fmt.Println("\nLogout successful")
-	return nil
-}
-
-// NewShowCommand requests a new show
-func NewShowCommand(c *cli.Context) error {
 	return nil
 }

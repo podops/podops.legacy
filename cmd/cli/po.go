@@ -45,7 +45,7 @@ func main() {
 			fmt.Println(helpText)
 			return nil
 		},
-		Flags:    setupFlags(),
+		Flags:    globalFlags(),
 		Commands: setupCommands(),
 	}
 
@@ -59,18 +59,18 @@ func main() {
 	}
 }
 
-func setupFlags() []cli.Flag {
+func globalFlags() []cli.Flag {
 	f := []cli.Flag{
 		&cli.StringFlag{
 			Name:        "url",
 			Value:       cl.DefaultServiceEndpoint,
 			Usage:       "set the service endpoint",
-			Destination: &endpoint,
+			Destination: &cl.DefaultValuesCLI.ServiceEndpoint,
 		},
 		&cli.StringFlag{
 			Name:        "s",
 			Usage:       "select the show a command is applied to",
-			Destination: &endpoint,
+			Destination: &cl.DefaultValuesCLI.DefaultShow,
 		},
 	}
 	return f
@@ -78,19 +78,6 @@ func setupFlags() []cli.Flag {
 
 func setupCommands() []cli.Command {
 	c := []cli.Command{
-		cli.Command{
-			Name:     "info",
-			Usage:    "Shows an overview of the current show",
-			Category: basicCmd,
-			Action:   NoopCommand,
-		},
-		cli.Command{
-			Name:      "new-show",
-			Usage:     "Request a new show",
-			UsageText: "new-show NAME",
-			Category:  basicCmd,
-			Action:    cl.NewShowCommand,
-		},
 
 		cli.Command{
 			Name:      "auth",
@@ -105,6 +92,28 @@ func setupCommands() []cli.Command {
 			Category: settingsCmd,
 			Action:   cl.LogoutCommand,
 		},
+		cli.Command{
+			Name:      "template",
+			Usage:     "Create a resource template with all default values",
+			UsageText: "template show | episode",
+			Category:  basicCmd,
+			Action:    cl.TemplateCommand,
+		},
+		cli.Command{
+			Name:      "new-show",
+			Usage:     "Setup a new show",
+			UsageText: "new-show NAME",
+			Category:  basicCmd,
+			Action:    cl.NewShowCommand,
+			Flags:     newShowFlags(),
+		},
+
+		cli.Command{
+			Name:     "info",
+			Usage:    "Shows an overview of the current show",
+			Category: basicCmd,
+			Action:   NoopCommand,
+		},
 
 		cli.Command{
 			Name:     "shows",
@@ -118,7 +127,6 @@ func setupCommands() []cli.Command {
 			Category: showCmd,
 			Action:   NoopCommand,
 		},
-
 		cli.Command{
 			Name:     "create",
 			Usage:    "Create a resource from a file, directory or URL",
@@ -155,15 +163,24 @@ func setupCommands() []cli.Command {
 			Category: showMgmtCmd,
 			Action:   NoopCommand,
 		},
-		cli.Command{
-			Name:      "template",
-			Usage:     "Create a resource template with all default values",
-			UsageText: "template show | episode",
-			Category:  basicCmd,
-			Action:    cl.TemplateCommand,
-		},
 	}
 	return c
+}
+
+func newShowFlags() []cli.Flag {
+	f := []cli.Flag{
+		&cli.StringFlag{
+			Name:        "title",
+			Usage:       "Show title",
+			Destination: &cl.DefaultValuesCLI.ShowTitle,
+		},
+		&cli.StringFlag{
+			Name:        "summary",
+			Usage:       "Show summary",
+			Destination: &cl.DefaultValuesCLI.ShowSummary,
+		},
+	}
+	return f
 }
 
 // NoopCommand does nothing

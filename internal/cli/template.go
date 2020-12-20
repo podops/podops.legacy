@@ -43,7 +43,7 @@ func TemplateCommand(c *cli.Context) error {
 				},
 				Owner: m.Owner{
 					Name:  "Podcast Owner Name",
-					Email: "hello@podcast.fm",
+					Email: "hello@podcast.me",
 				},
 				Author:    "Podcast author",
 				Copyright: "Podcast copyright",

@@ -21,10 +21,12 @@ type (
 		Token           string `json:"token"`
 		ClientID        string `json:"client_id"`
 		DefaultShow     string `json:"show"`
+		ShowTitle       string `json:"title"`
+		ShowSummary     string `json:"summary"`
 	}
 )
 
-var defaultValues *DefaultValues
+var DefaultValuesCLI *DefaultValues
 
 func init() {
 	df := &DefaultValues{
@@ -33,27 +35,27 @@ func init() {
 		ClientID:        "",
 		DefaultShow:     "",
 	}
-	defaultValues = df
+	DefaultValuesCLI = df
 }
 
 // ServiceEndpoint returns the service endpoint
 func ServiceEndpoint() string {
-	return defaultValues.ServiceEndpoint
+	return DefaultValuesCLI.ServiceEndpoint
 }
 
 // Token returns the API token of the current user
 func Token() string {
-	return defaultValues.Token
+	return DefaultValuesCLI.Token
 }
 
 // ClientID returns the users ID
 func ClientID() string {
-	return defaultValues.ClientID
+	return DefaultValuesCLI.ClientID
 }
 
 // DefaultShow returns the current show
 func DefaultShow() string {
-	return defaultValues.DefaultShow
+	return DefaultValuesCLI.DefaultShow
 }
 
 // LoadOrCreateDefaultValues initializes the default settings
@@ -68,12 +70,12 @@ func LoadOrCreateDefaultValues() {
 		defer jsonFile.Close()
 
 		byteValue, _ := ioutil.ReadAll(jsonFile)
-		json.Unmarshal(byteValue, defaultValues)
+		json.Unmarshal(byteValue, DefaultValuesCLI)
 	}
 }
 
 // StoreDefaultValues persists the current values
 func StoreDefaultValues() {
-	defaults, _ := json.Marshal(defaultValues)
+	defaults, _ := json.Marshal(DefaultValuesCLI)
 	ioutil.WriteFile(presetNameAndPath, defaults, 0644)
 }
