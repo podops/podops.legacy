@@ -8,6 +8,7 @@ import (
 	"github.com/urfave/cli"
 )
 
+// PrintError formats a CLI error and prints it
 func PrintError(c *cli.Context, err error) {
 	fmt.Println(fmt.Errorf("%w", err))
 }

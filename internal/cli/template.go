@@ -27,7 +27,7 @@ func TemplateCommand(c *cli.Context) error {
 			Kind:       "show",
 			Metadata: m.Metadata{
 				Name:   "podcast-name",
-				Labels: m.DefaultShowMetadata(),
+				Labels: m.DefaultShowMetadata(""),
 			},
 			Description: m.ShowDescription{
 				Title:   "Podcast Title",
@@ -69,7 +69,7 @@ func TemplateCommand(c *cli.Context) error {
 			Kind:       "episode",
 			Metadata: m.Metadata{
 				Name:   "episode1",
-				Labels: m.DefaultEpisodeMetadata(),
+				Labels: m.DefaultEpisodeMetadata("", ""),
 			},
 			Description: m.EpisodeDescription{
 				Title:       "Episode Title",

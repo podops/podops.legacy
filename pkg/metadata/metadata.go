@@ -1,12 +1,13 @@
 package metadata
 
-import (
-	"time"
-
-	"github.com/txsvc/commons/pkg/util"
-)
-
 const (
+	// DefaultPortalEndpoint points to the portal
+	DefaultPortalEndpoint = "https://podops.dev"
+	// DefaultAPIEndpoint points to the API
+	DefaultAPIEndpoint = "https://api.podops.dev"
+	// DefaultCDNEndpoint point to the CDN
+	DefaultCDNEndpoint = "https://cdn.podops.dev"
+
 	//
 	// Required and optional labels:
 	//
@@ -27,15 +28,16 @@ const (
 	//		block:		Yes OPTIONAL 'item.itunes.block' Anything else than 'Yes' has no effect
 	//
 
-	LabelLanguage = "language"
-	LabelExplicit = "explicit"
-	LabelType     = "type"
-	LabelBlock    = "block"
-	LabelComplete = "complete"
-	LabelGUID     = "guid"
-	LabelDate     = "date"
-	LabelSeason   = "season"
-	LabelEpisode  = "episode"
+	LabelLanguage   = "language"
+	LabelExplicit   = "explicit"
+	LabelType       = "type"
+	LabelBlock      = "block"
+	LabelComplete   = "complete"
+	LabelGUID       = "guid"
+	LabelParentGUID = "parent_guid"
+	LabelDate       = "date"
+	LabelSeason     = "season"
+	LabelEpisode    = "episode"
 
 	ShowTypeEpisodic = "Episodic"
 	ShowTypeSerial   = "Serial"
@@ -117,47 +119,3 @@ type (
 		Size   int    `yaml:"size,omitempty"`
 	}
 )
-
-// DefaultShowMetadata creates a default set of labels etc for a Show resource
-//
-//	language:	<ISO639 two-letter-code> REQUIRED 'channel.language'
-//	explicit:	True | False REQUIRED 'channel.itunes.explicit'
-//	type:		Episodic | Serial REQUIRED 'channel. itunes.type'
-//	block:		Yes OPTIONAL 'channel.itunes.block' Anything else than 'Yes' has no effect
-//	complete:	Yes OPTIONAL 'channel.itunes.complete' Anything else than 'Yes' has no effect
-func DefaultShowMetadata() map[string]string {
-
-	l := make(map[string]string)
-
-	l[LabelLanguage] = "en"
-	l[LabelExplicit] = "no"
-	l[LabelType] = ShowTypeEpisodic
-	l[LabelBlock] = "no"
-	l[LabelComplete] = "no"
-	l[LabelGUID], _ = util.ShortUUID()
-
-	return l
-}
-
-// DefaultEpisodeMetadata creates a default set of labels etc for a Episode resource
-//	guid:		<unique id> 'item.guid'
-//	date:		<publish date> REQUIRED 'item.pubDate'
-//	season: 	<season number> OPTIONAL 'item.itunes.season'
-//	episode:	<episode number> REQUIRED 'item.itunes.episode'
-//	explicit:	True | False REQUIRED 'channel.itunes.explicit'
-//	type:		Full | Trailer | Bonus REQUIRED 'item.itunes.episodeType'
-//	block:		Yes OPTIONAL 'item.itunes.block' Anything else than 'Yes' has no effect
-func DefaultEpisodeMetadata() map[string]string {
-
-	l := make(map[string]string)
-
-	l[LabelGUID], _ = util.ShortUUID()
-	l[LabelDate] = time.Now().UTC().Format(time.RFC1123Z)
-	l[LabelSeason] = "1"
-	l[LabelEpisode] = "1"
-	l[LabelExplicit] = "no"
-	l[LabelType] = EpisodeTypeFull
-	l[LabelBlock] = "no"
-
-	return l
-}
