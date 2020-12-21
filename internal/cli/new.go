@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/podops/podops/pkg/metadata"
-	m "github.com/podops/podops/pkg/metadata"
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
+
+	"github.com/podops/podops/pkg/metadata"
+	m "github.com/podops/podops/pkg/metadata"
 )
 
 type (
@@ -29,6 +30,10 @@ type (
 
 // NewShowCommand requests a new show
 func NewShowCommand(c *cli.Context) error {
+	if !IsAuthorized() {
+		return fmt.Errorf("Not authorized. Use 'po auth' first")
+	}
+
 	name := c.Args().First()
 	title := c.String("title")
 	if title == "" {
@@ -46,7 +51,7 @@ func NewShowCommand(c *cli.Context) error {
 	}
 
 	resp := NewShowResponse{}
-	err := Post("/new", Token(), &req, &resp)
+	_, err := Post(NewShowRoute, Token(), &req, &resp)
 	if err != nil {
 		PrintError(c, err)
 		return err

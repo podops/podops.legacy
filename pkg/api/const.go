@@ -5,8 +5,4 @@ const (
 	AdminNamespacePrefix = "/_a"
 	// NamespacePrefix namespace for the CLI. Should not be used directly.
 	NamespacePrefix = "/a/v1"
-
-	// All the API endpoint routes
-
-	NewShowRoute = "/new"
 )

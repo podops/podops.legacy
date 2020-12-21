@@ -53,69 +53,69 @@ type (
 
 	// Metadata contains information describing a resource
 	Metadata struct {
-		Name   string            // <unique name> REQUIRED
-		Labels map[string]string `yaml:"labels,omitempty"` // REQUIRED
+		Name   string            `json:"name" yaml:"name" binding:"required"` // REQUIRED <unique name>
+		Labels map[string]string `json:"labels" yaml:"labels,omitempty"`      // REQUIRED
 	}
 
 	// Show holds all metadata related to a podcast/show
 	Show struct {
-		APIVersion  string          `yaml:"apiVersion"` // default: v1.0
-		Kind        string          // default: show
-		Metadata    Metadata        // REQUIRED
-		Description ShowDescription // REQUIRED
-		Image       Resource        // REQUIRED 'channel.itunes.image'
+		APIVersion  string          `json:"apiVersion" yaml:"apiVersion" binding:"required"`   // REQUIRED default: v1.0
+		Kind        string          `json:"kind" yaml:"kind" binding:"required"`               // REQUIRED default: show
+		Metadata    Metadata        `json:"metadata" yaml:"metadata" binding:"required"`       // REQUIRED
+		Description ShowDescription `json:"description" yaml:"description" binding:"required"` // REQUIRED
+		Image       Resource        `json:"image" yaml:"image" binding:"required"`             // REQUIRED 'channel.itunes.image'
 	}
 
 	// Episode holds all metadata related to a podcast episode
 	Episode struct {
-		APIVersion  string             `yaml:"apiVersion"` // default: v1.0
-		Kind        string             // default: episode
-		Metadata    Metadata           // REQUIRED
-		Description EpisodeDescription // REQUIRED
-		Image       Resource           // REQUIRED 'item.itunes.image'
-		Enclosure   Resource           // REQUIRED
+		APIVersion  string             `json:"apiVersion" yaml:"apiVersion" binding:"required"`   // REQUIRED default: v1.0
+		Kind        string             `json:"kind" yaml:"kind" binding:"required"`               // REQUIRED default: episode
+		Metadata    Metadata           `json:"metadata" yaml:"metadata" binding:"required"`       // REQUIRED
+		Description EpisodeDescription `json:"description" yaml:"description" binding:"required"` // REQUIRED
+		Image       Resource           `json:"image" yaml:"image" binding:"required"`             // REQUIRED 'item.itunes.image'
+		Enclosure   Resource           `json:"enclosure" yaml:"enclosure" binding:"required"`     // REQUIRED
 	}
 
 	// ShowDescription holds essential show metadata
 	ShowDescription struct {
-		Title     string    // REQUIRED 'channel.title' 'channel.itunes.title'
-		Summary   string    // REQUIRED 'channel.description'
-		Link      Resource  // RECOMMENDED 'channel.link'
-		Category  Category  // REQUIRED channel.category
-		Owner     Owner     // RECOMMENDED 'channel.itunes.owner'
-		Author    string    // RECOMMENDED 'channel.itunes.author'
-		Copyright string    `yaml:"copyright,omitempty"` // OPTIONAL 'channel.copyright'
-		NewFeed   *Resource `yaml:"newFeed,omitempty"`   // OPTIONAL channel.itunes.new-feed-url -> move to label
+		Title     string    `json:"title" yaml:"title" binding:"required"`          // REQUIRED 'channel.title' 'channel.itunes.title'
+		Summary   string    `json:"summary" yaml:"summary" binding:"required"`      // REQUIRED 'channel.description'
+		Link      Resource  `json:"link" yaml:"link"`                               // RECOMMENDED 'channel.link'
+		Category  Category  `json:"category" yaml:"category" binding:"required"`    // REQUIRED channel.category
+		Owner     Owner     `json:"owner" yaml:"owner"`                             // RECOMMENDED 'channel.itunes.owner'
+		Author    string    `json:"author" yaml:"author"`                           // RECOMMENDED 'channel.itunes.author'
+		Copyright string    `json:"copyright,omitempty" yaml:"copyright,omitempty"` // OPTIONAL 'channel.copyright'
+		NewFeed   *Resource `json:"newFeed,omitempty" yaml:"newFeed,omitempty"`     // OPTIONAL channel.itunes.new-feed-url -> move to label
 	}
 
 	// EpisodeDescription holds essential episode metadata
 	EpisodeDescription struct {
-		Title       string   // REQUIRED 'item.title' 'item.itunes.title'
-		Summary     string   // REQUIRED 'item.description'
-		EpisodeText string   `yaml:"episodeText,omitempty"` // REQUIRED 'item.itunes.summary'
-		Link        Resource // RECOMMENDED 'item.link'
-		Duration    int      // REQUIRED 'item.itunes.duration'
+		Title       string   `json:"title" yaml:"title" binding:"required"`                                 // REQUIRED 'item.title' 'item.itunes.title'
+		Summary     string   `json:"summary" yaml:"summary" binding:"required"`                             // REQUIRED 'item.description'
+		EpisodeText string   `json:"episodeText,omitempty" yaml:"episodeText,omitempty" binding:"required"` // REQUIRED 'item.itunes.summary'
+		Link        Resource `json:"link" yaml:"link"`                                                      // RECOMMENDED 'item.link'
+		Duration    int      `json:"duration" yaml:"duration" binding:"required"`                           // REQUIRED 'item.itunes.duration'
 	}
 
 	// Owner describes the owner of the show/podcast
 	Owner struct {
-		Name  string // REQUIRED
-		Email string // REQUIRED
+		Name  string `json:"name" yaml:"name" binding:"required"`   // REQUIRED
+		Email string `json:"email" yaml:"email" binding:"required"` // REQUIRED
 	}
 
 	// Category is the show/episodes category and it's subcategories
 	Category struct {
-		Name        string   // REQUIRED
-		SubCategory []string `yaml:"subcategory,omitempty"` // OPTIONAL
+		Name        string   `json:"name" yaml:"name" binding:"required"`      // REQUIRED
+		SubCategory []string `json:"subcategory" yaml:"subcategory,omitempty"` // OPTIONAL
 	}
 
 	// Resource provides a link to a media resource
 	Resource struct {
-		URI    string // REQUIRED
-		Title  string `yaml:"title,omitempty"`
-		Anchor string `yaml:"anchor,omitempty"`
-		Rel    string `yaml:"rel,omitempty"`
-		Type   string `yaml:"type,omitempty"`
-		Size   int    `yaml:"size,omitempty"`
+		URI    string `json:"uri" yaml:"uri" binding:"required"`        // REQUIRED
+		Title  string `json:"title,omitempty" yaml:"title,omitempty"`   // OPTIONAL
+		Anchor string `json:"anchor,omitempty" yaml:"anchor,omitempty"` // OPTIONAL
+		Rel    string `json:"rel,omitempty" yaml:"rel,omitempty"`       // OPTIONAL
+		Type   string `json:"type,omitempty" yaml:"type,omitempty"`     // OPTIONAL
+		Size   int    `json:"size,omitempty" yaml:"size,omitempty"`     // OPTIONAL
 	}
 )

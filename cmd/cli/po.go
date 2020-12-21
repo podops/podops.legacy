@@ -59,23 +59,6 @@ func main() {
 	}
 }
 
-func globalFlags() []cli.Flag {
-	f := []cli.Flag{
-		&cli.StringFlag{
-			Name:        "url",
-			Value:       cl.DefaultServiceEndpoint,
-			Usage:       "set the service endpoint",
-			Destination: &cl.DefaultValuesCLI.ServiceEndpoint,
-		},
-		&cli.StringFlag{
-			Name:        "s",
-			Usage:       "select the show a command is applied to",
-			Destination: &cl.DefaultValuesCLI.DefaultShow,
-		},
-	}
-	return f
-}
-
 func setupCommands() []cli.Command {
 	c := []cli.Command{
 
@@ -165,6 +148,23 @@ func setupCommands() []cli.Command {
 		},
 	}
 	return c
+}
+
+func globalFlags() []cli.Flag {
+	f := []cli.Flag{
+		&cli.StringFlag{
+			Name:        "url",
+			Value:       cl.DefaultServiceEndpoint,
+			Usage:       "set the service endpoint",
+			Destination: &cl.DefaultValuesCLI.ServiceEndpoint,
+		},
+		&cli.StringFlag{
+			Name:        "s",
+			Usage:       "select the show a command is applied to",
+			Destination: &cl.DefaultValuesCLI.DefaultShow,
+		},
+	}
+	return f
 }
 
 func newShowFlags() []cli.Flag {

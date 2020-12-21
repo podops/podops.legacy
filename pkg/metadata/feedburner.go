@@ -25,7 +25,7 @@ func (s *Show) Podcast() (*rss.Channel, error) {
 	now := time.Now()
 
 	// basics
-	pf := rss.New(s.Description.Title, s.Description.Link.URI, s.Description.Summary, &now, &now)
+	pf := rss.New(s.Description.Title, s.Description.Link.URI, s.Description.Summary, &now, &now) // FIXME remove timestamps
 	// details
 	pf.AddSummary(s.Description.Summary)
 	if s.Description.Author == "" {

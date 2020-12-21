@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: show
+metadata:
+  name: abcd
+  labels:
+    block: "no"
+    complete: "no"
+    explicit: "no"
+    guid: 0ef9452091ea
+    language: en
+    type: Episodic
+description:
+  title: My First Podcast
+  summary: This is a dummy podcast
+  link:
+    uri: https://podops.dev/s/abcd
+  category:
+    name: Technology
+    subcategory:
+    - Podcasting
+  owner:
+    name: abcd Owner Name
+    email: hello@abcd.me
+  author: abcd author
+  copyright: abcd copyright
+image:
+  uri: https://cdn.podops.dev/abcd/coverart.png
+  rel: external

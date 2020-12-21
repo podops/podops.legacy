@@ -15,6 +15,7 @@ import (
 	"github.com/txsvc/service/pkg/auth"
 	"github.com/txsvc/service/pkg/svc"
 
+	"github.com/podops/podops/internal/cli"
 	"github.com/podops/podops/pkg/api"
 )
 
@@ -55,7 +56,7 @@ func main() {
 
 	// API endpoints with authentication
 	apiEndpoints := svc.SecureGroup(api.NamespacePrefix, jwt.MiddlewareFunc())
-	apiEndpoints.POST(api.NewShowRoute, "api.create", api.NewShowEndpoint)
+	apiEndpoints.POST(cli.NewShowRoute, "api.create", api.NewShowEndpoint)
 
 	// add CORS handler, allowing all. See https://github.com/gin-contrib/cors
 	svc.Use(cors.Default())
