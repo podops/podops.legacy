@@ -1,9 +1,8 @@
-package feed
+package rss
 
 import (
 	"bytes"
 	"encoding/xml"
-	"fmt"
 	"io"
 	"strconv"
 	"time"
@@ -13,69 +12,78 @@ import (
 )
 
 const (
-	pVersion = "1.0.0"
+	generatorVersion = "PodOps v1.0 (https://github.com/podops/podops)"
 )
 
-// Podcast represents a podcast.
-type Podcast struct {
-	XMLName        xml.Name `xml:"channel"`
-	Title          string   `xml:"title"`
-	Link           string   `xml:"link"`
-	Description    string   `xml:"description"`
-	Category       string   `xml:"category,omitempty"`
-	Cloud          string   `xml:"cloud,omitempty"`
-	Copyright      string   `xml:"copyright,omitempty"`
-	Docs           string   `xml:"docs,omitempty"`
-	Generator      string   `xml:"generator,omitempty"`
-	Language       string   `xml:"language,omitempty"`
-	LastBuildDate  string   `xml:"lastBuildDate,omitempty"`
-	ManagingEditor string   `xml:"managingEditor,omitempty"`
-	PubDate        string   `xml:"pubDate,omitempty"`
-	Rating         string   `xml:"rating,omitempty"`
-	SkipHours      string   `xml:"skipHours,omitempty"`
-	SkipDays       string   `xml:"skipDays,omitempty"`
-	TTL            int      `xml:"ttl,omitempty"`
-	WebMaster      string   `xml:"webMaster,omitempty"`
-	Image          *Image
-	TextInput      *TextInput
-	AtomLink       *AtomLink
+type (
+	// Channel represents a RSS feed with iTunes/podcast specific extensions
+	Channel struct {
+		XMLName        xml.Name `xml:"channel"`
+		Title          string   `xml:"title"`
+		Link           string   `xml:"link"`
+		Description    string   `xml:"description"`
+		Category       string   `xml:"category,omitempty"`
+		Cloud          string   `xml:"cloud,omitempty"`
+		Copyright      string   `xml:"copyright,omitempty"`
+		Docs           string   `xml:"docs,omitempty"`
+		Generator      string   `xml:"generator,omitempty"`
+		Language       string   `xml:"language,omitempty"`
+		LastBuildDate  string   `xml:"lastBuildDate,omitempty"`
+		ManagingEditor string   `xml:"managingEditor,omitempty"`
+		PubDate        string   `xml:"pubDate,omitempty"`
+		Rating         string   `xml:"rating,omitempty"`
+		SkipHours      string   `xml:"skipHours,omitempty"`
+		SkipDays       string   `xml:"skipDays,omitempty"`
+		TTL            int      `xml:"ttl,omitempty"`
+		WebMaster      string   `xml:"webMaster,omitempty"`
+		Image          *Image
+		TextInput      *TextInput
+		AtomLink       *AtomLink
 
-	// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
-	IAuthor     string `xml:"itunes:author,omitempty"`
-	ISubtitle   string `xml:"itunes:subtitle,omitempty"`
-	ISummary    *ISummary
-	IBlock      string `xml:"itunes:block,omitempty"`
-	IImage      *IImage
-	IDuration   string  `xml:"itunes:duration,omitempty"`
-	IExplicit   string  `xml:"itunes:explicit,omitempty"`
-	IComplete   string  `xml:"itunes:complete,omitempty"`
-	INewFeedURL string  `xml:"itunes:new-feed-url,omitempty"`
-	IOwner      *Author // Author is formatted for itunes as-is
-	ICategories []*ICategory
-	// ADDED
-	ITitle string `xml:"itunes:title,omitempty"`
-	IType  string `xml:"itunes:type,omitempty"`
+		// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
+		IAuthor     string `xml:"itunes:author,omitempty"`
+		ISubtitle   string `xml:"itunes:subtitle,omitempty"`
+		ISummary    *ISummary
+		IBlock      string `xml:"itunes:block,omitempty"`
+		IImage      *IImage
+		IDuration   string  `xml:"itunes:duration,omitempty"`
+		IExplicit   string  `xml:"itunes:explicit,omitempty"`
+		IComplete   string  `xml:"itunes:complete,omitempty"`
+		INewFeedURL string  `xml:"itunes:new-feed-url,omitempty"`
+		IOwner      *Author // Author is formatted for itunes as-is
+		ICategories []*ICategory
+		// ADDED
+		ITitle string `xml:"itunes:title,omitempty"`
+		IType  string `xml:"itunes:type,omitempty"`
 
-	Items []*Item
+		Items []*Item
 
-	encode func(w io.Writer, o interface{}) error
-}
+		encode func(w io.Writer, o interface{}) error
+	}
 
-// New instantiates a Podcast with required parameters.
+	channelWrapper struct {
+		XMLName  xml.Name `xml:"rss"`
+		Version  string   `xml:"version,attr"`
+		ATOMNS   string   `xml:"xmlns:atom,attr,omitempty"`
+		ITUNESNS string   `xml:"xmlns:itunes,attr"`
+		Channel  *Channel
+	}
+)
+
+// New instantiates a podcast with required parameters.
 //
 // Nil-able fields are optional but recommended as they are formatted
 // to the expected proper formats.
-func New(title, link, description string,
-	pubDate, lastBuildDate *time.Time) Podcast {
-	return Podcast{
+func New(title, link, description string, pubDate, lastBuildDate *time.Time) Channel {
+	return Channel{
 		Title:         title,
 		ITitle:        title,
 		Link:          link,
 		Description:   description,
-		Generator:     fmt.Sprintf("podops v%s (github.com/podops/podops)", pVersion),
+		Generator:     generatorVersion,
 		PubDate:       parseDateRFC1123Z(pubDate),
 		LastBuildDate: parseDateRFC1123Z(lastBuildDate),
-		Language:      "en-us",
+		Language:      "en",
 
 		// setup dependency (could inject later)
 		encode: encoder,
@@ -83,7 +91,7 @@ func New(title, link, description string,
 }
 
 // AddAuthor adds the specified Author to the podcast.
-func (p *Podcast) AddAuthor(name, email string) {
+func (p *Channel) AddAuthor(name, email string) {
 	if len(email) == 0 {
 		return
 	}
@@ -95,7 +103,7 @@ func (p *Podcast) AddAuthor(name, email string) {
 }
 
 // AddAtomLink adds a FQDN reference to an atom feed.
-func (p *Podcast) AddAtomLink(href string) {
+func (p *Channel) AddAtomLink(href string) {
 	if len(href) == 0 {
 		return
 	}
@@ -106,7 +114,7 @@ func (p *Podcast) AddAtomLink(href string) {
 	}
 }
 
-// AddCategory adds the category to the Podcast.
+// AddCategory adds the category to the podcast.
 //
 // ICategory can be listed multiple times.
 //
@@ -114,77 +122,9 @@ func (p *Podcast) AddAtomLink(href string) {
 // list, if any, including ICategory.
 //
 // Note that Apple iTunes has a specific list of categories that only can be
-// used and will invalidate the feed if deviated from the list.  That list is
-// as follows.
+// used and will invalidate the feed if deviated from the list.
 //
-//   * Arts
-//     * Design
-//     * Fashion & Beauty
-//     * Food
-//     * Literature
-//     * Performing Arts
-//     * Visual Arts
-//   * Business
-//     * Business News
-//     * Careers
-//     * Investing
-//     * Management & Marketing
-//     * Shopping
-//   * Comedy
-//   * Education
-//     * Education Technology
-//     * Higher Education
-//     * K-12
-//     * Language Courses
-//     * Training
-//   * Games & Hobbies
-//     * Automotive
-//     * Aviation
-//     * Hobbies
-//     * Other Games
-//     * Video Games
-//   * Government & Organizations
-//     * Local
-//     * National
-//     * Non-Profit
-//     * Regional
-//   * Health
-//     * Alternative Health
-//     * Fitness & Nutrition
-//     * Self-Help
-//     * Sexuality
-//   * Kids & Family
-//   * Music
-//   * News & Politics
-//   * Religion & Spirituality
-//     * Buddhism
-//     * Christianity
-//     * Hinduism
-//     * Islam
-//     * Judaism
-//     * Other
-//     * Spirituality
-//   * Science & Medicine
-//     * Medicine
-//     * Natural Sciences
-//     * Social Sciences
-//   * Society & Culture
-//     * History
-//     * Personal Journals
-//     * Philosophy
-//     * Places & Travel
-//   * Sports & Recreation
-//     * Amateur
-//     * College & High School
-//     * Outdoor
-//     * Professional
-//   * Technology
-//     * Gadgets
-//     * Podcasting
-//     * Software How-To
-//     * Tech News
-//   * TV & Film
-func (p *Podcast) AddCategory(category string, subCategories []string) {
+func (p *Channel) AddCategory(category string, subCategories []string) {
 	if len(category) == 0 {
 		return
 	}
@@ -215,7 +155,7 @@ func (p *Podcast) AddCategory(category string, subCategories []string) {
 // extensions (.jpg, .png), and in the RGB colorspace. To optimize
 // images for mobile devices, Apple recommends compressing your
 // image files.
-func (p *Podcast) AddImage(url string) {
+func (p *Channel) AddImage(url string) {
 	if len(url) == 0 {
 		return
 	}
@@ -268,7 +208,7 @@ func (p *Podcast) AddImage(url string) {
 //   * For specifications of itunes tags, see:
 //     https://help.apple.com/itc/podcasts_connect/#/itcb54353390
 //
-func (p *Podcast) AddItem(i *Item) (int, error) {
+func (p *Channel) AddItem(i *Item) (int, error) {
 	// initial guards for required fields
 	if len(i.Title) == 0 || len(i.Description) == 0 {
 		return len(p.Items), errors.New("Title and Description are required")
@@ -288,7 +228,7 @@ func (p *Podcast) AddItem(i *Item) (int, error) {
 	}
 
 	// corrective actions and overrides
-	//
+
 	i.PubDateFormatted = parseDateRFC1123Z(i.PubDate)
 	i.AuthorFormatted = parseAuthorNameEmail(i.Author)
 	if i.Enclosure != nil {
@@ -312,7 +252,7 @@ func (p *Podcast) AddItem(i *Item) (int, error) {
 	}
 
 	// iTunes it
-	//
+
 	if len(i.IAuthor) == 0 {
 		switch {
 		case i.Author != nil:
@@ -338,14 +278,14 @@ func (p *Podcast) AddItem(i *Item) (int, error) {
 // AddPubDate adds the datetime as a parsed PubDate.
 //
 // UTC time is used by default.
-func (p *Podcast) AddPubDate(datetime *time.Time) {
+func (p *Channel) AddPubDate(datetime *time.Time) {
 	p.PubDate = parseDateRFC1123Z(datetime)
 }
 
 // AddLastBuildDate adds the datetime as a parsed PubDate.
 //
 // UTC time is used by default.
-func (p *Podcast) AddLastBuildDate(datetime *time.Time) {
+func (p *Channel) AddLastBuildDate(datetime *time.Time) {
 	p.LastBuildDate = parseDateRFC1123Z(datetime)
 }
 
@@ -354,7 +294,7 @@ func (p *Podcast) AddLastBuildDate(datetime *time.Time) {
 //
 // Note that this field should be just a few words long according to Apple.
 // This method will truncate the string to 64 chars if too long with "..."
-func (p *Podcast) AddSubTitle(subTitle string) {
+func (p *Channel) AddSubTitle(subTitle string) {
 	count := utf8.RuneCountInString(subTitle)
 	if count == 0 {
 		return
@@ -372,7 +312,7 @@ func (p *Podcast) AddSubTitle(subTitle string) {
 //
 // Note that this field is a CDATA encoded field which allows for rich text
 // such as html links: `<a href="http://www.apple.com">Apple</a>`.
-func (p *Podcast) AddSummary(summary string) {
+func (p *Channel) AddSummary(summary string) {
 	count := utf8.RuneCountInString(summary)
 	if count == 0 {
 		return
@@ -387,21 +327,21 @@ func (p *Podcast) AddSummary(summary string) {
 }
 
 // Bytes returns an encoded []byte slice.
-func (p *Podcast) Bytes() []byte {
+func (p *Channel) Bytes() []byte {
 	return []byte(p.String())
 }
 
 // Encode writes the bytes to the io.Writer stream in RSS 2.0 specification.
-func (p *Podcast) Encode(w io.Writer) error {
+func (p *Channel) Encode(w io.Writer) error {
 	if _, err := w.Write([]byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")); err != nil {
-		return errors.Wrap(err, "podcast.Encode: w.Write return error")
+		return errors.Wrap(err, "Channel.Encode: w.Write return error")
 	}
 
 	atomLink := ""
 	if p.AtomLink != nil {
 		atomLink = "http://www.w3.org/2005/Atom"
 	}
-	wrapped := podcastWrapper{
+	wrapped := channelWrapper{
 		ITUNESNS: "http://www.itunes.com/dtds/podcast-1.0.dtd",
 		ATOMNS:   atomLink,
 		Version:  "2.0",
@@ -411,48 +351,10 @@ func (p *Podcast) Encode(w io.Writer) error {
 }
 
 // String encodes the Podcast state to a string.
-func (p *Podcast) String() string {
+func (p *Channel) String() string {
 	b := new(bytes.Buffer)
 	if err := p.Encode(b); err != nil {
-		return "String: podcast.write returned the error: " + err.Error()
+		return "String: channel.write returned the error: " + err.Error()
 	}
 	return b.String()
-}
-
-// // Write implements the io.Writer interface to write an RSS 2.0 stream
-// // that is compliant to the RSS 2.0 specification.
-// func (p *Podcast) Write(b []byte) (n int, err error) {
-// 	buf := bytes.NewBuffer(b)
-// 	if err := p.Encode(buf); err != nil {
-// 		return 0, errors.Wrap(err, "Write: podcast.encode returned error")
-// 	}
-// 	return buf.Len(), nil
-// }
-
-type podcastWrapper struct {
-	XMLName  xml.Name `xml:"rss"`
-	Version  string   `xml:"version,attr"`
-	ATOMNS   string   `xml:"xmlns:atom,attr,omitempty"`
-	ITUNESNS string   `xml:"xmlns:itunes,attr"`
-	Channel  *Podcast
-}
-
-var encoder = func(w io.Writer, o interface{}) error {
-	e := xml.NewEncoder(w)
-	e.Indent("", "  ")
-	if err := e.Encode(o); err != nil {
-		return errors.Wrap(err, "podcast.encoder: e.Encode returned error")
-	}
-	return nil
-}
-
-var parseAuthorNameEmail = func(a *Author) string {
-	var author string
-	if a != nil {
-		author = a.Email
-		if len(a.Name) > 0 {
-			author = fmt.Sprintf("%s (%s)", a.Email, a.Name)
-		}
-	}
-	return author
 }

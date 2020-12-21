@@ -4,28 +4,28 @@ import (
 	"errors"
 	"time"
 
-	"github.com/podops/podops/pkg/feed"
+	"github.com/podops/podops/internal/rss"
 )
 
-var mediaTypeMap map[string]feed.EnclosureType
+var mediaTypeMap map[string]rss.EnclosureType
 
 func init() {
-	mediaTypeMap = make(map[string]feed.EnclosureType)
-	mediaTypeMap["audio/x-m4a"] = feed.M4A
-	mediaTypeMap["video/x-m4v"] = feed.M4V
-	mediaTypeMap["video/mp4"] = feed.MP4
-	mediaTypeMap["audio/mpeg"] = feed.MP3
-	mediaTypeMap["video/quicktime"] = feed.MOV
-	mediaTypeMap["application/pdf"] = feed.PDF
-	mediaTypeMap["document/x-epub"] = feed.EPUB
+	mediaTypeMap = make(map[string]rss.EnclosureType)
+	mediaTypeMap["audio/x-m4a"] = rss.M4A
+	mediaTypeMap["video/x-m4v"] = rss.M4V
+	mediaTypeMap["video/mp4"] = rss.MP4
+	mediaTypeMap["audio/mpeg"] = rss.MP3
+	mediaTypeMap["video/quicktime"] = rss.MOV
+	mediaTypeMap["application/pdf"] = rss.PDF
+	mediaTypeMap["document/x-epub"] = rss.EPUB
 }
 
 // Podcast transforms Show metadata into a podcast feed struct
-func (s *Show) Podcast() (*feed.Podcast, error) {
+func (s *Show) Podcast() (*rss.Channel, error) {
 	now := time.Now()
 
 	// basics
-	pf := feed.New(s.Description.Title, s.Description.Link.URI, s.Description.Summary, &now, &now)
+	pf := rss.New(s.Description.Title, s.Description.Link.URI, s.Description.Summary, &now, &now)
 	// details
 	pf.AddSummary(s.Description.Summary)
 	if s.Description.Author == "" {
@@ -35,7 +35,7 @@ func (s *Show) Podcast() (*feed.Podcast, error) {
 	}
 	pf.AddCategory(s.Description.Category.Name, s.Description.Category.SubCategory)
 	pf.AddImage(s.Image.URI)
-	pf.IOwner = &feed.Author{
+	pf.IOwner = &rss.Author{
 		Name:  s.Description.Owner.Name,
 		Email: s.Description.Owner.Email,
 	}
@@ -69,14 +69,14 @@ func (s *Show) Podcast() (*feed.Podcast, error) {
 //	complete:	Yes OPTIONAL 'channel.itunes.complete' Anything else than 'Yes' has no effect
 
 // Item returns the episode struct needed for a podcast feed struct
-func (e *Episode) Item() (*feed.Item, error) {
+func (e *Episode) Item() (*rss.Item, error) {
 
 	pubDate, err := time.Parse(time.RFC1123Z, e.Metadata.Labels[LabelDate])
 	if err != nil {
 		return nil, err
 	}
 
-	ef := &feed.Item{
+	ef := &rss.Item{
 		Title:       e.Description.Title,
 		Description: e.Description.Summary,
 	}

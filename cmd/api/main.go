@@ -55,7 +55,7 @@ func main() {
 
 	// API endpoints with authentication
 	apiEndpoints := svc.SecureGroup(api.NamespacePrefix, jwt.MiddlewareFunc())
-	apiEndpoints.POST(api.NewShowEndpointURI, "api.create", api.NewShowEndpoint)
+	apiEndpoints.POST(api.NewShowRoute, "api.create", api.NewShowEndpoint)
 
 	// add CORS handler, allowing all. See https://github.com/gin-contrib/cors
 	svc.Use(cors.Default())

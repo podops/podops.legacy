@@ -6,5 +6,7 @@ const (
 	// NamespacePrefix namespace for the CLI. Should not be used directly.
 	NamespacePrefix = "/a/v1"
 
-	NewShowEndpointURI = "/new"
+	// All the API endpoint routes
+
+	NewShowRoute = "/new"
 )

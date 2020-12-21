@@ -1,6 +1,8 @@
-package feed
+package rss
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+)
 
 // AtomLink represents the Atom reference link.
 type AtomLink struct {
