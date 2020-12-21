@@ -38,6 +38,7 @@ cloud.google.com/go/storage v1.0.0/go.mod h1:IhtSnM/ZTZV8YYJWCY8RULGVqBDmpoyjwiy
 cloud.google.com/go/storage v1.5.0/go.mod h1:tpKbwo567HUNpVclU5sGELwQWBDZ8gh0ZeosJ0Rtdos=
 cloud.google.com/go/storage v1.6.0/go.mod h1:N7U0C8pVQ/+NIKOBQyamJIeKQKkZ+mxpohlUTyfDhBk=
 cloud.google.com/go/storage v1.8.0/go.mod h1:Wv1Oy7z6Yz3DshWRJFhqM/UCfaWIRTdp0RXyy7KQOVs=
+cloud.google.com/go/storage v1.10.0 h1:STgFzyU5/8miMl0//zKh2aQeTyeaUH3WN9bSUiJ09bA=
 cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9ullr3+Kg0=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
@@ -136,8 +137,10 @@ github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.4 h1:L8R9j+yAqZuZjsqh/z+F1NCffTKKLShY6zXTItVIZ8M=
 github.com/google/go-cmp v0.5.4/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
+github.com/google/martian v2.1.0+incompatible h1:/CP5g8u/VJHijgedC/Legn3BAbAaWPgecwXBIDzw5no=
 github.com/google/martian v2.1.0+incompatible/go.mod h1:9I4somxYTbIHy5NJKHRl3wXiIaQGbYVAs8BPL6v8lEs=
 github.com/google/martian/v3 v3.0.0/go.mod h1:y5Zk1BBys9G+gd6Jrk0W3cC1+ELVxBWuIGO+w/tUAp0=
+github.com/google/martian/v3 v3.1.0 h1:wCKgOCHuUEVfsaQLpPSJb7VdYCdTVZQAuOdYm1yc/60=
 github.com/google/martian/v3 v3.1.0/go.mod h1:y5Zk1BBys9G+gd6Jrk0W3cC1+ELVxBWuIGO+w/tUAp0=
 github.com/google/pprof v0.0.0-20181206194817-3ea8567a2e57/go.mod h1:zfwlbNMJ+OItoe0UupaVj+oy1omPYYDuagoSzA8v9mc=
 github.com/google/pprof v0.0.0-20190515194954-54271f7e092f/go.mod h1:zfwlbNMJ+OItoe0UupaVj+oy1omPYYDuagoSzA8v9mc=
@@ -234,8 +237,8 @@ github.com/txsvc/platform v0.11.0 h1:T5kaDjH5pNUG6f/HoOGdqecu5KIFOkRI4RHbd0ai1Co
 github.com/txsvc/platform v0.11.0/go.mod h1:p8JY9FYNSJdMvV0n5bpn0GV/O1PJyZncsZO/k38VC38=
 github.com/txsvc/platform v0.12.1 h1:1jhBeNfQ0G8IkJaGhY3kV1XgGcWdAnKVSm0iRiYkah8=
 github.com/txsvc/platform v0.12.1/go.mod h1:WuVb5sdgQGVGTK/KOvOv/8rSZXbj47XNDu+YrIzum/Q=
-github.com/txsvc/service v0.11.1 h1:ZcMIJc8KEK8STDUn01mgkNvyoXjcAHd4tNP6wijFj3g=
-github.com/txsvc/service v0.11.1/go.mod h1:Hz2/U4h9iYXwS03jvs1FaThwqDyC157lhHEr3VjNFkg=
+github.com/txsvc/service v0.12.2 h1:mESuPda+1DTZCs4V6Kwqy6ZGYu2sQsGTsdVUg/3yNO0=
+github.com/txsvc/service v0.12.2/go.mod h1:SgRBZP4B+t8+Z3JBzeRAeIBn5HJIccY60AAM9eFrCtc=
 github.com/ugorji/go v1.1.7/go.mod h1:kZn38zHttfInRq0xu/PH0az30d+z6vm202qpg1oXVMw=
 github.com/ugorji/go v1.2.1 h1:dz+JxTe7GZQdErTo7SREc1jQj/hFP1k7jyIAwODoW+k=
 github.com/ugorji/go v1.2.1/go.mod h1:cSVypSfTLm2o9fKxXvQgn3rMmkPXovcWor6Qn5tbFmI=

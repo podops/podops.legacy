@@ -14,7 +14,8 @@ func AuthCommand(c *cli.Context) error {
 	if token != "" {
 		// FIXME: validate the token first
 		DefaultValuesCLI.Token = token
-		StoreDefaultValues()
+
+		StoreConfig()
 
 		fmt.Println("\nAuthentication successful")
 	}
@@ -29,11 +30,9 @@ func LogoutCommand(c *cli.Context) error {
 		Token:           "",
 		ClientID:        "",
 		DefaultShow:     "",
-		ShowTitle:       "",
-		ShowSummary:     "",
 	}
 	DefaultValuesCLI = df
-	StoreDefaultValues()
+	StoreConfig()
 
 	fmt.Println("\nLogout successful")
 	return nil

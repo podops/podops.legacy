@@ -33,7 +33,7 @@ var endpoint string = "https://api.podops.dev"
 func main() {
 
 	// load presets
-	cl.LoadOrCreateDefaultValues()
+	cl.LoadOrCreateConfig()
 
 	// initialize CLI
 	app := &cli.App{
@@ -170,14 +170,14 @@ func setupCommands() []cli.Command {
 func newShowFlags() []cli.Flag {
 	f := []cli.Flag{
 		&cli.StringFlag{
-			Name:        "title",
-			Usage:       "Show title",
-			Destination: &cl.DefaultValuesCLI.ShowTitle,
+			Name:  "title",
+			Usage: "Show title",
+			//Destination: &cl.DefaultValuesCLI.ShowTitle,
 		},
 		&cli.StringFlag{
-			Name:        "summary",
-			Usage:       "Show summary",
-			Destination: &cl.DefaultValuesCLI.ShowSummary,
+			Name:  "summary",
+			Usage: "Show summary",
+			//Destination: &cl.DefaultValuesCLI.ShowSummary,
 		},
 	}
 	return f

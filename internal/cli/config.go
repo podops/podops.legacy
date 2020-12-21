@@ -21,8 +21,6 @@ type (
 		Token           string `json:"token"`
 		ClientID        string `json:"client_id"`
 		DefaultShow     string `json:"show"`
-		ShowTitle       string `json:"title"`
-		ShowSummary     string `json:"summary"`
 	}
 )
 
@@ -58,10 +56,10 @@ func DefaultShow() string {
 	return DefaultValuesCLI.DefaultShow
 }
 
-// LoadOrCreateDefaultValues initializes the default settings
-func LoadOrCreateDefaultValues() {
+// LoadOrCreateConfig initializes the default settings
+func LoadOrCreateConfig() {
 	if _, err := os.Stat(presetNameAndPath); os.IsNotExist(err) {
-		StoreDefaultValues()
+		StoreConfig()
 	} else {
 		jsonFile, err := os.Open(presetNameAndPath)
 		if err != nil {
@@ -74,8 +72,8 @@ func LoadOrCreateDefaultValues() {
 	}
 }
 
-// StoreDefaultValues persists the current values
-func StoreDefaultValues() {
+// StoreConfig persists the current values
+func StoreConfig() {
 	defaults, _ := json.Marshal(DefaultValuesCLI)
 	ioutil.WriteFile(presetNameAndPath, defaults, 0644)
 }

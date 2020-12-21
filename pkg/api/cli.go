@@ -12,8 +12,8 @@ import (
 	"github.com/podops/podops/internal/cli"
 )
 
-// CreateNewShowEndpoint creates an new show
-func CreateNewShowEndpoint(c *gin.Context) {
+// NewShowEndpoint creates an new show and does all the background setup
+func NewShowEndpoint(c *gin.Context) {
 	var req cli.NewShowRequest
 
 	err := c.BindJSON(&req)
@@ -23,8 +23,10 @@ func CreateNewShowEndpoint(c *gin.Context) {
 	}
 
 	// create a show
-	showName := strings.ToLower(strings.TrimSpace(req.Name))
+	showName := strings.ToLower(strings.TrimSpace(req.Name)) // FIXME: verify && cleanup the name. Should follow Domain name conventions.
 	guid, _ := util.ShortUUID()
+
+	// # FIXME create the actual setup
 
 	// just send the ID back
 	resp := cli.NewShowResponse{

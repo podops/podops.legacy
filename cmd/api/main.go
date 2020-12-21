@@ -40,7 +40,7 @@ func main() {
 	secret := env.GetString("MASTER_KEY", "supersecretsecret")
 
 	// create the JWT middleware
-	a, err := auth.GetSecureJWTMiddleware(env.GetString("REALM", "podops"), secret)
+	jwt, err := auth.GetSecureJWTMiddleware(env.GetString("REALM", "podops"), secret)
 	if err != nil {
 		log.Fatal("JWT Error:" + err.Error())
 	}
@@ -49,12 +49,13 @@ func main() {
 	svc.GET("/", svc.NullEndpoint)
 
 	// Admin Endpoints
-	admin := svc.Group("/_a")
-	admin.POST("/token", api.CreateJWTAuthorizationEndpoint)
+	admin := svc.Group(api.AdminNamespacePrefix)
+	admin.POST("/token", auth.CreateJWTAuthorizationEndpoint)
+	admin.GET("/token", auth.ValidateJWTAuthorizationEndpoint)
 
 	// API endpoints with authentication
-	apiEndpoints := svc.SecureGroup(svc.NamespacePrefix, a.MiddlewareFunc())
-	apiEndpoints.POST("/cli/new", "api.create", api.CreateNewShowEndpoint)
+	apiEndpoints := svc.SecureGroup(api.NamespacePrefix, jwt.MiddlewareFunc())
+	apiEndpoints.POST(api.NewShowEndpointURI, "api.create", api.NewShowEndpoint)
 
 	// add CORS handler, allowing all. See https://github.com/gin-contrib/cors
 	svc.Use(cors.Default())
