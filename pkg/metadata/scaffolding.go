@@ -52,7 +52,7 @@ func DefaultEpisodeMetadata(guid, parentGUID string) map[string]string {
 
 // DefaultShow creates a default show struc
 func DefaultShow(name, title, summary, guid string) *Show {
-	show := &Show{
+	return &Show{
 		APIVersion: "v1",
 		Kind:       "show",
 		Metadata: Metadata{
@@ -83,14 +83,12 @@ func DefaultShow(name, title, summary, guid string) *Show {
 			Rel: "external",
 		},
 	}
-
-	return show
 }
 
 // DefaultEpisode creates a default episode struc
 func DefaultEpisode(name, episodeName, guid, parentGUID string) *Episode {
 
-	episode := &Episode{
+	return &Episode{
 		APIVersion: "v1",
 		Kind:       "episode",
 		Metadata: Metadata{
@@ -104,7 +102,7 @@ func DefaultEpisode(name, episodeName, guid, parentGUID string) *Episode {
 			Link: Resource{
 				URI: fmt.Sprintf("%s/s/%s/%s", DefaultPortalEndpoint, name, episodeName),
 			},
-			Duration: 0,
+			Duration: 1, // Seconds. Must not be 0, otherwise a validation error occurs.
 		},
 		Image: Resource{
 			URI: fmt.Sprintf("%s/%s/%s/coverart.png", DefaultCDNEndpoint, name, guid),
@@ -114,9 +112,7 @@ func DefaultEpisode(name, episodeName, guid, parentGUID string) *Episode {
 			URI:  fmt.Sprintf("%s/%s/%s/%s.mp3", DefaultCDNEndpoint, name, guid, episodeName),
 			Type: "audio/mpeg",
 			Rel:  "external",
-			Size: 0,
+			Size: 0, // bytes
 		},
 	}
-
-	return episode
 }
