@@ -31,7 +31,7 @@ type (
 
 // NewShowCommand requests a new show
 func NewShowCommand(c *cli.Context) error {
-	if !IsAuthorized() {
+	if !client.IsAuthorized() {
 		return fmt.Errorf("Not authorized. Use 'po auth' first")
 	}
 
@@ -52,7 +52,7 @@ func NewShowCommand(c *cli.Context) error {
 	}
 
 	resp := NewShowResponse{}
-	status, err := Post(NewShowRoute, Token(), &req, &resp)
+	status, err := client.Post(NewShowRoute, &req, &resp)
 	if err != nil {
 		PrintError(c, NewShowRoute, status, err)
 		return nil
@@ -78,9 +78,9 @@ func NewShowCommand(c *cli.Context) error {
 	fmt.Printf("--- show dump:\n\n%s\n\n", string(showDoc))
 	fmt.Printf("--- episode dump:\n\n%s\n\n", string(episodeDoc))
 
-	// update the config
-	DefaultValuesCLI.ShowID = resp.GUID
-	StoreConfig()
+	// update the client
+	client.GUID = resp.GUID
+	client.Store(presetsNameAndPath)
 
 	return nil
 }

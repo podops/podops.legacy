@@ -3,8 +3,11 @@ package cli
 // https://github.com/urfave/cli/blob/master/docs/v2/manual.md
 
 import (
+	"context"
 	"fmt"
+	"os"
 
+	"github.com/podops/podops/podcast"
 	"github.com/urfave/cli"
 )
 
@@ -13,9 +16,8 @@ func AuthCommand(c *cli.Context) error {
 	token := c.Args().First()
 	if token != "" {
 		// FIXME: validate the token first
-		DefaultValuesCLI.Token = token
-
-		StoreConfig()
+		client.Token = token
+		client.Store(presetsNameAndPath)
 
 		fmt.Println("\nAuthentication successful")
 	}
@@ -25,14 +27,16 @@ func AuthCommand(c *cli.Context) error {
 
 // LogoutCommand clears all session information
 func LogoutCommand(c *cli.Context) error {
-	df := &DefaultValues{
-		ServiceEndpoint: DefaultServiceEndpoint,
-		Token:           "",
-		ClientID:        "",
-		ShowID:          "",
+
+	err := os.Remove(presetsNameAndPath)
+	if err != nil {
+		return err
 	}
-	DefaultValuesCLI = df
-	StoreConfig()
+
+	client, err = podcast.NewClientFromFile(context.Background(), presetsNameAndPath)
+	if err != nil {
+		return err
+	}
 
 	fmt.Println("\nLogout successful")
 	return nil

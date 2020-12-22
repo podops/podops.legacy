@@ -15,7 +15,7 @@ import (
 
 // CreateCommand creates a resource from a file, directory or URL
 func CreateCommand(c *cli.Context) error {
-	if !IsAuthorized() {
+	if !client.IsAuthorized() {
 		return fmt.Errorf("Not authorized. Use 'po auth' first")
 	}
 
@@ -54,8 +54,8 @@ func CreateCommand(c *cli.Context) error {
 		}
 
 		resp := errors.StatusObject{}
-		route := fmt.Sprintf("/create/%s/show?force=%v", ShowID(), flagForce)
-		status, err := Post(route, Token(), &show, &resp)
+		route := fmt.Sprintf("/create/%s/show?force=%v", client.GUID, flagForce)
+		status, err := client.Post(route, &show, &resp)
 		if err != nil {
 			PrintError(c, route, status, err)
 			return nil
@@ -75,8 +75,8 @@ func CreateCommand(c *cli.Context) error {
 		}
 
 		resp := errors.StatusObject{}
-		route := fmt.Sprintf("/create/%s/episode?force=%v", ShowID(), flagForce)
-		status, err := Post(route, Token(), &episode, &resp)
+		route := fmt.Sprintf("/create/%s/episode?force=%v", client.GUID, flagForce)
+		status, err := client.Post(route, &episode, &resp)
 		if err != nil {
 			PrintError(c, route, status, err)
 			return nil

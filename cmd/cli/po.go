@@ -18,12 +18,7 @@ It also includes administrative commands for managing your live podcasts.
 
 To see the full list of commands supported, run 'po help'`
 
-var endpoint string = "https://api.podops.dev"
-
 func main() {
-
-	// load presets
-	cl.LoadOrCreateConfig()
 
 	// initialize CLI
 	app := &cli.App{
@@ -35,7 +30,7 @@ func main() {
 			fmt.Println(helpText)
 			return nil
 		},
-		Flags:    globalFlags(),
+		//Flags:    globalFlags(),
 		Commands: setupCommands(),
 	}
 
@@ -139,18 +134,6 @@ func setupCommands() []cli.Command {
 		},
 	}
 	return c
-}
-
-func globalFlags() []cli.Flag {
-	f := []cli.Flag{
-		&cli.StringFlag{
-			Name:        "url",
-			Value:       cl.DefaultServiceEndpoint,
-			Usage:       "set the service endpoint",
-			Destination: &cl.DefaultValuesCLI.ServiceEndpoint,
-		},
-	}
-	return f
 }
 
 func newShowFlags() []cli.Flag {
