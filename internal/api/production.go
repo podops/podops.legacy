@@ -11,13 +11,27 @@ import (
 	"github.com/podops/podops/internal/errors"
 	"github.com/podops/podops/pkg/metadata"
 
-	"github.com/podops/podops/internal/cli"
 	"github.com/podops/podops/internal/production"
 )
 
-// NewShowEndpoint creates an new show and does all the background setup
-func NewShowEndpoint(c *gin.Context) {
-	var req cli.NewShowRequest
+type (
+	// ProductionRequest defines the request
+	ProductionRequest struct {
+		Name    string `json:"name" binding:"required"`
+		Title   string `json:"title" binding:"required"`
+		Summary string `json:"summary" binding:"required"`
+	}
+
+	// ProductionResponse defines the request
+	ProductionResponse struct {
+		Name string `json:"name" binding:"required"`
+		GUID string `json:"guid" binding:"required"`
+	}
+)
+
+// CreateProductionEndpoint creates an new show and does all the background setup
+func CreateProductionEndpoint(c *gin.Context) {
+	var req ProductionRequest
 
 	err := c.BindJSON(&req)
 	if err != nil {
@@ -35,8 +49,8 @@ func NewShowEndpoint(c *gin.Context) {
 	}
 
 	// just send the GUID and canonical name back
-	resp := cli.NewShowResponse{
-		Name: showName,
+	resp := ProductionResponse{
+		Name: p.Name,
 		GUID: p.GUID,
 	}
 	StandardResponse(c, http.StatusCreated, &resp)

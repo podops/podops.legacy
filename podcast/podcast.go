@@ -19,6 +19,15 @@ const (
 
 	// DefaultServiceEndpoint is the service URL
 	DefaultServiceEndpoint = "https://api.podops.dev/a/v1"
+
+	// All the API & CLI endpoint routes
+
+	// NewShowRoute creates a new production
+	NewShowRoute = "/new"
+	// CreateRoute creates a resource
+	CreateRoute = "/create/:id/:rsrc"
+	// UpdateRoute updates a resource
+	UpdateRoute = "/update/:id/:rsrc"
 )
 
 // Client is a client for interacting with the PodOps service.
@@ -117,7 +126,6 @@ func (cl *Client) Post(cmd string, request, response interface{}) (int, error) {
 
 	// anything other than OK, Created, Accepted, No Content is treated as an error
 	if resp.StatusCode > http.StatusNoContent {
-
 		return resp.StatusCode, errors.New(fmt.Sprintf("Status %d", resp.StatusCode), resp.StatusCode)
 	}
 
@@ -129,5 +137,5 @@ func (cl *Client) Post(cmd string, request, response interface{}) (int, error) {
 		return http.StatusInternalServerError, err
 	}
 
-	return resp.StatusCode, err
+	return resp.StatusCode, nil
 }

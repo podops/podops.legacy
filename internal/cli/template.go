@@ -5,7 +5,6 @@ package cli
 import (
 	"fmt"
 	"io/ioutil"
-	"net/http"
 
 	"github.com/txsvc/commons/pkg/util"
 	"github.com/urfave/cli"
@@ -41,7 +40,7 @@ func TemplateCommand(c *cli.Context) error {
 		show := metadata.DefaultShow(name, "Podcast Title", "Podcast summary describing the podcast", guid)
 		showDoc, err := yaml.Marshal(&show)
 		if err != nil {
-			PrintError(c, NewShowRoute, http.StatusInternalServerError, err)
+			PrintError(c, err)
 			return nil
 		}
 
@@ -52,7 +51,7 @@ func TemplateCommand(c *cli.Context) error {
 		episode := metadata.DefaultEpisode(parent, name, guid, parentGUID)
 		episodeDoc, err := yaml.Marshal(&episode)
 		if err != nil {
-			PrintError(c, NewShowRoute, http.StatusInternalServerError, err)
+			PrintError(c, err)
 			return nil
 		}
 

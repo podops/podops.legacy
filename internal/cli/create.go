@@ -55,9 +55,9 @@ func CreateCommand(c *cli.Context) error {
 
 		resp := errors.StatusObject{}
 		route := fmt.Sprintf("/create/%s/show?force=%v", client.GUID, flagForce)
-		status, err := client.Post(route, &show, &resp)
+		_, err := client.Post(route, &show, &resp)
 		if err != nil {
-			PrintError(c, route, status, err)
+			PrintError(c, err)
 			return nil
 		}
 
@@ -76,9 +76,9 @@ func CreateCommand(c *cli.Context) error {
 
 		resp := errors.StatusObject{}
 		route := fmt.Sprintf("/create/%s/episode?force=%v", client.GUID, flagForce)
-		status, err := client.Post(route, &episode, &resp)
+		_, err := client.Post(route, &episode, &resp)
 		if err != nil {
-			PrintError(c, route, status, err)
+			PrintError(c, err)
 			return nil
 		}
 

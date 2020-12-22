@@ -72,7 +72,7 @@ func setupCommands() []cli.Command {
 			Usage:     "Setup a new show",
 			UsageText: "new-show NAME",
 			Category:  cl.BasicCmdGroup,
-			Action:    cl.NewShowCommand,
+			Action:    cl.CreateProductionCommand,
 			Flags:     newShowFlags(),
 		},
 		{
