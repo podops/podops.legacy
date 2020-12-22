@@ -5,6 +5,7 @@ package cli
 import (
 	"fmt"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
@@ -51,24 +52,24 @@ func NewShowCommand(c *cli.Context) error {
 	}
 
 	resp := NewShowResponse{}
-	_, err := Post(NewShowRoute, Token(), &req, &resp)
+	status, err := Post(NewShowRoute, Token(), &req, &resp)
 	if err != nil {
-		PrintError(c, err)
-		return err
+		PrintError(c, NewShowRoute, status, err)
+		return nil
 	}
 
 	show := metadata.DefaultShow(resp.Name, title, summary, resp.GUID)
 	showDoc, err := yaml.Marshal(&show)
 	if err != nil {
-		PrintError(c, err)
-		return err
+		PrintError(c, NewShowRoute, http.StatusInternalServerError, err)
+		return nil
 	}
 
 	episode := metadata.DefaultEpisode(resp.Name, "episode1", resp.GUID)
 	episodeDoc, err := yaml.Marshal(&episode)
 	if err != nil {
-		PrintError(c, err)
-		return err
+		PrintError(c, NewShowRoute, http.StatusInternalServerError, err)
+		return nil
 	}
 
 	ioutil.WriteFile(fmt.Sprintf("show-%s.yaml", show.Metadata.Labels[m.LabelGUID]), showDoc, 0644)

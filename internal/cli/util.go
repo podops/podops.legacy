@@ -7,7 +7,9 @@ import (
 	"net/http"
 
 	"github.com/txsvc/commons/pkg/env"
-	"github.com/txsvc/commons/pkg/errors"
+	"github.com/urfave/cli"
+
+	"github.com/podops/podops/internal/errors"
 )
 
 var endpoint string = env.GetString("API_ENDPOINT", "https://api.podops.dev/a/v1")
@@ -32,13 +34,15 @@ func Post(cmd, token string, request, response interface{}) (int, error) {
 	// post the request to Slack
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
-
 	if err != nil {
 		return resp.StatusCode, err
 	}
-	if resp.StatusCode != http.StatusOK {
-		return resp.StatusCode, errors.New(fmt.Sprintf("API error: %s", resp.Status))
+
+	defer resp.Body.Close()
+
+	// anything other than OK, Created, Accepted, No Content is treated as an error
+	if resp.StatusCode > http.StatusNoContent {
+		return resp.StatusCode, errors.New(fmt.Sprintf("Status %d", resp.StatusCode), resp.StatusCode)
 	}
 
 	// unmarshal the response
@@ -53,4 +57,20 @@ func Post(cmd, token string, request, response interface{}) (int, error) {
 // IsAuthorized does a quick verification
 func IsAuthorized() bool {
 	return DefaultValuesCLI.Token != ""
+}
+
+// PrintError formats a CLI error and prints it
+func PrintError(c *cli.Context, operation string, status int, err error) {
+	msg := ""
+	switch status {
+	case http.StatusInternalServerError:
+		msg = fmt.Sprintf("Oops, something went wrong! [%s]", operation)
+		break
+	case http.StatusConflict:
+		msg = fmt.Sprintf("Could not create resource [%s]", operation)
+		break
+	default:
+		msg = err.Error()
+	}
+	fmt.Println(msg)
 }

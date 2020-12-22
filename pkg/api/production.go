@@ -27,10 +27,10 @@ func NewShowEndpoint(c *gin.Context) {
 	// create a show
 	showName := strings.ToLower(strings.TrimSpace(req.Name)) // FIXME: verify && cleanup the name. Should follow Domain name conventions.
 
-	p, status, err := production.CreateProduction(appengine.NewContext(c.Request), showName, req.Title, req.Summary)
+	p, err := production.CreateProduction(appengine.NewContext(c.Request), showName, req.Title, req.Summary)
 	if err != nil {
 		platform.ReportError(err)
-		StandardJSONResponse(c, status, nil, err)
+		ErrorResponse(c, err)
 		return
 	}
 
@@ -39,5 +39,5 @@ func NewShowEndpoint(c *gin.Context) {
 		Name: showName,
 		GUID: p.GUID,
 	}
-	StandardJSONResponse(c, status, &resp, nil)
+	StandardResponse(c, http.StatusCreated, &resp)
 }

@@ -7,9 +7,10 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	"github.com/txsvc/commons/pkg/errors"
 	"github.com/txsvc/commons/pkg/util"
 	"github.com/txsvc/platform/pkg/platform"
+
+	"github.com/podops/podops/internal/errors"
 )
 
 const (
@@ -35,14 +36,14 @@ type (
 )
 
 // CreateProduction initializes a new show and all its metadata
-func CreateProduction(ctx context.Context, name, title, summary string) (*Production, int, error) {
+func CreateProduction(ctx context.Context, name, title, summary string) (*Production, error) {
 
 	p, err := FindProductionByName(ctx, name)
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, errors.Wrap(err)
 	}
 	if p != nil {
-		return nil, http.StatusConflict, errors.New(fmt.Sprintf("Podcast with name '%s' already exists", name))
+		return nil, errors.New(fmt.Sprintf("Show with name '%s' already exists", name), http.StatusConflict)
 	}
 
 	guid, _ := util.ShortUUID()
@@ -60,7 +61,7 @@ func CreateProduction(ctx context.Context, name, title, summary string) (*Produc
 	k := productionKey(guid)
 	_, err = platform.DataStore().Put(ctx, k, p)
 
-	return p, http.StatusCreated, nil
+	return p, nil
 }
 
 // GetProduction returns a production based on the GUID

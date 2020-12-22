@@ -8,7 +8,7 @@ require (
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.6.3
 	github.com/pkg/errors v0.9.1
-	github.com/txsvc/commons v1.0.4
+	github.com/txsvc/commons v1.0.6
 	github.com/txsvc/platform v0.12.1
 	github.com/txsvc/service v0.12.2
 	github.com/urfave/cli v1.22.5
