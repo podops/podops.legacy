@@ -65,7 +65,7 @@ func NewShowCommand(c *cli.Context) error {
 		return nil
 	}
 
-	episode := metadata.DefaultEpisode(resp.Name, "episode1", resp.GUID)
+	episode := metadata.DefaultEpisode(resp.Name, "episode1", resp.GUID, resp.GUID)
 	episodeDoc, err := yaml.Marshal(&episode)
 	if err != nil {
 		PrintError(c, NewShowRoute, http.StatusInternalServerError, err)

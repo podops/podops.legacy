@@ -1,8 +1,14 @@
 package errors
 
 //
-// This is a copy of majordomusio/commons/pkg/error, with improvements.
+// This is a copy of txsvc/commons/pkg/error, with lots of changes and improvements.
 // Will be eventually backported.
+//
+//
+// References
+// https://www.digitalocean.com/community/tutorials/creating-custom-errors-in-go
+// https://dave.cheney.net/2016/04/27/dont-just-check-errors-handle-them-gracefully
+// https://godoc.org/github.com/pkg/errors
 //
 
 import (

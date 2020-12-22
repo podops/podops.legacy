@@ -3,8 +3,6 @@ package metadata
 import (
 	"fmt"
 	"time"
-
-	"github.com/txsvc/commons/pkg/util"
 )
 
 // DefaultShowMetadata creates a default set of labels etc for a Show resource
@@ -90,8 +88,7 @@ func DefaultShow(name, title, summary, guid string) *Show {
 }
 
 // DefaultEpisode creates a default episode struc
-func DefaultEpisode(name, episodeName, parentGUID string) *Episode {
-	guid, _ := util.ShortUUID()
+func DefaultEpisode(name, episodeName, guid, parentGUID string) *Episode {
 
 	episode := &Episode{
 		APIVersion: "v1",

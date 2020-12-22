@@ -54,7 +54,7 @@ func RedirectToStorageEndpoint(c *gin.Context) {
 
 	// FIXME: implement analytics here ...
 	target := redirectBase + c.Request.URL.Path
-	platform.Log(header)
+	platform.Log(header, nil)
 
 	// redirect to the CDN of Google's Cloud Storage
 	c.Redirect(http.StatusTemporaryRedirect, target)

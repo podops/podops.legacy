@@ -24,6 +24,7 @@ type (
 	}
 )
 
+// DefaultValuesCLI global struct with current config values
 var DefaultValuesCLI *DefaultValues
 
 func init() {
