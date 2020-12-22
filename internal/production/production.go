@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"cloud.google.com/go/datastore"
-	"gopkg.in/yaml.v2"
 
 	"github.com/txsvc/commons/pkg/util"
 	"github.com/txsvc/platform/pkg/platform"
@@ -73,41 +72,56 @@ func CreateProduction(ctx context.Context, name, title, summary string) (*Produc
 	}
 
 	// create a dummy Storage location for this production at production.podops.dev/guid
-	bkt := platform.Storage().Bucket(bucketProduction)
 
 	show := metadata.DefaultShow(name, title, summary, guid)
-	showDoc, err := yaml.Marshal(&show)
+	err = CreateResource(ctx, fmt.Sprintf("%s/show-%s.yaml", guid, guid), true, &show)
 	if err != nil {
 		platform.DataStore().Delete(ctx, k)
 		return nil, errors.Wrap(err)
 	}
 
-	showWriter := bkt.Object(fmt.Sprintf("%s/show-%s.yaml", guid, guid)).NewWriter(ctx)
-	if _, err := showWriter.Write(showDoc); err != nil {
-		platform.DataStore().Delete(ctx, k)
-		return nil, errors.Wrap(err)
-	}
-	if err := showWriter.Close(); err != nil {
-		platform.DataStore().Delete(ctx, k)
-		return nil, errors.Wrap(err)
-	}
+	/*
+		showDoc, err := yaml.Marshal(&show)
+		if err != nil {
+			platform.DataStore().Delete(ctx, k)
+			return nil, errors.Wrap(err)
+		}
+
+		showWriter := bkt.Object(fmt.Sprintf("%s/show-%s.yaml", guid, guid)).NewWriter(ctx)
+		if _, err := showWriter.Write(showDoc); err != nil {
+			platform.DataStore().Delete(ctx, k)
+			return nil, errors.Wrap(err)
+		}
+		if err := showWriter.Close(); err != nil {
+			platform.DataStore().Delete(ctx, k)
+			return nil, errors.Wrap(err)
+		}
+	*/
 
 	episode := metadata.DefaultEpisode(name, "episode1", guid, guid)
-	episodeDoc, err := yaml.Marshal(&episode)
+	err = CreateResource(ctx, fmt.Sprintf("%s/episode-%s.yaml", guid, guid), true, &episode)
 	if err != nil {
 		platform.DataStore().Delete(ctx, k)
 		return nil, errors.Wrap(err)
 	}
 
-	episodeWriter := bkt.Object(fmt.Sprintf("%s/episode-%s.yaml", guid, guid)).NewWriter(ctx)
-	if _, err := episodeWriter.Write(episodeDoc); err != nil {
-		platform.DataStore().Delete(ctx, k)
-		return nil, errors.Wrap(err)
-	}
-	if err := episodeWriter.Close(); err != nil {
-		platform.DataStore().Delete(ctx, k)
-		return nil, errors.Wrap(err)
-	}
+	/*
+		episodeDoc, err := yaml.Marshal(&episode)
+		if err != nil {
+			platform.DataStore().Delete(ctx, k)
+			return nil, errors.Wrap(err)
+		}
+
+		episodeWriter := bkt.Object(fmt.Sprintf("%s/episode-%s.yaml", guid, guid)).NewWriter(ctx)
+		if _, err := episodeWriter.Write(episodeDoc); err != nil {
+			platform.DataStore().Delete(ctx, k)
+			return nil, errors.Wrap(err)
+		}
+		if err := episodeWriter.Close(); err != nil {
+			platform.DataStore().Delete(ctx, k)
+			return nil, errors.Wrap(err)
+		}
+	*/
 
 	// all done
 	return p, nil

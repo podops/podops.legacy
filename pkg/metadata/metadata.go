@@ -57,6 +57,13 @@ type (
 		Labels map[string]string `json:"labels" yaml:"labels,omitempty"`      // REQUIRED
 	}
 
+	// BasicResource holds only metadata
+	BasicResource struct {
+		APIVersion string   `json:"apiVersion" yaml:"apiVersion" binding:"required"` // REQUIRED default: v1.0
+		Kind       string   `json:"kind" yaml:"kind" binding:"required"`             // REQUIRED default: show
+		Metadata   Metadata `json:"metadata" yaml:"metadata" binding:"required"`     // REQUIRED
+	}
+
 	// Show holds all metadata related to a podcast/show
 	Show struct {
 		APIVersion  string          `json:"apiVersion" yaml:"apiVersion" binding:"required"`   // REQUIRED default: v1.0

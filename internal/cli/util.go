@@ -42,8 +42,11 @@ func Post(cmd, token string, request, response interface{}) (int, error) {
 
 	// anything other than OK, Created, Accepted, No Content is treated as an error
 	if resp.StatusCode > http.StatusNoContent {
+
 		return resp.StatusCode, errors.New(fmt.Sprintf("Status %d", resp.StatusCode), resp.StatusCode)
 	}
+
+	// FIXME: support empty body e.g. for StatusAccepted ...
 
 	// unmarshal the response
 	err = json.NewDecoder(resp.Body).Decode(response)

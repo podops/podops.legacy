@@ -29,7 +29,7 @@ func LogoutCommand(c *cli.Context) error {
 		ServiceEndpoint: DefaultServiceEndpoint,
 		Token:           "",
 		ClientID:        "",
-		DefaultShow:     "",
+		ShowID:          "",
 	}
 	DefaultValuesCLI = df
 	StoreConfig()

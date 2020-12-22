@@ -98,8 +98,8 @@ func DefaultEpisode(name, episodeName, guid, parentGUID string) *Episode {
 			Labels: DefaultEpisodeMetadata(guid, parentGUID),
 		},
 		Description: EpisodeDescription{
-			Title:       fmt.Sprintf("%s - Episode Title", name),
-			Summary:     fmt.Sprintf("%s - Episode Subtitle or short summary", name),
+			Title:       fmt.Sprintf("%s - Episode Title", episodeName),
+			Summary:     fmt.Sprintf("%s - Episode Subtitle or short summary", episodeName),
 			EpisodeText: "A long-form description of the episode with notes etc.",
 			Link: Resource{
 				URI: fmt.Sprintf("%s/s/%s/%s", DefaultPortalEndpoint, name, episodeName),

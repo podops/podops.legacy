@@ -22,10 +22,23 @@ func TemplateCommand(c *cli.Context) error {
 		return nil
 	}
 
+	guid, _ := util.ShortUUID()
+	name := c.String("name")
+	if name == "" {
+		name = "resource name"
+	}
+	parent := c.String("parent")
+	if parent == "" {
+		parent = "parent-name"
+	}
+	parentGUID := c.String("pid")
+	if parentGUID == "" {
+		parentGUID = "parent-guid"
+	}
+
 	if template == "show" {
 
-		guid, _ := util.ShortUUID()
-		show := metadata.DefaultShow("podcast-name", "Podcast Title", "Podcast summary describing the podcast", guid)
+		show := metadata.DefaultShow(name, "Podcast Title", "Podcast summary describing the podcast", guid)
 		showDoc, err := yaml.Marshal(&show)
 		if err != nil {
 			PrintError(c, NewShowRoute, http.StatusInternalServerError, err)
@@ -36,8 +49,7 @@ func TemplateCommand(c *cli.Context) error {
 		fmt.Printf("--- show dump:\n\n%s\n\n", string(showDoc))
 	} else {
 
-		guid, _ := util.ShortUUID()
-		episode := metadata.DefaultEpisode("podcast-name", "episode1", guid, "parent-"+guid)
+		episode := metadata.DefaultEpisode(parent, name, guid, parentGUID)
 		episodeDoc, err := yaml.Marshal(&episode)
 		if err != nil {
 			PrintError(c, NewShowRoute, http.StatusInternalServerError, err)

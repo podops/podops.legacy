@@ -79,7 +79,8 @@ func NewShowCommand(c *cli.Context) error {
 	fmt.Printf("--- episode dump:\n\n%s\n\n", string(episodeDoc))
 
 	// update the config
-	DefaultValuesCLI.DefaultShow = resp.GUID
+	DefaultValuesCLI.ShowID = resp.GUID
+	StoreConfig()
 
 	return nil
 }

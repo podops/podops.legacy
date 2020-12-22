@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/txsvc/platform/pkg/platform"
 
 	"github.com/podops/podops/internal/errors"
 )
@@ -43,4 +44,11 @@ func ErrorResponse(c *gin.Context, err error) {
 	}
 
 	c.JSON(resp.Status, &resp)
+}
+
+// HandleError is just a convenience method to avoid boiler-plate code
+func HandleError(c *gin.Context, e error) {
+	ee := errors.Wrap(e)
+	platform.ReportError(ee)
+	ErrorResponse(c, ee)
 }

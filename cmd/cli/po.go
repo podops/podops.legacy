@@ -11,16 +11,6 @@ import (
 	cl "github.com/podops/podops/internal/cli"
 )
 
-const (
-	cliName    = "po"
-	cliVersion = "v0.1"
-
-	basicCmd    = "Basic Commands"
-	settingsCmd = "Settings Commands"
-	showCmd     = "Show Commands"
-	showMgmtCmd = "Show Management Commands"
-)
-
 const helpText = `PodOps: Podcast Operations CLI
 
 This client tool helps you to create and produce podcasts.
@@ -37,11 +27,11 @@ func main() {
 
 	// initialize CLI
 	app := &cli.App{
-		Name:    cliName,
-		Version: cliVersion,
+		Name:    cl.CmdLineName,
+		Version: cl.CmdLineVersion,
 		Usage:   "PodOps: Podcast Operations CLI",
 		Action: func(c *cli.Context) error {
-			fmt.Println(fmt.Sprintf("%s - %s\n", cliName, cliVersion))
+			fmt.Println(fmt.Sprintf("%s - %s\n", cl.CmdLineName, cl.CmdLineVersion))
 			fmt.Println(helpText)
 			return nil
 		},
@@ -61,90 +51,91 @@ func main() {
 
 func setupCommands() []cli.Command {
 	c := []cli.Command{
-
-		cli.Command{
+		{
 			Name:      "auth",
 			Usage:     "Login to the PodOps service and validate the token",
 			UsageText: "auth TOKEN",
-			Category:  settingsCmd,
+			Category:  cl.SettingsCmdGroup,
 			Action:    cl.AuthCommand,
 		},
-		cli.Command{
+		{
 			Name:     "logout",
 			Usage:    "Logout and clear all session information",
-			Category: settingsCmd,
+			Category: cl.SettingsCmdGroup,
 			Action:   cl.LogoutCommand,
 		},
-		cli.Command{
+		{
 			Name:      "template",
 			Usage:     "Create a resource template with all default values",
-			UsageText: "template show | episode",
-			Category:  basicCmd,
+			UsageText: "template [show | episode]",
+			Category:  cl.BasicCmdGroup,
 			Action:    cl.TemplateCommand,
+			Flags:     templateFlags(),
 		},
-		cli.Command{
+		{
 			Name:      "new-show",
 			Usage:     "Setup a new show",
 			UsageText: "new-show NAME",
-			Category:  basicCmd,
+			Category:  cl.BasicCmdGroup,
 			Action:    cl.NewShowCommand,
 			Flags:     newShowFlags(),
 		},
-
-		cli.Command{
-			Name:     "info",
-			Usage:    "Shows an overview of the current show",
-			Category: basicCmd,
-			Action:   NoopCommand,
-		},
-
-		cli.Command{
-			Name:     "shows",
-			Usage:    "List all shows",
-			Category: showCmd,
-			Action:   NoopCommand,
-		},
-		cli.Command{
-			Name:     "show",
-			Usage:    "Switch to another show",
-			Category: showCmd,
-			Action:   NoopCommand,
-		},
-		cli.Command{
+		{
 			Name:     "create",
 			Usage:    "Create a resource from a file, directory or URL",
-			Category: showMgmtCmd,
-			Action:   NoopCommand,
+			Category: cl.ShowCmdGroup,
+			Action:   cl.CreateCommand,
+			Flags:    createFlags(),
 		},
-		cli.Command{
+		// NOT IMPLEMENTED
+		{
+			Name:     "info",
+			Usage:    "Shows an overview of the current show",
+			Category: cl.BasicCmdGroup,
+			Action:   cl.NoopCommand,
+		},
+
+		{
+			Name:     "shows",
+			Usage:    "List all shows",
+			Category: cl.ShowCmdGroup,
+			Action:   cl.NoopCommand,
+		},
+		{
+			Name:     "show",
+			Usage:    "Switch to another show",
+			Category: cl.ShowCmdGroup,
+			Action:   cl.NoopCommand,
+		},
+		{
 			Name:     "apply",
 			Usage:    "Apply a change to a resource from a file, directory or URL",
-			Category: showMgmtCmd,
-			Action:   NoopCommand,
+			Category: cl.ShowMgmtCmdGroup,
+			Action:   cl.NoopCommand,
 		},
-		cli.Command{
+		{
 			Name:     "get",
 			Usage:    "Display one or many resources by name",
-			Category: showMgmtCmd,
-			Action:   NoopCommand,
+			Category: cl.ShowMgmtCmdGroup,
+			Action:   cl.NoopCommand,
 		},
-		cli.Command{
+		{
 			Name:     "delete",
 			Usage:    "Delete one or many resources by name",
-			Category: showMgmtCmd,
-			Action:   NoopCommand,
+			Category: cl.ShowMgmtCmdGroup,
+			Action:   cl.NoopCommand,
 		},
-		cli.Command{
+		{
 			Name:     "produce",
 			Usage:    "Start the production of the podcast feed on the service",
-			Category: showMgmtCmd,
-			Action:   NoopCommand,
+			Category: cl.ShowMgmtCmdGroup,
+			Action:   cl.NoopCommand,
 		},
-		cli.Command{
+		{
 			Name:     "build",
 			Usage:    "Start the build of the podcast assets locally",
-			Category: showMgmtCmd,
-			Action:   NoopCommand,
+			Category: cl.ShowMgmtCmdGroup,
+			Action:   cl.NoopCommand,
 		},
 	}
 	return c
@@ -158,11 +149,6 @@ func globalFlags() []cli.Flag {
 			Usage:       "set the service endpoint",
 			Destination: &cl.DefaultValuesCLI.ServiceEndpoint,
 		},
-		&cli.StringFlag{
-			Name:        "s",
-			Usage:       "select the show a command is applied to",
-			Destination: &cl.DefaultValuesCLI.DefaultShow,
-		},
 	}
 	return f
 }
@@ -172,21 +158,41 @@ func newShowFlags() []cli.Flag {
 		&cli.StringFlag{
 			Name:  "title",
 			Usage: "Show title",
-			//Destination: &cl.DefaultValuesCLI.ShowTitle,
 		},
 		&cli.StringFlag{
 			Name:  "summary",
 			Usage: "Show summary",
-			//Destination: &cl.DefaultValuesCLI.ShowSummary,
 		},
 	}
 	return f
 }
 
-// NoopCommand does nothing
-func NoopCommand(c *cli.Context) error {
-	fmt.Println(fmt.Sprintf("%s - %s\n", cliName, cliVersion))
-	fmt.Println(fmt.Sprintf("'%s %s' is not yet implemented!", cliName, c.Command.Name))
+func templateFlags() []cli.Flag {
+	f := []cli.Flag{
+		&cli.StringFlag{
+			Name:  "name",
+			Usage: "Resource name",
+		},
+		&cli.StringFlag{
+			Name:  "parent",
+			Usage: "Parent resource name",
+		},
+		&cli.StringFlag{
+			Name:  "pid",
+			Usage: "Parent resource GUID",
+		},
+	}
+	return f
+}
 
-	return nil
+func createFlags() []cli.Flag {
+	f := []cli.Flag{
+		&cli.StringFlag{
+			Name:     "force",
+			Usage:    "[yes | no] Forces changes to a resource",
+			Required: false,
+			Value:    "no",
+		},
+	}
+	return f
 }

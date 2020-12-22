@@ -17,10 +17,10 @@ const (
 type (
 	// DefaultValues stores all presets the CLI needs
 	DefaultValues struct {
-		ServiceEndpoint string `json:"url"`
-		Token           string `json:"token"`
-		ClientID        string `json:"client_id"`
-		DefaultShow     string `json:"show"`
+		ServiceEndpoint string `json:"url" binding:"required"`
+		Token           string `json:"token" binding:"required"`
+		ClientID        string `json:"client_id" binding:"required"`
+		ShowID          string `json:"show" binding:"required"`
 	}
 )
 
@@ -32,7 +32,7 @@ func init() {
 		ServiceEndpoint: DefaultServiceEndpoint,
 		Token:           "",
 		ClientID:        "",
-		DefaultShow:     "",
+		ShowID:          "",
 	}
 	DefaultValuesCLI = df
 }
@@ -52,9 +52,9 @@ func ClientID() string {
 	return DefaultValuesCLI.ClientID
 }
 
-// DefaultShow returns the current show
-func DefaultShow() string {
-	return DefaultValuesCLI.DefaultShow
+// ShowID returns the current show
+func ShowID() string {
+	return DefaultValuesCLI.ShowID
 }
 
 // LoadOrCreateConfig initializes the default settings
