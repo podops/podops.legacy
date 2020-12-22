@@ -15,8 +15,8 @@ import (
 	"github.com/txsvc/service/pkg/auth"
 	"github.com/txsvc/service/pkg/svc"
 
+	"github.com/podops/podops/internal/api"
 	"github.com/podops/podops/internal/cli"
-	"github.com/podops/podops/pkg/api"
 )
 
 func init() {

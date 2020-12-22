@@ -7,9 +7,10 @@ import (
 	"syscall"
 
 	"github.com/gin-gonic/gin"
-	"github.com/podops/podops/pkg/api"
 
 	"github.com/txsvc/platform/pkg/platform"
+
+	"github.com/podops/podops/internal/api"
 )
 
 func init() {
