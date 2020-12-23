@@ -43,13 +43,16 @@ type (
 
 // CreateProduction initializes a new show and all its metadata
 func CreateProduction(ctx context.Context, name, title, summary string) (*Production, error) {
+	if name == "" {
+		return nil, errors.New("Name must not be empty", http.StatusBadRequest)
+	}
 
 	p, err := FindProductionByName(ctx, name)
 	if err != nil {
 		return nil, errors.Wrap(err)
 	}
 	if p != nil {
-		return nil, errors.New(fmt.Sprintf("Production with name '%s' already exists", name), http.StatusConflict)
+		return nil, errors.New(fmt.Sprintf("Name '%s' already exists", name), http.StatusConflict)
 	}
 
 	id, _ := util.ShortUUID()
@@ -75,13 +78,6 @@ func CreateProduction(ctx context.Context, name, title, summary string) (*Produc
 
 	show := metadata.DefaultShow(name, title, summary, guid)
 	err = CreateResource(ctx, fmt.Sprintf("%s/show-%s.yaml", guid, guid), true, &show)
-	if err != nil {
-		platform.DataStore().Delete(ctx, k)
-		return nil, errors.Wrap(err)
-	}
-
-	episode := metadata.DefaultEpisode("episode1", name, guid, guid)
-	err = CreateResource(ctx, fmt.Sprintf("%s/episode-%s.yaml", guid, guid), true, &episode)
 	if err != nil {
 		platform.DataStore().Delete(ctx, k)
 		return nil, errors.Wrap(err)
