@@ -50,8 +50,8 @@ func main() {
 
 	// Admin Endpoints
 	admin := svc.Group(api.AdminNamespacePrefix)
-	admin.POST("/token", auth.CreateJWTAuthorizationEndpoint)
-	admin.GET("/token", auth.ValidateJWTAuthorizationEndpoint)
+	admin.POST(api.AuthenticationRoute, auth.CreateJWTAuthorizationEndpoint)
+	admin.GET(api.AuthenticationRoute, auth.ValidateJWTAuthorizationEndpoint)
 
 	// API endpoints with authentication
 	apiEndpoints := svc.SecureGroup(api.NamespacePrefix, jwt.MiddlewareFunc())

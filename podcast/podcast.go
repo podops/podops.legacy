@@ -18,12 +18,14 @@ const (
 	presetNameAndPath = ".po"
 
 	// DefaultServiceEndpoint is the service URL
-	DefaultServiceEndpoint = "https://api.podops.dev/a/v1"
+	DefaultServiceEndpoint = "https://api.podops.dev"
 
+	// AuthenticationRoute is used to verify a token
+	authenticationRoute = "/_a/token"
 	// productionRoute route to call ProductionEndpoint
-	productionRoute = "/new"
+	productionRoute = "/a/v1/new"
 	// resourceRoute route to call ResourceEndpoint
-	resourceRoute = "/update/%s/%s" // "/update/:rsrc/:id"
+	resourceRoute = "/a/v1/update/%s/%s" // "/update/:rsrc/:id"
 )
 
 // Client is a client for interacting with the PodOps service.
@@ -35,6 +37,7 @@ type (
 		ServiceEndpoint string `json:"url" binding:"required"`
 		Token           string `json:"token" binding:"required"`
 		GUID            string `json:"guid" binding:"required"`
+		authorized      bool
 	}
 )
 
@@ -43,11 +46,16 @@ type (
 // Clients should be reused instead of created as needed. The methods of Client
 // are safe for concurrent use by multiple goroutines.
 func NewClient(ctx context.Context, token string) (*Client, error) {
-	return &Client{
+	client := &Client{
 		ServiceEndpoint: env.GetString("API_ENDPOINT", DefaultServiceEndpoint),
 		Token:           token,
 		GUID:            "",
-	}, nil
+		authorized:      false,
+	}
+	if err := client.Validate(); err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
 // NewClientFromFile creates a client by reading values from a file
@@ -55,16 +63,16 @@ func NewClient(ctx context.Context, token string) (*Client, error) {
 // Clients should be reused instead of created as needed. The methods of Client
 // are safe for concurrent use by multiple goroutines.
 func NewClientFromFile(ctx context.Context, path string) (*Client, error) {
-	var client Client
+	var client *Client
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		client = Client{
-			ServiceEndpoint: env.GetString("API_ENDPOINT", "https://api.podops.dev/a/v1"),
-			Token:           "token",
+		client = &Client{
+			ServiceEndpoint: env.GetString("API_ENDPOINT", DefaultServiceEndpoint),
+			Token:           "",
 			GUID:            "",
+			authorized:      false,
 		}
-		client.Store(path)
-		return &client, nil
+		return client, nil
 	}
 
 	jsonFile, err := os.Open(path)
@@ -76,7 +84,11 @@ func NewClientFromFile(ctx context.Context, path string) (*Client, error) {
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	json.Unmarshal(byteValue, &client)
 
-	return &client, nil
+	if err := client.Validate(); err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }
 
 // Close does whatever kind of clean-up is necessary
@@ -93,6 +105,25 @@ func (cl *Client) Store(path string) {
 // IsAuthorized does a quick verification
 func (cl *Client) IsAuthorized() bool {
 	return cl.Token != ""
+}
+
+// Validate verifies the token against the backend service
+func (cl *Client) Validate() error {
+
+	if cl.Token == "" {
+		return errors.New("Missing token", http.StatusBadRequest)
+	}
+
+	status, err := cl.Get(authenticationRoute, nil)
+	if err != nil {
+		return err
+	}
+	if status != http.StatusAccepted {
+		// the only valid positive response
+		return errors.New("Not authorized", status)
+	}
+	cl.authorized = true
+	return nil
 }
 
 // Post is used to invoke an API method by posting a JSON payload.
@@ -131,6 +162,42 @@ func (cl *Client) Post(cmd string, request, response interface{}) (int, error) {
 	err = json.NewDecoder(resp.Body).Decode(response)
 	if err != nil {
 		return http.StatusInternalServerError, err
+	}
+
+	return resp.StatusCode, nil
+}
+
+// Get is used to invoke an API method by requesting an URI. No payload, only queries!
+func (cl *Client) Get(cmd string, response interface{}) (int, error) {
+
+	req, err := http.NewRequest("GET", cl.ServiceEndpoint+cmd, nil)
+	if err != nil {
+		return http.StatusBadRequest, err
+	}
+
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	req.Header.Set("Authorization", "Bearer "+cl.Token)
+
+	// post the request to Slack
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return resp.StatusCode, err
+	}
+
+	defer resp.Body.Close()
+
+	// anything other than OK, Created, Accepted, No Content is treated as an error
+	if resp.StatusCode > http.StatusNoContent {
+		return resp.StatusCode, errors.New(fmt.Sprintf("Status %d", resp.StatusCode), resp.StatusCode)
+	}
+
+	// unmarshal the response if one is expected
+	if response != nil {
+		err = json.NewDecoder(resp.Body).Decode(response)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
 	}
 
 	return resp.StatusCode, nil

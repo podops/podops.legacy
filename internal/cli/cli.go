@@ -29,6 +29,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	if cl != nil {
 		client = cl
 	}

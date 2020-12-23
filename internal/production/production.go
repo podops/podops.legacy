@@ -49,7 +49,7 @@ func CreateProduction(ctx context.Context, name, title, summary string) (*Produc
 		return nil, errors.Wrap(err)
 	}
 	if p != nil {
-		return nil, errors.New(fmt.Sprintf("Show with name '%s' already exists", name), http.StatusConflict)
+		return nil, errors.New(fmt.Sprintf("Production with name '%s' already exists", name), http.StatusConflict)
 	}
 
 	id, _ := util.ShortUUID()
@@ -80,7 +80,7 @@ func CreateProduction(ctx context.Context, name, title, summary string) (*Produc
 		return nil, errors.Wrap(err)
 	}
 
-	episode := metadata.DefaultEpisode(name, "episode1", guid, guid)
+	episode := metadata.DefaultEpisode("episode1", name, guid, guid)
 	err = CreateResource(ctx, fmt.Sprintf("%s/episode-%s.yaml", guid, guid), true, &episode)
 	if err != nil {
 		platform.DataStore().Delete(ctx, k)

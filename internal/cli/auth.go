@@ -14,12 +14,23 @@ import (
 // AuthCommand logs into the PodOps service and validates the token
 func AuthCommand(c *cli.Context) error {
 	token := c.Args().First()
+
 	if token != "" {
-		// FIXME: validate the token first
-		client.Token = token
-		client.Store(presetsNameAndPath)
+		if err := close(); err != nil {
+			return err
+		}
+
+		cl, err := podcast.NewClient(context.Background(), token)
+		if err != nil {
+			fmt.Println("\nNot authorized")
+			return nil
+		}
+
+		cl.Store(presetsNameAndPath)
 
 		fmt.Println("\nAuthentication successful")
+	} else {
+		fmt.Println("\nMissing token")
 	}
 
 	return nil
@@ -28,16 +39,25 @@ func AuthCommand(c *cli.Context) error {
 // LogoutCommand clears all session information
 func LogoutCommand(c *cli.Context) error {
 
-	err := os.Remove(presetsNameAndPath)
-	if err != nil {
+	if err := close(); err != nil {
 		return err
 	}
 
-	client, err = podcast.NewClientFromFile(context.Background(), presetsNameAndPath)
-	if err != nil {
-		return err
-	}
+	client.Close()
+	client = nil
 
 	fmt.Println("\nLogout successful")
+	return nil
+}
+
+func close() error {
+	// remove the .po file if it exists
+	f, _ := os.Stat(presetsNameAndPath)
+	if f != nil {
+		err := os.Remove(presetsNameAndPath)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }

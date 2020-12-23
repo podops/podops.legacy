@@ -6,6 +6,7 @@ type (
 		Name    string `json:"name" binding:"required"`
 		Title   string `json:"title" binding:"required"`
 		Summary string `json:"summary" binding:"required"`
+		GUID    string `json:"guid,omitempty"`
 	}
 
 	// ProductionResponse defines the request

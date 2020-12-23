@@ -34,6 +34,8 @@ func CreateProductionCommand(c *cli.Context) error {
 		PrintError(c, err)
 	}
 
+	// FIXME replace with /get !!
+
 	show := metadata.DefaultShow(p.Name, title, summary, p.GUID)
 	showDoc, err := yaml.Marshal(&show)
 	if err != nil {
