@@ -11,6 +11,11 @@ import (
 	cl "github.com/podops/podops/internal/cli"
 )
 
+const (
+	cmdLineName    = "po"
+	cmdLineVersion = "v0.1"
+)
+
 const helpText = `PodOps: Podcast Operations Client
 
 This client tool helps you to create and produce podcasts.
@@ -22,8 +27,8 @@ func main() {
 
 	// initialize CLI
 	app := &cli.App{
-		Name:    cl.CmdLineName,
-		Version: cl.CmdLineVersion,
+		Name:    cmdLineName,
+		Version: cmdLineVersion,
 		Usage:   "PodOps: Podcast Operations Client",
 		Action: func(c *cli.Context) error {
 			fmt.Println(helpText)
@@ -71,7 +76,7 @@ func setupCommands() []cli.Command {
 			Usage:     "Setup a new show/production",
 			UsageText: "new-show NAME",
 			Category:  cl.BasicCmdGroup,
-			Action:    cl.CreateProductionCommand,
+			Action:    cl.NewProductionCommand,
 			Flags:     newShowFlags(),
 		},
 		{
@@ -80,7 +85,13 @@ func setupCommands() []cli.Command {
 			UsageText: "create FILENAME",
 			Category:  cl.ShowCmdGroup,
 			Action:    cl.CreateCommand,
-			Flags:     createFlags(),
+		},
+		{
+			Name:      "update",
+			Usage:     "Update a resource from a file, directory or URL",
+			UsageText: "update FILENAME",
+			Category:  cl.ShowCmdGroup,
+			Action:    cl.UpdateCommand,
 		},
 
 		// NOT IMPLEMENTED
@@ -135,6 +146,16 @@ func setupCommands() []cli.Command {
 				Category: cl.ShowMgmtCmdGroup,
 				Action:   cl.NoopCommand,
 			},
+
+		*/
+		/*
+
+				{
+				Name:     "hack",
+				Usage:    "hack",
+				Category: cl.BasicCmdGroup,
+				Action:   cl.HackCommand,
+			},
 		*/
 	}
 	return c
@@ -171,18 +192,6 @@ func templateFlags() []cli.Flag {
 		&cli.StringFlag{
 			Name:  "parentid",
 			Usage: "Parent resource GUID",
-		},
-	}
-	return f
-}
-
-func createFlags() []cli.Flag {
-	f := []cli.Flag{
-		&cli.StringFlag{
-			Name:     "force",
-			Usage:    "[yes|no] Overwrite an existing resource",
-			Required: false,
-			Value:    "no",
 		},
 	}
 	return f

@@ -67,7 +67,18 @@ func (cl *Client) Store(path string) {
 
 // IsAuthorized does a quick verification
 func (cl *Client) IsAuthorized() bool {
-	return cl.Token != ""
+	return cl.authorized
+}
+
+// Valid verifies that a remote command can be executed
+func (cl *Client) Valid() error {
+	if !cl.authorized {
+		return fmt.Errorf("Not authorized. Use 'po auth' first")
+	}
+	if cl.GUID == "" {
+		return fmt.Errorf("No show selected. Use 'po show' first")
+	}
+	return nil
 }
 
 // Validate verifies the token against the backend service

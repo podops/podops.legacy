@@ -10,10 +10,10 @@ import (
 	"github.com/podops/podops/pkg/metadata"
 )
 
-// CreateProductionCommand requests a new show
-func CreateProductionCommand(c *cli.Context) error {
-	if !client.IsAuthorized() {
-		return fmt.Errorf("Not authorized. Use 'po auth' first")
+// NewProductionCommand requests a new show
+func NewProductionCommand(c *cli.Context) error {
+	if err := client.Valid(); err != nil {
+		return err
 	}
 
 	name := c.Args().First()

@@ -1,7 +1,5 @@
 package cli
 
-// https://github.com/urfave/cli/blob/master/docs/v2/manual.md
-
 import (
 	"context"
 	"fmt"
@@ -16,16 +14,19 @@ func AuthCommand(c *cli.Context) error {
 	token := c.Args().First()
 
 	if token != "" {
+		// remove the old settings first
 		if err := close(); err != nil {
 			return err
 		}
 
+		// create a new client and force token verification
 		cl, err := podcast.NewClient(context.Background(), token)
 		if err != nil {
 			fmt.Println("\nNot authorized")
 			return nil
 		}
 
+		// store the token if valid
 		cl.Store(presetsNameAndPath)
 
 		fmt.Println("\nAuthentication successful")
@@ -38,11 +39,9 @@ func AuthCommand(c *cli.Context) error {
 
 // LogoutCommand clears all session information
 func LogoutCommand(c *cli.Context) error {
-
 	if err := close(); err != nil {
 		return err
 	}
-
 	client.Close()
 	client = nil
 

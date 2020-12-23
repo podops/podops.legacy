@@ -23,6 +23,8 @@ func (cl *Client) Get(cmd string, response interface{}) (int, error) {
 // Post is used to invoke an API method using http POST
 func (cl *Client) Post(cmd string, request, response interface{}) (int, error) {
 
+	fmt.Println(cmd)
+
 	m, err := json.Marshal(&request)
 	if err != nil {
 		return http.StatusInternalServerError, err

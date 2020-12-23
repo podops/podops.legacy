@@ -14,16 +14,26 @@ const (
 	// presetsNameAndPath is the name and location of the config file
 	presetsNameAndPath = ".po"
 
-	CmdLineName    = "po"
-	CmdLineVersion = "v0.1"
-
-	BasicCmdGroup    = "Basic Commands"
+	// BasicCmdGroup groups basic commands
+	BasicCmdGroup = "Basic Commands"
+	// SettingsCmdGroup groups settings
 	SettingsCmdGroup = "Settings Commands"
-	ShowCmdGroup     = "Show Commands"
+	// ShowCmdGroup groups basic show commands
+	ShowCmdGroup = "Show Commands"
+	// ShowMgmtCmdGroup groups advanced show commands
 	ShowMgmtCmdGroup = "Show Management Commands"
 )
 
-var client *podcast.Client
+type (
+	// ResourceLoaderFunc implements loading of resources
+	ResourceLoaderFunc func(data []byte) (interface{}, error)
+)
+
+var (
+	client *podcast.Client
+
+	resourceLoaders map[string]ResourceLoaderFunc
+)
 
 func init() {
 	cl, err := podcast.NewClientFromFile(context.Background(), presetsNameAndPath)
@@ -33,6 +43,10 @@ func init() {
 	if cl != nil {
 		client = cl
 	}
+
+	resourceLoaders = make(map[string]ResourceLoaderFunc)
+	resourceLoaders["show"] = loadShowResource
+	resourceLoaders["episode"] = loadEpisodeResource
 }
 
 // PrintError formats a CLI error and prints it
