@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/podops/podops/internal/errors"
-	t "github.com/podops/podops/pkg/types"
+	t "github.com/podops/podops/internal/types"
 )
 
 const (

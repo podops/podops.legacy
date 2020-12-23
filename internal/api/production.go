@@ -7,9 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/appengine"
 
-	t "github.com/podops/podops/pkg/types"
-
 	"github.com/podops/podops/internal/production"
+	t "github.com/podops/podops/internal/types"
 )
 
 // ProductionEndpoint creates an new show and does all the background setup
