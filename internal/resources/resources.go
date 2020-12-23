@@ -1,4 +1,4 @@
-package production
+package resources
 
 import (
 	"context"

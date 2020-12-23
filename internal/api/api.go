@@ -3,11 +3,15 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/txsvc/platform/pkg/platform"
+	"google.golang.org/appengine"
 
 	"github.com/podops/podops/internal/errors"
+	"github.com/podops/podops/internal/resources"
+	t "github.com/podops/podops/internal/types"
+	"github.com/podops/podops/pkg/metadata"
 )
 
 const (
@@ -26,44 +30,84 @@ const (
 	ResourceRoute = "/update/:parent/:kind/:id"
 )
 
-// StandardResponse is the default way to respond to API requests
-func StandardResponse(c *gin.Context, status int, res interface{}) {
-	if res == nil {
-		resp := errors.StatusObject{
-			Status:  status,
-			Message: fmt.Sprintf("Status %d", status),
-		}
-		c.JSON(status, &resp)
-	} else {
-		c.JSON(status, res)
-	}
-}
+// ProductionEndpoint creates an new show and does all the background setup
+func ProductionEndpoint(c *gin.Context) {
+	var req t.ProductionRequest
 
-// ErrorResponse responds with an ErrorObject
-func ErrorResponse(c *gin.Context, err error) {
-	var resp errors.StatusObject
-	if err == nil {
-		resp = errors.StatusObject{
-			Status:  http.StatusInternalServerError,
-			Message: fmt.Sprintf("Status %d", http.StatusInternalServerError), // keep it consistent with StandardResponse
-		}
-	} else {
-		if ee, ok := err.(*errors.StatusObject); ok {
-			resp.Status = ee.Status
-			resp.Message = ee.Message
-		} else {
-			resp = errors.StatusObject{
-				Status:  http.StatusInternalServerError,
-				Message: err.Error(),
-			}
-		}
+	err := c.BindJSON(&req)
+	if err != nil {
+		HandleError(c, err)
+		return
 	}
 
-	c.JSON(resp.Status, &resp)
+	// create a show
+	// FIXME: verify && cleanup the name. Should follow Domain name conventions.
+	showName := strings.ToLower(strings.TrimSpace(req.Name))
+	p, err := resources.CreateProduction(appengine.NewContext(c.Request), showName, req.Title, req.Summary)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	// send the GUID and canonical name back
+	resp := t.ProductionResponse{
+		Name: p.Name,
+		GUID: p.GUID,
+	}
+	StandardResponse(c, http.StatusCreated, &resp)
 }
 
-// HandleError is just a convenience method to avoid boiler-plate code
-func HandleError(c *gin.Context, e error) {
-	platform.ReportError(e)
-	ErrorResponse(c, e)
+// ResourceEndpoint creates or updates a resource
+func ResourceEndpoint(c *gin.Context) {
+
+	parent := c.Param("parent")
+	if parent == "" {
+		HandleError(c, errors.New("Invalid route. Expected ':parent", http.StatusBadRequest))
+		return
+	}
+	kind := c.Param("kind")
+	if kind == "" {
+		HandleError(c, errors.New("Invalid route. Expected ':kind", http.StatusBadRequest))
+		return
+	}
+	guid := c.Param("id")
+	if guid == "" {
+		HandleError(c, errors.New("Invalid route. Expected ':id", http.StatusBadRequest))
+		return
+	}
+
+	//force := c.DefaultQuery("force", "false")
+	forceFlag := true
+	var payload interface{}
+
+	if kind == "show" {
+		var show metadata.Show
+
+		err := c.BindJSON(&show)
+		if err != nil {
+			HandleError(c, err)
+			return
+		}
+		payload = &show
+	} else if kind == "episode" {
+		var episode metadata.Episode
+
+		err := c.BindJSON(&episode)
+		if err != nil {
+			HandleError(c, err)
+			return
+		}
+		payload = &episode
+	} else {
+		HandleError(c, errors.New(fmt.Sprintf("Invalid resource. '%s", kind), http.StatusBadRequest))
+		return
+	}
+
+	err := resources.CreateResource(appengine.NewContext(c.Request), fmt.Sprintf("%s/%s-%s.yaml", parent, kind, guid), forceFlag, payload)
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	StandardResponse(c, http.StatusCreated, nil)
 }

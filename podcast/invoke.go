@@ -9,7 +9,18 @@ import (
 	"github.com/podops/podops/internal/errors"
 )
 
-// Post is used to invoke an API method by posting a JSON payload.
+// Get is used to request data from the API. No payload, only queries!
+func (cl *Client) Get(cmd string, response interface{}) (int, error) {
+
+	req, err := http.NewRequest("GET", cl.ServiceEndpoint+cmd, nil)
+	if err != nil {
+		return http.StatusBadRequest, err
+	}
+
+	return cl.invoke(req, response)
+}
+
+// Post is used to invoke an API method using http POST
 func (cl *Client) Post(cmd string, request, response interface{}) (int, error) {
 
 	m, err := json.Marshal(&request)
@@ -22,55 +33,43 @@ func (cl *Client) Post(cmd string, request, response interface{}) (int, error) {
 		return http.StatusBadRequest, err
 	}
 
-	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	req.Header.Set("Authorization", "Bearer "+cl.Token)
+	return cl.invoke(req, response)
+}
 
-	// post the request to Slack
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return resp.StatusCode, err
-	}
+// Put is used to invoke an API method using http PUT
+func (cl *Client) Put(cmd string, request, response interface{}) (int, error) {
 
-	defer resp.Body.Close()
-
-	// anything other than OK, Created, Accepted, No Content is treated as an error
-	if resp.StatusCode > http.StatusNoContent {
-		return resp.StatusCode, errors.New(fmt.Sprintf("Status %d", resp.StatusCode), resp.StatusCode)
-	}
-
-	// FIXME: support empty body e.g. for StatusAccepted ...
-
-	// unmarshal the response
-	err = json.NewDecoder(resp.Body).Decode(response)
+	m, err := json.Marshal(&request)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	return resp.StatusCode, nil
-}
-
-// Get is used to invoke an API method by requesting an URI. No payload, only queries!
-func (cl *Client) Get(cmd string, response interface{}) (int, error) {
-
-	req, err := http.NewRequest("GET", cl.ServiceEndpoint+cmd, nil)
+	req, err := http.NewRequest("PUT", cl.ServiceEndpoint+cmd, bytes.NewBuffer(m))
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
 
+	return cl.invoke(req, response)
+}
+
+func (cl *Client) invoke(req *http.Request, response interface{}) (int, error) {
+
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("Authorization", "Bearer "+cl.Token)
 
-	// post the request to Slack
+	// perform the request
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		if resp == nil {
+			return http.StatusInternalServerError, err
+		}
 		return resp.StatusCode, err
 	}
 
 	defer resp.Body.Close()
 
-	// anything other than OK, Created, Accepted, No Content is treated as an error
+	// anything other than OK, Created, Accepted, NoContent is treated as an error
 	if resp.StatusCode > http.StatusNoContent {
 		return resp.StatusCode, errors.New(fmt.Sprintf("Status %d", resp.StatusCode), resp.StatusCode)
 	}

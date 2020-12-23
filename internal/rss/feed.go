@@ -3,72 +3,84 @@ package rss
 import (
 	"bytes"
 	"encoding/xml"
+	"errors"
+	"fmt"
 	"io"
 	"strconv"
 	"time"
 	"unicode/utf8"
-
-	"github.com/pkg/errors"
 )
+
+// iTunes Specifications: https://help.apple.com/itc/podcasts_connect/#/itcb54353390
 
 const (
 	generatorVersion = "PodOps v1.0 (https://github.com/podops/podops)"
+
+	M4A EnclosureType = iota
+	M4V
+	MP4
+	MP3
+	MOV
+	PDF
+	EPUB
+
+	enclosureDefault = "application/octet-stream"
 )
 
-type (
-	// Channel represents a RSS feed with iTunes/podcast specific extensions
-	Channel struct {
-		XMLName        xml.Name `xml:"channel"`
-		Title          string   `xml:"title"`
-		Link           string   `xml:"link"`
-		Description    string   `xml:"description"`
-		Category       string   `xml:"category,omitempty"`
-		Cloud          string   `xml:"cloud,omitempty"`
-		Copyright      string   `xml:"copyright,omitempty"`
-		Docs           string   `xml:"docs,omitempty"`
-		Generator      string   `xml:"generator,omitempty"`
-		Language       string   `xml:"language,omitempty"`
-		LastBuildDate  string   `xml:"lastBuildDate,omitempty"`
-		ManagingEditor string   `xml:"managingEditor,omitempty"`
-		PubDate        string   `xml:"pubDate,omitempty"`
-		Rating         string   `xml:"rating,omitempty"`
-		SkipHours      string   `xml:"skipHours,omitempty"`
-		SkipDays       string   `xml:"skipDays,omitempty"`
-		TTL            int      `xml:"ttl,omitempty"`
-		WebMaster      string   `xml:"webMaster,omitempty"`
-		Image          *Image
-		TextInput      *TextInput
-		AtomLink       *AtomLink
+var parseDuration = func(duration int64) string {
+	h := duration / 3600
+	duration = duration % 3600
 
-		// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
-		IAuthor     string `xml:"itunes:author,omitempty"`
-		ISubtitle   string `xml:"itunes:subtitle,omitempty"`
-		ISummary    *ISummary
-		IBlock      string `xml:"itunes:block,omitempty"`
-		IImage      *IImage
-		IDuration   string  `xml:"itunes:duration,omitempty"`
-		IExplicit   string  `xml:"itunes:explicit,omitempty"`
-		IComplete   string  `xml:"itunes:complete,omitempty"`
-		INewFeedURL string  `xml:"itunes:new-feed-url,omitempty"`
-		IOwner      *Author // Author is formatted for itunes as-is
-		ICategories []*ICategory
-		// ADDED
-		ITitle string `xml:"itunes:title,omitempty"`
-		IType  string `xml:"itunes:type,omitempty"`
+	m := duration / 60
+	duration = duration % 60
 
-		Items []*Item
+	s := duration
 
-		encode func(w io.Writer, o interface{}) error
+	// HH:MM:SS
+	if h > 9 {
+		return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
 	}
 
-	channelWrapper struct {
-		XMLName  xml.Name `xml:"rss"`
-		Version  string   `xml:"version,attr"`
-		ATOMNS   string   `xml:"xmlns:atom,attr,omitempty"`
-		ITUNESNS string   `xml:"xmlns:itunes,attr"`
-		Channel  *Channel
+	// H:MM:SS
+	if h > 0 {
+		return fmt.Sprintf("%d:%02d:%02d", h, m, s)
 	}
-)
+
+	// MM:SS
+	if m > 9 {
+		return fmt.Sprintf("%02d:%02d", m, s)
+	}
+
+	// M:SS
+	return fmt.Sprintf("%d:%02d", m, s)
+}
+
+var parseDateRFC1123Z = func(t *time.Time) string {
+	if t != nil && !t.IsZero() {
+		return t.Format(time.RFC1123Z)
+	}
+	return time.Now().UTC().Format(time.RFC1123Z)
+}
+
+var encoder = func(w io.Writer, o interface{}) error {
+	e := xml.NewEncoder(w)
+	e.Indent("", "  ")
+	if err := e.Encode(o); err != nil {
+		return fmt.Errorf("channel.encoder: e.Encode returned error %v", err)
+	}
+	return nil
+}
+
+var parseAuthorNameEmail = func(a *Author) string {
+	var author string
+	if a != nil {
+		author = a.Email
+		if len(a.Name) > 0 {
+			author = fmt.Sprintf("%s (%s)", a.Email, a.Name)
+		}
+	}
+	return author
+}
 
 // New instantiates a podcast with required parameters.
 //
@@ -334,7 +346,7 @@ func (p *Channel) Bytes() []byte {
 // Encode writes the bytes to the io.Writer stream in RSS 2.0 specification.
 func (p *Channel) Encode(w io.Writer) error {
 	if _, err := w.Write([]byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")); err != nil {
-		return errors.Wrap(err, "Channel.Encode: w.Write return error")
+		return fmt.Errorf("Channel.Encode: w.Write return error: %v", err)
 	}
 
 	atomLink := ""
@@ -357,4 +369,84 @@ func (p *Channel) String() string {
 		return "String: channel.write returned the error: " + err.Error()
 	}
 	return b.String()
+}
+
+// AddEnclosure adds the downloadable asset to the podcast Item.
+func (i *Item) AddEnclosure(
+	url string, enclosureType EnclosureType, lengthInBytes int64) {
+	i.Enclosure = &Enclosure{
+		URL:    url,
+		Type:   enclosureType,
+		Length: lengthInBytes,
+	}
+}
+
+// AddImage adds the image as an iTunes-only IImage.  RSS 2.0 does not have
+// the specification of Images at the Item level.
+//
+// Podcast feeds contain artwork that is a minimum size of
+// 1400 x 1400 pixels and a maximum size of 3000 x 3000 pixels,
+// 72 dpi, in JPEG or PNG format with appropriate file
+// extensions (.jpg, .png), and in the RGB colorspace. To optimize
+// images for mobile devices, Apple recommends compressing your
+// image files.
+func (i *Item) AddImage(url string) {
+	if len(url) > 0 {
+		i.IImage = &IImage{HREF: url}
+	}
+}
+
+// AddPubDate adds the datetime as a parsed PubDate.
+//
+// UTC time is used by default.
+func (i *Item) AddPubDate(datetime *time.Time) {
+	i.PubDate = datetime
+	i.PubDateFormatted = parseDateRFC1123Z(i.PubDate)
+}
+
+// AddSummary adds the iTunes summary.
+//
+// Limit: 4000 characters
+//
+// Note that this field is a CDATA encoded field which allows for rich text
+// such as html links: `<a href="http://www.apple.com">Apple</a>`.
+func (i *Item) AddSummary(summary string) {
+	count := utf8.RuneCountInString(summary)
+	if count > 4000 {
+		s := []rune(summary)
+		summary = string(s[0:4000])
+	}
+	i.ISummary = &ISummary{
+		Text: summary,
+	}
+}
+
+// AddDuration adds the duration to the iTunes duration field.
+func (i *Item) AddDuration(durationInSeconds int64) {
+	if durationInSeconds <= 0 {
+		return
+	}
+	i.IDuration = parseDuration(durationInSeconds)
+}
+
+// String returns the MIME type encoding of the specified EnclosureType.
+func (et EnclosureType) String() string {
+	// https://help.apple.com/itc/podcasts_connect/#/itcb54353390
+	switch et {
+	case M4A:
+		return "audio/x-m4a"
+	case M4V:
+		return "video/x-m4v"
+	case MP4:
+		return "video/mp4"
+	case MP3:
+		return "audio/mpeg"
+	case MOV:
+		return "video/quicktime"
+	case PDF:
+		return "application/pdf"
+	case EPUB:
+		return "document/x-epub"
+	}
+	return enclosureDefault
 }
