@@ -23,7 +23,7 @@ const (
 	// ProductionRoute route to ProductionEndpoint
 	ProductionRoute = "/new"
 	// ResourceRoute route to ResourceEndpoint
-	ResourceRoute = "/update/:rsrc/:id"
+	ResourceRoute = "/update/:parent/:kind/:id"
 )
 
 // StandardResponse is the default way to respond to API requests
