@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/podops/podops/podcast"
 	"github.com/urfave/cli"
@@ -36,6 +37,6 @@ func init() {
 
 // PrintError formats a CLI error and prints it
 func PrintError(c *cli.Context, err error) {
-	msg := fmt.Sprintf("Command '%s'. Something went wrong: %v", c.Command.Name, err)
+	msg := fmt.Sprintf("%s: %v", c.Command.Name, strings.ToLower(err.Error()))
 	fmt.Println(msg)
 }

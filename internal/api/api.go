@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/appengine"
 
-	"github.com/podops/podops/internal/errors"
 	"github.com/podops/podops/internal/resources"
 	t "github.com/podops/podops/internal/types"
 	"github.com/podops/podops/pkg/metadata"
@@ -36,7 +35,7 @@ func ProductionEndpoint(c *gin.Context) {
 
 	err := c.BindJSON(&req)
 	if err != nil {
-		HandleError(c, err)
+		HandleError(c, http.StatusInternalServerError, err)
 		return
 	}
 
@@ -45,7 +44,7 @@ func ProductionEndpoint(c *gin.Context) {
 	showName := strings.ToLower(strings.TrimSpace(req.Name))
 	p, err := resources.CreateProduction(appengine.NewContext(c.Request), showName, req.Title, req.Summary)
 	if err != nil {
-		HandleError(c, err)
+		HandleError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -62,17 +61,17 @@ func ResourceEndpoint(c *gin.Context) {
 
 	parent := c.Param("parent")
 	if parent == "" {
-		HandleError(c, errors.New("Invalid route. Expected ':parent", http.StatusBadRequest))
+		HandleError(c, http.StatusBadRequest, fmt.Errorf("resource: invalid route, expected ':parent"))
 		return
 	}
 	kind := c.Param("kind")
 	if kind == "" {
-		HandleError(c, errors.New("Invalid route. Expected ':kind", http.StatusBadRequest))
+		HandleError(c, http.StatusBadRequest, fmt.Errorf("resource: invalid route, expected ':kind"))
 		return
 	}
 	guid := c.Param("id")
 	if guid == "" {
-		HandleError(c, errors.New("Invalid route. Expected ':id", http.StatusBadRequest))
+		HandleError(c, http.StatusBadRequest, fmt.Errorf("resource: invalid route, expected ':id"))
 		return
 	}
 
@@ -85,7 +84,7 @@ func ResourceEndpoint(c *gin.Context) {
 
 		err := c.BindJSON(&show)
 		if err != nil {
-			HandleError(c, err)
+			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
 		payload = &show
@@ -94,18 +93,18 @@ func ResourceEndpoint(c *gin.Context) {
 
 		err := c.BindJSON(&episode)
 		if err != nil {
-			HandleError(c, err)
+			HandleError(c, http.StatusInternalServerError, err)
 			return
 		}
 		payload = &episode
 	} else {
-		HandleError(c, errors.New(fmt.Sprintf("Invalid resource. '%s", kind), http.StatusBadRequest))
+		HandleError(c, http.StatusBadRequest, fmt.Errorf("resource: invalid kind '%s", kind))
 		return
 	}
 
 	err := resources.CreateResource(appengine.NewContext(c.Request), fmt.Sprintf("%s/%s-%s.yaml", parent, kind, guid), forceFlag, payload)
 	if err != nil {
-		HandleError(c, err)
+		HandleError(c, http.StatusInternalServerError, err)
 		return
 	}
 

@@ -3,7 +3,6 @@ package resources
 import (
 	"context"
 
-	"github.com/podops/podops/internal/errors"
 	"github.com/txsvc/platform/pkg/platform"
 	"gopkg.in/yaml.v2"
 )
@@ -14,16 +13,16 @@ func CreateResource(ctx context.Context, path string, force bool, rsrc interface
 
 	data, err := yaml.Marshal(rsrc)
 	if err != nil {
-		return errors.Wrap(err)
+		return err
 	}
 
 	bkt := platform.Storage().Bucket(bucketProduction)
 	writer := bkt.Object(path).NewWriter(ctx)
 	if _, err := writer.Write(data); err != nil {
-		return errors.Wrap(err)
+		return err
 	}
 	if err := writer.Close(); err != nil {
-		return errors.Wrap(err)
+		return err
 	}
 
 	return nil

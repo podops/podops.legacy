@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/podops/podops/internal/errors"
 	t "github.com/podops/podops/internal/types"
 )
 
@@ -29,7 +28,7 @@ const (
 func (cl *Client) CreateProduction(name, title, summary string) (*t.ProductionResponse, error) {
 
 	if name == "" {
-		return nil, errors.New("Name must not be empty", http.StatusBadRequest)
+		return nil, fmt.Errorf("resource: name must not be empty")
 	}
 
 	req := t.ProductionRequest{
@@ -51,7 +50,7 @@ func (cl *Client) CreateProduction(name, title, summary string) (*t.ProductionRe
 // UpdateResource invokes the ResourceEndpoint
 func (cl *Client) UpdateResource(kind, guid string, rsrc interface{}) (int, error) {
 
-	resp := errors.StatusObject{}
+	resp := t.StatusObject{}
 	status, err := cl.Post(fmt.Sprintf(resourceRoute, cl.GUID, kind, guid), rsrc, &resp)
 
 	if err != nil {
@@ -75,7 +74,7 @@ func (cl *Client) IsAuthorized() bool {
 func (cl *Client) Validate() error {
 
 	if cl.Token == "" {
-		return errors.New("Missing token", http.StatusBadRequest)
+		return fmt.Errorf("validation: missing token")
 	}
 
 	status, err := cl.Get(authenticationRoute, nil)
@@ -84,7 +83,7 @@ func (cl *Client) Validate() error {
 	}
 	if status != http.StatusAccepted {
 		// the only valid positive response
-		return errors.New("Not authorized", status)
+		return fmt.Errorf("validation: not authorized %d", status)
 	}
 	cl.authorized = true
 	return nil

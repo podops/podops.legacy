@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/podops/podops/internal/errors"
+	t "github.com/podops/podops/internal/types"
 )
 
 // Get is used to request data from the API. No payload, only queries!
@@ -71,7 +71,15 @@ func (cl *Client) invoke(req *http.Request, response interface{}) (int, error) {
 
 	// anything other than OK, Created, Accepted, NoContent is treated as an error
 	if resp.StatusCode > http.StatusNoContent {
-		return resp.StatusCode, errors.New(fmt.Sprintf("Status %d", resp.StatusCode), resp.StatusCode)
+		if response != nil {
+			// as we expect a response, there might be a StatusObject
+			status := &t.StatusObject{}
+			err = json.NewDecoder(resp.Body).Decode(&status)
+			if err != nil {
+				return resp.StatusCode, fmt.Errorf(fmt.Sprintf("status: %d", resp.StatusCode))
+			}
+			return status.Status, fmt.Errorf(status.Message)
+		}
 	}
 
 	// unmarshal the response if one is expected

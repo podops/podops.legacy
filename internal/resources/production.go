@@ -3,7 +3,6 @@ package resources
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strings"
 
 	"cloud.google.com/go/datastore"
@@ -11,7 +10,6 @@ import (
 	"github.com/txsvc/commons/pkg/util"
 	"github.com/txsvc/platform/pkg/platform"
 
-	"github.com/podops/podops/internal/errors"
 	"github.com/podops/podops/pkg/metadata"
 )
 
@@ -44,15 +42,15 @@ type (
 // CreateProduction initializes a new show and all its metadata
 func CreateProduction(ctx context.Context, name, title, summary string) (*Production, error) {
 	if name == "" {
-		return nil, errors.New("Name must not be empty", http.StatusBadRequest)
+		return nil, fmt.Errorf("production: name must not be empty")
 	}
 
 	p, err := FindProductionByName(ctx, name)
 	if err != nil {
-		return nil, errors.Wrap(err)
+		return nil, err
 	}
 	if p != nil {
-		return nil, errors.New(fmt.Sprintf("Name '%s' already exists", name), http.StatusConflict)
+		return nil, fmt.Errorf(fmt.Sprintf("Name '%s' already exists", name))
 	}
 
 	id, _ := util.ShortUUID()
@@ -71,7 +69,7 @@ func CreateProduction(ctx context.Context, name, title, summary string) (*Produc
 	k := productionKey(guid)
 	_, err = platform.DataStore().Put(ctx, k, p)
 	if err != nil {
-		return nil, errors.Wrap(err)
+		return nil, err
 	}
 
 	// create a dummy Storage location for this production at production.podops.dev/guid
@@ -80,7 +78,7 @@ func CreateProduction(ctx context.Context, name, title, summary string) (*Produc
 	err = CreateResource(ctx, fmt.Sprintf("%s/show-%s.yaml", guid, guid), true, &show)
 	if err != nil {
 		platform.DataStore().Delete(ctx, k)
-		return nil, errors.Wrap(err)
+		return nil, err
 	}
 
 	// all done
