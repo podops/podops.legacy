@@ -58,17 +58,6 @@ func CreateCommand(c *cli.Context) error {
 		}
 
 		payload = &show
-		/*
-			resp := errors.StatusObject{}
-			route := fmt.Sprintf("/create/%s/show?force=%v", client.GUID, flagForce)
-			_, err := client.Post(route, &show, &resp)
-			if err != nil {
-				PrintError(c, err)
-				return nil
-			}
-
-			fmt.Println(fmt.Sprintf("Updated resource '%s'", show.Metadata.Labels[metadata.LabelGUID]))
-		*/
 
 	} else if r.Kind == "episode" {
 		var episode metadata.Episode
@@ -82,18 +71,6 @@ func CreateCommand(c *cli.Context) error {
 		}
 
 		payload = &episode
-
-		/*
-			resp := errors.StatusObject{}
-			route := fmt.Sprintf("/create/%s/episode?force=%v", client.GUID, flagForce)
-			_, err := client.Post(route, &episode, &resp)
-			if err != nil {
-				PrintError(c, err)
-				return nil
-			}
-
-			fmt.Println(fmt.Sprintf("Updated resource '%s'", episode.Metadata.Labels[metadata.LabelGUID]))
-		*/
 
 	} else {
 		return fmt.Errorf("Unsupported resource type '%s'", r.Kind)

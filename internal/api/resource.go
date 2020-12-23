@@ -64,45 +64,5 @@ func ResourceEndpoint(c *gin.Context) {
 		return
 	}
 
-	// FIXME validate guid and parent against whatever is in the doc!
-
-	/*
-		OLD IMPLEMENTATION
-		if resource == "show" {
-			var show metadata.Show
-
-			err := c.BindJSON(&show)
-			if err != nil {
-				HandleError(c, err)
-				return
-			}
-
-			err = production.CreateResource(appengine.NewContext(c.Request), fmt.Sprintf("%s/show-%s.yaml", parent, guid), forceFlag, &show)
-			if err != nil {
-				HandleError(c, err)
-				return
-			}
-
-		} else if resource == "episode" {
-			var episode metadata.Episode
-
-			err := c.BindJSON(&episode)
-			if err != nil {
-				HandleError(c, err)
-				return
-			}
-
-			err = production.CreateResource(appengine.NewContext(c.Request), fmt.Sprintf("%s/episode-%s.yaml", parent, guid), forceFlag, &episode)
-			if err != nil {
-				HandleError(c, err)
-				return
-			}
-
-		} else {
-			HandleError(c, errors.New(fmt.Sprintf("Invalid resource. '%s", resource), http.StatusBadRequest))
-			return
-		}
-	*/
-
 	StandardResponse(c, http.StatusCreated, nil)
 }
