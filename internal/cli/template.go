@@ -21,43 +21,54 @@ func TemplateCommand(c *cli.Context) error {
 		return nil
 	}
 
-	guid, _ := util.ShortUUID()
+	// extract flags or set defaults
 	name := c.String("name")
 	if name == "" {
-		name = "resource name"
+		name = "NAME"
+	}
+	guid := c.String("id")
+	if guid == "" {
+		guid, _ = util.ShortUUID()
 	}
 	parent := c.String("parent")
 	if parent == "" {
-		parent = "parent-name"
+		parent = "PARENT-NAME"
 	}
-	parentGUID := c.String("pid")
+	parentGUID := c.String("parentid")
 	if parentGUID == "" {
-		parentGUID = "parent-guid"
+		parentGUID = "PARENT-ID"
 	}
 
+	// create the yamls
 	if template == "show" {
 
-		show := metadata.DefaultShow(name, "Podcast Title", "Podcast summary describing the podcast", guid)
-		showDoc, err := yaml.Marshal(&show)
+		show := metadata.DefaultShow(name, "TITLE", "SUMMARY", guid)
+		err := dump(fmt.Sprintf("show-%s.yaml", guid), show)
 		if err != nil {
 			PrintError(c, err)
 			return nil
 		}
-
-		ioutil.WriteFile(fmt.Sprintf("show-%s.yaml", guid), showDoc, 0644)
-		fmt.Printf("--- show dump:\n\n%s\n\n", string(showDoc))
 	} else {
 
-		episode := metadata.DefaultEpisode(parent, name, guid, parentGUID)
-		episodeDoc, err := yaml.Marshal(&episode)
+		episode := metadata.DefaultEpisode(name, parent, guid, parentGUID)
+		err := dump(fmt.Sprintf("episode-%s.yaml", guid), episode)
 		if err != nil {
 			PrintError(c, err)
 			return nil
 		}
-
-		ioutil.WriteFile(fmt.Sprintf("episode-%s.yaml", guid), episodeDoc, 0644)
-		fmt.Printf("--- episode dump:\n\n%s\n\n", string(episodeDoc))
 	}
+
+	return nil
+}
+
+func dump(path string, doc interface{}) error {
+	data, err := yaml.Marshal(doc)
+	if err != nil {
+		return err
+	}
+
+	ioutil.WriteFile(path, data, 0644)
+	fmt.Printf("--- %s:\n\n%s\n\n", path, string(data))
 
 	return nil
 }

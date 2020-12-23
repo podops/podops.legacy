@@ -16,7 +16,6 @@ import (
 	"github.com/txsvc/service/pkg/svc"
 
 	"github.com/podops/podops/internal/api"
-	"github.com/podops/podops/internal/cli"
 )
 
 func init() {
@@ -56,9 +55,9 @@ func main() {
 
 	// API endpoints with authentication
 	apiEndpoints := svc.SecureGroup(api.NamespacePrefix, jwt.MiddlewareFunc())
-	apiEndpoints.POST(cli.NewShowRoute, "api.create", api.CreateProductionEndpoint)
-	apiEndpoints.POST(cli.CreateRoute, "api.create,api.update", api.CreateEndpoint)
-	apiEndpoints.POST(cli.UpdateRoute, "api.create,api.update", api.UpdateEndpoint)
+	apiEndpoints.POST(api.ProductionRoute, "api.create", api.ProductionEndpoint)
+	apiEndpoints.POST(api.ResourceRoute, "api.create,api.update", api.ResourceEndpoint) // creates a resource, fails if it already exists
+	apiEndpoints.PUT(api.ResourceRoute, "api.update", api.ResourceEndpoint)             // updates a resource, fails if it does NOT exist
 
 	// add CORS handler, allowing all. See https://github.com/gin-contrib/cors
 	svc.Use(cors.Default())

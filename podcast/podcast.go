@@ -20,14 +20,10 @@ const (
 	// DefaultServiceEndpoint is the service URL
 	DefaultServiceEndpoint = "https://api.podops.dev/a/v1"
 
-	// All the API & CLI endpoint routes
-
-	// NewShowRoute creates a new production
-	NewShowRoute = "/new"
-	// CreateRoute creates a resource
-	CreateRoute = "/create/:id/:rsrc"
-	// UpdateRoute updates a resource
-	UpdateRoute = "/update/:id/:rsrc"
+	// productionRoute route to call ProductionEndpoint
+	productionRoute = "/new"
+	// resourceRoute route to call ResourceEndpoint
+	resourceRoute = "/update/%s/%s" // "/update/:rsrc/:id"
 )
 
 // Client is a client for interacting with the PodOps service.

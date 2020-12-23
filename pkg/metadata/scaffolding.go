@@ -72,7 +72,7 @@ func DefaultShow(name, title, summary, guid string) *Show {
 				},
 			},
 			Owner: Owner{
-				Name:  fmt.Sprintf("%s Owner Name", name),
+				Name:  fmt.Sprintf("%s owner", name),
 				Email: fmt.Sprintf("hello@%s.me", name),
 			},
 			Author:    fmt.Sprintf("%s author", name),
@@ -86,30 +86,30 @@ func DefaultShow(name, title, summary, guid string) *Show {
 }
 
 // DefaultEpisode creates a default episode struc
-func DefaultEpisode(name, episodeName, guid, parentGUID string) *Episode {
+func DefaultEpisode(name, parentName, guid, parentGUID string) *Episode {
 
 	return &Episode{
 		APIVersion: "v1",
 		Kind:       "episode",
 		Metadata: Metadata{
-			Name:   episodeName,
+			Name:   name,
 			Labels: DefaultEpisodeMetadata(guid, parentGUID),
 		},
 		Description: EpisodeDescription{
-			Title:       fmt.Sprintf("%s - Episode Title", episodeName),
-			Summary:     fmt.Sprintf("%s - Episode Subtitle or short summary", episodeName),
+			Title:       fmt.Sprintf("%s - Episode Title", name),
+			Summary:     fmt.Sprintf("%s - Episode Subtitle or short summary", name),
 			EpisodeText: "A long-form description of the episode with notes etc.",
 			Link: Resource{
-				URI: fmt.Sprintf("%s/s/%s/%s", DefaultPortalEndpoint, name, episodeName),
+				URI: fmt.Sprintf("%s/s/%s/%s", DefaultPortalEndpoint, parentName, name),
 			},
 			Duration: 1, // Seconds. Must not be 0, otherwise a validation error occurs.
 		},
 		Image: Resource{
-			URI: fmt.Sprintf("%s/%s/%s/coverart.png", DefaultCDNEndpoint, name, guid),
+			URI: fmt.Sprintf("%s/%s/%s/coverart.png", DefaultCDNEndpoint, parentName, guid),
 			Rel: "external",
 		},
 		Enclosure: Resource{
-			URI:  fmt.Sprintf("%s/%s/%s/%s.mp3", DefaultCDNEndpoint, name, guid, episodeName),
+			URI:  fmt.Sprintf("%s/%s/%s/%s.mp3", DefaultCDNEndpoint, parentName, guid, name),
 			Type: "audio/mpeg",
 			Rel:  "external",
 			Size: 0, // bytes
