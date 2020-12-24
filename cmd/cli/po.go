@@ -95,9 +95,16 @@ func setupCommands() []cli.Command {
 		},
 		{
 			Name:     "list",
-			Usage:    "List all shows",
-			Category: cl.ShowCmdGroup,
+			Usage:    "List all shows/productions",
+			Category: cl.BasicCmdGroup,
 			Action:   cl.ListProductionCommand,
+		},
+		{
+			Name:      "set",
+			Usage:     "List the current show/production, switch to another show/production",
+			UsageText: "set [NAME]\n\n\t # Display the current show/production\n\t po set\n\n\t # Set the current show/production\n\t po set NAME",
+			Category:  cl.ShowCmdGroup,
+			Action:    cl.SetProductionCommand,
 		},
 
 		// NOT IMPLEMENTED
@@ -110,18 +117,6 @@ func setupCommands() []cli.Command {
 				Action:   cl.NoopCommand,
 			},
 
-			{
-				Name:     "shows",
-				Usage:    "List all shows",
-				Category: cl.ShowCmdGroup,
-				Action:   cl.NoopCommand,
-			},
-			{
-				Name:     "show",
-				Usage:    "Switch to another show",
-				Category: cl.ShowCmdGroup,
-				Action:   cl.NoopCommand,
-			},
 			{
 				Name:     "apply",
 				Usage:    "Apply a change to a resource from a file, directory or URL",
@@ -154,15 +149,7 @@ func setupCommands() []cli.Command {
 			},
 
 		*/
-		/*
 
-				{
-				Name:     "hack",
-				Usage:    "hack",
-				Category: cl.BasicCmdGroup,
-				Action:   cl.HackCommand,
-			},
-		*/
 	}
 	return c
 }
