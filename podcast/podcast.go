@@ -22,6 +22,8 @@ const (
 	productionRoute = "/a/v1/new"
 	// resourceRoute route to call ResourceEndpoint
 	resourceRoute = "/a/v1/update/%s/%s/%s" // "/update/:parent/:rsrc/:id"
+	// listRoute route to call ListEndpoint
+	listRoute = "/a/v1/list"
 )
 
 // CreateProduction invokes the CreateProductionEndpoint
@@ -44,6 +46,17 @@ func (cl *Client) CreateProduction(name, title, summary string) (*t.ProductionRe
 		return nil, err
 	}
 
+	return &resp, nil
+}
+
+// List retrieves a list of resources
+func (cl *Client) List() (*t.ProductionsResponse, error) {
+	var resp t.ProductionsResponse
+
+	_, err := cl.Get(listRoute, &resp)
+	if err != nil {
+		return nil, err
+	}
 	return &resp, nil
 }
 

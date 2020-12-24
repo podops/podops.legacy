@@ -17,6 +17,18 @@ type (
 		GUID string `json:"guid" binding:"required"`
 	}
 
+	// ProductionsResponse returns a list of productions
+	ProductionsResponse struct {
+		List []ProductionDetails `json:"list" `
+	}
+
+	// ProductionDetails provides details about a production
+	ProductionDetails struct {
+		Name  string `json:"name" binding:"required"`
+		GUID  string `json:"guid" binding:"required"`
+		Title string `json:"title,omitempty" `
+	}
+
 	// StatusObject is used to report status and errors in an API request.
 	// The struct can be used as a response object or be treated as an error object
 	StatusObject struct {

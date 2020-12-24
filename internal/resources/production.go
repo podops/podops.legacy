@@ -110,6 +110,18 @@ func FindProductionByName(ctx context.Context, name string) (*Production, error)
 	return p[0], nil
 }
 
+// FindProductionsByOwner returns all productions belonging to the same owner
+func FindProductionsByOwner(ctx context.Context, owner string) ([]*Production, error) {
+	var p []*Production
+	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreProductions).Filter("Owner =", owner), &p); err != nil {
+		return nil, err
+	}
+	if p == nil {
+		return nil, nil
+	}
+	return p, nil
+}
+
 func productionKey(guid string) *datastore.Key {
 	return datastore.NameKey(DatastoreProductions, guid, nil)
 }

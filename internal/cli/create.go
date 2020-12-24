@@ -23,6 +23,7 @@ func CreateCommand(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
 	_, err = client.UpdateResource(kind, guid, resource)
 	if err != nil {
 		return err

@@ -93,6 +93,12 @@ func setupCommands() []cli.Command {
 			Category:  cl.ShowCmdGroup,
 			Action:    cl.UpdateCommand,
 		},
+		{
+			Name:     "list",
+			Usage:    "List all shows",
+			Category: cl.ShowCmdGroup,
+			Action:   cl.ListProductionCommand,
+		},
 
 		// NOT IMPLEMENTED
 

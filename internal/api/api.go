@@ -28,6 +28,8 @@ const (
 	ProductionRoute = "/new"
 	// ResourceRoute route to ResourceEndpoint
 	ResourceRoute = "/update/:parent/:kind/:id"
+	// ListRoute route to ListProductionsEndpoint
+	ListRoute = "/list"
 )
 
 // ProductionEndpoint creates an new show and does all the background setup
@@ -61,6 +63,32 @@ func ProductionEndpoint(c *gin.Context) {
 		GUID: p.GUID,
 	}
 	StandardResponse(c, http.StatusCreated, &resp)
+}
+
+// ListProductionsEndpoint creates an new show and does all the background setup
+func ListProductionsEndpoint(c *gin.Context) {
+
+	clientID, err := getClientID(c)
+	if err != nil || clientID == "" {
+		HandleError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	productions, err := resources.FindProductionsByOwner(appengine.NewContext(c.Request), clientID)
+	if err != nil {
+		HandleError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	resp := t.ProductionsResponse{}
+	resp.List = make([]t.ProductionDetails, len(productions))
+	for i, p := range productions {
+		resp.List[i].GUID = p.GUID
+		resp.List[i].Name = p.Name
+		resp.List[i].Title = p.Title
+	}
+
+	StandardResponse(c, http.StatusOK, &resp)
 }
 
 // ResourceEndpoint creates or updates a resource
@@ -111,7 +139,7 @@ func ResourceEndpoint(c *gin.Context) {
 
 	err := resources.CreateResource(appengine.NewContext(c.Request), fmt.Sprintf("%s/%s-%s.yaml", parent, kind, guid), forceFlag, payload)
 	if err != nil {
-		HandleError(c, http.StatusInternalServerError, err)
+		HandleError(c, http.StatusBadRequest, err)
 		return
 	}
 

@@ -55,6 +55,7 @@ func main() {
 
 	// API endpoints with authentication
 	apiEndpoints := svc.SecureGroup(api.NamespacePrefix, jwt.MiddlewareFunc())
+	apiEndpoints.GET(api.ListRoute, "api.view", api.ListProductionsEndpoint)
 	apiEndpoints.POST(api.ProductionRoute, "api.create", api.ProductionEndpoint)
 	apiEndpoints.POST(api.ResourceRoute, "api.create,api.update", api.ResourceEndpoint) // creates a resource, fails if it already exists
 	apiEndpoints.PUT(api.ResourceRoute, "api.update", api.ResourceEndpoint)             // updates a resource, fails if it does NOT exist
