@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/txsvc/service/pkg/auth"
 	"google.golang.org/appengine"
 
 	"github.com/podops/podops/internal/resources"
@@ -39,10 +40,16 @@ func ProductionEndpoint(c *gin.Context) {
 		return
 	}
 
+	clientID, err := getClientID(c)
+	if err != nil || clientID == "" {
+		HandleError(c, http.StatusBadRequest, err)
+		return
+	}
+
 	// create a show
 	// FIXME: verify && cleanup the name. Should follow Domain name conventions.
 	showName := strings.ToLower(strings.TrimSpace(req.Name))
-	p, err := resources.CreateProduction(appengine.NewContext(c.Request), showName, req.Title, req.Summary)
+	p, err := resources.CreateProduction(appengine.NewContext(c.Request), showName, req.Title, req.Summary, clientID)
 	if err != nil {
 		HandleError(c, http.StatusBadRequest, err)
 		return
@@ -109,4 +116,20 @@ func ResourceEndpoint(c *gin.Context) {
 	}
 
 	StandardResponse(c, http.StatusCreated, nil)
+}
+
+func getClientID(c *gin.Context) (string, error) {
+	token := auth.GetBearerToken(c)
+	if token == "" {
+		return "", fmt.Errorf("production: missing token")
+	}
+	a, err := auth.FindAuthorization(appengine.NewContext(c.Request), token)
+	if err != nil {
+		return "", err
+	}
+	if a == nil {
+		return "", fmt.Errorf("production: no authorization")
+	}
+
+	return a.ClientID, nil
 }

@@ -12,8 +12,8 @@ import (
 
 // NewProductionCommand requests a new show
 func NewProductionCommand(c *cli.Context) error {
-	if err := client.Valid(); err != nil {
-		return err
+	if !client.IsAuthorized() {
+		return fmt.Errorf("Not authorized. Use 'po auth' first")
 	}
 
 	name := c.Args().First()

@@ -26,6 +26,7 @@ type (
 	// Production holds the shows main data
 	Production struct {
 		GUID      string `json:"guid"`
+		Owner     string `json:"owner"`
 		Name      string `json:"name"`
 		Title     string `json:"title"`
 		Summary   string `json:"summary"`
@@ -40,7 +41,7 @@ type (
 )
 
 // CreateProduction initializes a new show and all its metadata
-func CreateProduction(ctx context.Context, name, title, summary string) (*Production, error) {
+func CreateProduction(ctx context.Context, name, title, summary, clientID string) (*Production, error) {
 	if name == "" {
 		return nil, fmt.Errorf("production: name must not be empty")
 	}
@@ -59,6 +60,7 @@ func CreateProduction(ctx context.Context, name, title, summary string) (*Produc
 
 	p = &Production{
 		GUID:    guid,
+		Owner:   clientID,
 		Name:    name,
 		Title:   title,
 		Summary: summary,
