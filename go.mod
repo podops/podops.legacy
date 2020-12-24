@@ -8,9 +8,9 @@ require (
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.6.3
 	github.com/pkg/errors v0.9.1
-	github.com/txsvc/commons v1.0.6
-	github.com/txsvc/platform v0.13.1
-	github.com/txsvc/service v0.12.2
+	github.com/txsvc/commons v1.1.0
+	github.com/txsvc/platform v1.0.0
+	github.com/txsvc/service v1.0.0
 	github.com/urfave/cli v1.22.5
 	google.golang.org/appengine v1.6.7
 	gopkg.in/yaml.v2 v2.4.0
