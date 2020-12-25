@@ -16,13 +16,6 @@ const (
 	cmdLineVersion = "v0.1"
 )
 
-const helpText = `PodOps: Podcast Operations Client
-
-This client tool helps you to create and produce podcasts.
-It also includes administrative commands for managing your live podcasts.
-
-To see the full list of supported commands, run 'po help'`
-
 func main() {
 
 	// initialize CLI
@@ -31,7 +24,7 @@ func main() {
 		Version: cmdLineVersion,
 		Usage:   "PodOps: Podcast Operations Client",
 		Action: func(c *cli.Context) error {
-			fmt.Println(helpText)
+			fmt.Println(globalHelpText)
 			return nil
 		},
 		//Flags:    globalFlags(),
@@ -104,54 +97,10 @@ func setupCommands() []cli.Command {
 		{
 			Name:      "set",
 			Usage:     "List the current show/production, switch to another show/production",
-			UsageText: "set [NAME]\n\n\t # Display the current show/production\n\t po set\n\n\t # Set the current show/production\n\t po set NAME",
+			UsageText: setUsageText,
 			Category:  cl.ShowCmdGroup,
 			Action:    cl.SetProductionCommand,
 		},
-
-		// NOT IMPLEMENTED
-
-		/*
-			{
-				Name:     "info",
-				Usage:    "Shows an overview of the current show",
-				Category: cl.BasicCmdGroup,
-				Action:   cl.NoopCommand,
-			},
-
-			{
-				Name:     "apply",
-				Usage:    "Apply a change to a resource from a file, directory or URL",
-				Category: cl.ShowMgmtCmdGroup,
-				Action:   cl.NoopCommand,
-			},
-			{
-				Name:     "get",
-				Usage:    "Display one or many resources by name",
-				Category: cl.ShowMgmtCmdGroup,
-				Action:   cl.NoopCommand,
-			},
-			{
-				Name:     "delete",
-				Usage:    "Delete one or many resources by name",
-				Category: cl.ShowMgmtCmdGroup,
-				Action:   cl.NoopCommand,
-			},
-			{
-				Name:     "produce",
-				Usage:    "Start the production of the podcast feed on the service",
-				Category: cl.ShowMgmtCmdGroup,
-				Action:   cl.NoopCommand,
-			},
-			{
-				Name:     "build",
-				Usage:    "Start the build of the podcast assets locally",
-				Category: cl.ShowMgmtCmdGroup,
-				Action:   cl.NoopCommand,
-			},
-
-		*/
-
 	}
 	return c
 }
@@ -201,3 +150,23 @@ func templateFlags() []cli.Flag {
 	}
 	return f
 }
+
+//
+// all the help texts used in the CLI
+//
+const (
+	globalHelpText = `PodOps: Podcast Operations Client
+
+This client tool helps you to create and produce podcasts.
+It also includes administrative commands for managing your live podcasts.
+
+To see the full list of supported commands, run 'po help'`
+
+	setUsageText = `set [NAME]
+
+	 # Display the current show/production
+	 po set
+	 
+	 # Set the current show/production
+	 po set [NAME]`
+)
