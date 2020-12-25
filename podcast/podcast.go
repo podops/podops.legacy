@@ -60,11 +60,23 @@ func (cl *Client) List() (*t.ProductionsResponse, error) {
 	return &resp, nil
 }
 
+// CreateResource invokes the ResourceEndpoint
+func (cl *Client) CreateResource(kind, guid string, rsrc interface{}) (int, error) {
+
+	resp := t.StatusObject{}
+	status, err := cl.Post(fmt.Sprintf(resourceRoute, cl.GUID, kind, guid), rsrc, &resp)
+
+	if err != nil {
+		return status, err
+	}
+	return status, nil
+}
+
 // UpdateResource invokes the ResourceEndpoint
 func (cl *Client) UpdateResource(kind, guid string, rsrc interface{}) (int, error) {
 
 	resp := t.StatusObject{}
-	status, err := cl.Post(fmt.Sprintf(resourceRoute, cl.GUID, kind, guid), rsrc, &resp)
+	status, err := cl.Put(fmt.Sprintf(resourceRoute, cl.GUID, kind, guid), rsrc, &resp)
 
 	if err != nil {
 		return status, err

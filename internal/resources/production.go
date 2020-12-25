@@ -77,7 +77,7 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 	// create a dummy Storage location for this production at production.podops.dev/guid
 
 	show := metadata.DefaultShow(name, title, summary, guid)
-	err = CreateResource(ctx, fmt.Sprintf("%s/show-%s.yaml", guid, guid), true, &show)
+	err = WriteResource(ctx, fmt.Sprintf("%s/show-%s.yaml", guid, guid), true, false, &show)
 	if err != nil {
 		platform.DataStore().Delete(ctx, k)
 		return nil, err

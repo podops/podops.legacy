@@ -24,7 +24,7 @@ func CreateCommand(c *cli.Context) error {
 		return err
 	}
 
-	_, err = client.UpdateResource(kind, guid, resource)
+	_, err = client.CreateResource(kind, guid, resource)
 	if err != nil {
 		return err
 	}
@@ -35,5 +35,25 @@ func CreateCommand(c *cli.Context) error {
 
 // UpdateCommand updates a resource from a file, directory or URL
 func UpdateCommand(c *cli.Context) error {
+	if err := client.Valid(); err != nil {
+		return err
+	}
+
+	if c.NArg() != 1 {
+		return fmt.Errorf("Wrong number of arguments. Expected 1, got %d", c.NArg())
+	}
+	path := c.Args().First()
+
+	resource, kind, guid, err := loadResource(path)
+	if err != nil {
+		return err
+	}
+
+	_, err = client.UpdateResource(kind, guid, resource)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(fmt.Sprintf("Updated resource %s-%s", kind, guid))
 	return nil
 }

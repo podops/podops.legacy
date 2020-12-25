@@ -111,7 +111,7 @@ func ResourceEndpoint(c *gin.Context) {
 	}
 
 	//force := c.DefaultQuery("force", "false")
-	forceFlag := true
+	forceFlag := false
 	var payload interface{}
 
 	if kind == "show" {
@@ -137,7 +137,11 @@ func ResourceEndpoint(c *gin.Context) {
 		return
 	}
 
-	err := resources.CreateResource(appengine.NewContext(c.Request), fmt.Sprintf("%s/%s-%s.yaml", parent, kind, guid), forceFlag, payload)
+	createFlag := true // POST
+	if c.Request.Method == "PUT" {
+		createFlag = false
+	}
+	err := resources.WriteResource(appengine.NewContext(c.Request), fmt.Sprintf("%s/%s-%s.yaml", parent, kind, guid), createFlag, forceFlag, payload)
 	if err != nil {
 		HandleError(c, http.StatusBadRequest, err)
 		return
