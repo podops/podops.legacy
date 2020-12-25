@@ -110,8 +110,11 @@ func ResourceEndpoint(c *gin.Context) {
 		return
 	}
 
-	//force := c.DefaultQuery("force", "false")
 	forceFlag := false
+	if c.DefaultQuery("f", "false") == "true" {
+		forceFlag = true
+	}
+
 	var payload interface{}
 
 	if kind == "show" {

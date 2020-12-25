@@ -85,6 +85,7 @@ func setupCommands() []cli.Command {
 			UsageText: "create FILENAME",
 			Category:  cl.ShowCmdGroup,
 			Action:    cl.CreateCommand,
+			Flags:     createFlags(),
 		},
 		{
 			Name:      "update",
@@ -92,6 +93,7 @@ func setupCommands() []cli.Command {
 			UsageText: "update FILENAME",
 			Category:  cl.ShowCmdGroup,
 			Action:    cl.UpdateCommand,
+			Flags:     createFlags(),
 		},
 		{
 			Name:     "list",
@@ -163,6 +165,16 @@ func newShowFlags() []cli.Flag {
 		&cli.StringFlag{
 			Name:  "summary",
 			Usage: "Show summary",
+		},
+	}
+	return f
+}
+
+func createFlags() []cli.Flag {
+	f := []cli.Flag{
+		&cli.BoolFlag{
+			Name:  "force",
+			Usage: "Force create/update",
 		},
 	}
 	return f

@@ -21,7 +21,7 @@ const (
 	// productionRoute route to call ProductionEndpoint
 	productionRoute = "/a/v1/new"
 	// resourceRoute route to call ResourceEndpoint
-	resourceRoute = "/a/v1/update/%s/%s/%s" // "/update/:parent/:rsrc/:id"
+	resourceRoute = "/a/v1/update/%s/%s/%s?f=%v" // "/update/:parent/:rsrc/:id"
 	// listRoute route to call ListEndpoint
 	listRoute = "/a/v1/list"
 )
@@ -61,10 +61,10 @@ func (cl *Client) List() (*t.ProductionsResponse, error) {
 }
 
 // CreateResource invokes the ResourceEndpoint
-func (cl *Client) CreateResource(kind, guid string, rsrc interface{}) (int, error) {
+func (cl *Client) CreateResource(kind, guid string, force bool, rsrc interface{}) (int, error) {
 
 	resp := t.StatusObject{}
-	status, err := cl.Post(fmt.Sprintf(resourceRoute, cl.GUID, kind, guid), rsrc, &resp)
+	status, err := cl.Post(fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -73,10 +73,10 @@ func (cl *Client) CreateResource(kind, guid string, rsrc interface{}) (int, erro
 }
 
 // UpdateResource invokes the ResourceEndpoint
-func (cl *Client) UpdateResource(kind, guid string, rsrc interface{}) (int, error) {
+func (cl *Client) UpdateResource(kind, guid string, force bool, rsrc interface{}) (int, error) {
 
 	resp := t.StatusObject{}
-	status, err := cl.Put(fmt.Sprintf(resourceRoute, cl.GUID, kind, guid), rsrc, &resp)
+	status, err := cl.Put(fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err

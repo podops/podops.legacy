@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/podops/podops/podcast"
 	"github.com/urfave/cli"
@@ -46,17 +45,5 @@ func LogoutCommand(c *cli.Context) error {
 	client = nil
 
 	fmt.Println("\nLogout successful")
-	return nil
-}
-
-func close() error {
-	// remove the .po file if it exists
-	f, _ := os.Stat(presetsNameAndPath)
-	if f != nil {
-		err := os.Remove(presetsNameAndPath)
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }

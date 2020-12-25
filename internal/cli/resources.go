@@ -18,13 +18,14 @@ func CreateCommand(c *cli.Context) error {
 		return fmt.Errorf("Wrong number of arguments. Expected 1, got %d", c.NArg())
 	}
 	path := c.Args().First()
+	force := c.Bool("force")
 
 	resource, kind, guid, err := loadResource(path)
 	if err != nil {
 		return err
 	}
 
-	_, err = client.CreateResource(kind, guid, resource)
+	_, err = client.CreateResource(kind, guid, force, resource)
 	if err != nil {
 		return err
 	}
@@ -43,13 +44,14 @@ func UpdateCommand(c *cli.Context) error {
 		return fmt.Errorf("Wrong number of arguments. Expected 1, got %d", c.NArg())
 	}
 	path := c.Args().First()
+	force := c.Bool("force")
 
 	resource, kind, guid, err := loadResource(path)
 	if err != nil {
 		return err
 	}
 
-	_, err = client.UpdateResource(kind, guid, resource)
+	_, err = client.UpdateResource(kind, guid, force, resource)
 	if err != nil {
 		return err
 	}
