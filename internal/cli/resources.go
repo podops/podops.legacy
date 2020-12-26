@@ -5,7 +5,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // CreateCommand creates a resource from a file, directory or URL

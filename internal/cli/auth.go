@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/podops/podops/podcast"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // AuthCommand logs into the PodOps service and validates the token

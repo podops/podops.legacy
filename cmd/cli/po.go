@@ -6,7 +6,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 
 	cl "github.com/podops/podops/internal/cli"
 )
@@ -41,8 +41,8 @@ func main() {
 	}
 }
 
-func setupCommands() []cli.Command {
-	c := []cli.Command{
+func setupCommands() []*cli.Command {
+	c := []*cli.Command{
 		{
 			Name:      "auth",
 			Usage:     "Login to the PodOps service",
@@ -108,12 +108,14 @@ func setupCommands() []cli.Command {
 func newShowFlags() []cli.Flag {
 	f := []cli.Flag{
 		&cli.StringFlag{
-			Name:  "title",
-			Usage: "Show title",
+			Name:    "title",
+			Usage:   "Show title",
+			Aliases: []string{"t"},
 		},
 		&cli.StringFlag{
-			Name:  "summary",
-			Usage: "Show summary",
+			Name:    "summary",
+			Usage:   "Show summary",
+			Aliases: []string{"s"},
 		},
 	}
 	return f
@@ -122,8 +124,9 @@ func newShowFlags() []cli.Flag {
 func createFlags() []cli.Flag {
 	f := []cli.Flag{
 		&cli.BoolFlag{
-			Name:  "force",
-			Usage: "Force create/update",
+			Name:    "force",
+			Usage:   "Force create/update",
+			Aliases: []string{"f"},
 		},
 	}
 	return f
@@ -132,20 +135,24 @@ func createFlags() []cli.Flag {
 func templateFlags() []cli.Flag {
 	f := []cli.Flag{
 		&cli.StringFlag{
-			Name:  "name",
-			Usage: "Resource name",
+			Name:    "name",
+			Usage:   "Resource name",
+			Aliases: []string{"n"},
 		},
 		&cli.StringFlag{
-			Name:  "parent",
-			Usage: "Parent resource name",
+			Name:    "parent",
+			Usage:   "Parent resource name",
+			Aliases: []string{"p"},
 		},
 		&cli.StringFlag{
-			Name:  "id",
-			Usage: "Resource GUID",
+			Name:    "guid",
+			Usage:   "Resource GUID",
+			Aliases: []string{"id"},
 		},
 		&cli.StringFlag{
-			Name:  "parentid",
-			Usage: "Parent resource GUID",
+			Name:    "parentid",
+			Usage:   "Parent resource GUID",
+			Aliases: []string{"pid"},
 		},
 	}
 	return f

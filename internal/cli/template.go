@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 
 	"github.com/txsvc/commons/pkg/util"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v2"
 
 	"github.com/podops/podops/pkg/metadata"

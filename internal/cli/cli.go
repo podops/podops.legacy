@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/podops/podops/podcast"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 const (
