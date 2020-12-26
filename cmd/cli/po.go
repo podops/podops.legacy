@@ -32,7 +32,7 @@ func main() {
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
-	sort.Sort(cli.CommandsByName(app.Commands))
+	//sort.Sort(cli.CommandsByName(app.Commands))
 
 	// runthe CLI
 	err := app.Run(os.Args)
@@ -43,6 +43,31 @@ func main() {
 
 func setupCommands() []*cli.Command {
 	c := []*cli.Command{
+		// Basic Commands
+		{
+			Name:     "list",
+			Usage:    "List all shows/productions",
+			Category: cl.BasicCmdGroup,
+			Action:   cl.ListProductionCommand,
+		},
+		{
+			Name:      "new-show",
+			Usage:     "Setup a new show/production",
+			UsageText: "new-show NAME",
+			Category:  cl.BasicCmdGroup,
+			Action:    cl.NewProductionCommand,
+			Flags:     newShowFlags(),
+		},
+		{
+			Name:      "template",
+			Usage:     "Create a resource template with default values",
+			UsageText: "template [show|episode]",
+			Category:  cl.BasicCmdGroup,
+			Action:    cl.TemplateCommand,
+			Flags:     templateFlags(),
+		},
+
+		// Settings
 		{
 			Name:      "auth",
 			Usage:     "Login to the PodOps service",
@@ -56,21 +81,21 @@ func setupCommands() []*cli.Command {
 			Category: cl.SettingsCmdGroup,
 			Action:   cl.LogoutCommand,
 		},
+		// Show/production commands
 		{
-			Name:      "template",
-			Usage:     "Create a resource template with default values",
-			UsageText: "template [show|episode]",
-			Category:  cl.BasicCmdGroup,
-			Action:    cl.TemplateCommand,
-			Flags:     templateFlags(),
+			Name:      "set",
+			Usage:     "List the current show/production, switch to another show/production",
+			UsageText: setUsageText,
+			Category:  cl.ShowCmdGroup,
+			Action:    cl.SetProductionCommand,
 		},
 		{
-			Name:      "new-show",
-			Usage:     "Setup a new show/production",
-			UsageText: "new-show NAME",
-			Category:  cl.BasicCmdGroup,
-			Action:    cl.NewProductionCommand,
-			Flags:     newShowFlags(),
+			Name:      "get",
+			Usage:     "Lists a single resource/a collection of resources",
+			UsageText: getUsageText,
+			Category:  cl.ShowCmdGroup,
+			Action:    cl.NoOpCommand,
+			//Flags:     createFlags(),
 		},
 		{
 			Name:      "create",
@@ -89,17 +114,12 @@ func setupCommands() []*cli.Command {
 			Flags:     createFlags(),
 		},
 		{
-			Name:     "list",
-			Usage:    "List all shows/productions",
-			Category: cl.BasicCmdGroup,
-			Action:   cl.ListProductionCommand,
-		},
-		{
-			Name:      "set",
-			Usage:     "List the current show/production, switch to another show/production",
-			UsageText: setUsageText,
+			Name:      "delete",
+			Usage:     "Delete a resource",
+			UsageText: "po delete [show|episode] NAME",
 			Category:  cl.ShowCmdGroup,
-			Action:    cl.SetProductionCommand,
+			Action:    cl.NoOpCommand,
+			//Flags:     createFlags(),
 		},
 	}
 	return c
@@ -176,4 +196,15 @@ To see the full list of supported commands, run 'po help'`
 	 
 	 # Set the current show/production
 	 po set [NAME]`
+
+	getUsageText = `get [RESOURCE]
+
+	 # List all resources
+	 po get
+
+	 # List all resources of a type
+	 po get [show|episode]
+
+	 # Show details about a resource
+	 po get [show|episode] NAME`
 )

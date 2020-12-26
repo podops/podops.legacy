@@ -90,7 +90,7 @@ func NewClientFromFile(ctx context.Context, path string) (*Client, error) {
 
 // Close does whatever kind of clean-up is necessary
 func (cl *Client) Close() {
-	// FIXME: just a placeholder
+	// FIXME: just a placeholder for now
 }
 
 // Store persists the Client state
