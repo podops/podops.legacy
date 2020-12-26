@@ -79,7 +79,7 @@ func DefaultShow(name, title, summary, guid string) *Show {
 			Copyright: fmt.Sprintf("%s copyright", name),
 		},
 		Image: Resource{
-			URI: fmt.Sprintf("%s/%s/coverart.png", DefaultCDNEndpoint, name),
+			URI: fmt.Sprintf("%s/%s/coverart.png", DefaultCDNEndpoint, guid),
 			Rel: "external",
 		},
 	}
@@ -105,11 +105,11 @@ func DefaultEpisode(name, parentName, guid, parentGUID string) *Episode {
 			Duration: 1, // Seconds. Must not be 0, otherwise a validation error occurs.
 		},
 		Image: Resource{
-			URI: fmt.Sprintf("%s/%s/%s/coverart.png", DefaultCDNEndpoint, parentName, guid),
+			URI: fmt.Sprintf("%s/%s/%s/coverart.png", DefaultCDNEndpoint, parentGUID, guid),
 			Rel: "external",
 		},
 		Enclosure: Resource{
-			URI:  fmt.Sprintf("%s/%s/%s/%s.mp3", DefaultCDNEndpoint, parentName, guid, name),
+			URI:  fmt.Sprintf("%s/%s/%s/%s.mp3", DefaultCDNEndpoint, parentGUID, guid, name),
 			Type: "audio/mpeg",
 			Rel:  "external",
 			Size: 0, // bytes

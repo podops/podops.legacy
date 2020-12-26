@@ -2,7 +2,7 @@ dispatch:
   - url: "podops.dev/"
     service: default
 
-  - url: "*/a/1/*"
+  - url: "*/a/v1/*"
     service: api
 
   - url: "*/_a/*"
