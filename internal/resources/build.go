@@ -90,7 +90,5 @@ func Build(ctx context.Context, guid string) error {
 		return err
 	}
 
-	fmt.Printf("--- feed:\n%v\n\n", feed)
-
 	return nil
 }
