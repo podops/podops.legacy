@@ -1,5 +1,9 @@
 package metadata
 
+import (
+	"time"
+)
+
 const (
 	// DefaultPortalEndpoint points to the portal
 	DefaultPortalEndpoint = "https://podops.dev"
@@ -126,3 +130,17 @@ type (
 		Size   int    `json:"size,omitempty" yaml:"size,omitempty"`     // OPTIONAL
 	}
 )
+
+// PublishDate returns the timestamp in seconds
+func (e *Episode) PublishDate() int64 {
+	pd := e.Metadata.Labels[LabelDate]
+	if pd == "" {
+		return 0
+	}
+	t, err := time.Parse(time.RFC1123Z, pd)
+	if err != nil {
+		return 0
+	}
+
+	return t.Unix()
+}

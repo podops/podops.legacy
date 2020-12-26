@@ -51,6 +51,13 @@ func setupCommands() []*cli.Command {
 			Action:   cl.ListProductionCommand,
 		},
 		{
+			Name:      "set",
+			Usage:     "List the current show/production, switch to another show/production",
+			UsageText: setUsageText,
+			Category:  cl.BasicCmdGroup,
+			Action:    cl.SetProductionCommand,
+		},
+		{
 			Name:      "new-show",
 			Usage:     "Setup a new show/production",
 			UsageText: "new-show NAME",
@@ -83,13 +90,6 @@ func setupCommands() []*cli.Command {
 		},
 		// Show/production commands
 		{
-			Name:      "set",
-			Usage:     "List the current show/production, switch to another show/production",
-			UsageText: setUsageText,
-			Category:  cl.ShowCmdGroup,
-			Action:    cl.SetProductionCommand,
-		},
-		{
 			Name:      "get",
 			Usage:     "Lists a single resource/a collection of resources",
 			UsageText: getUsageText,
@@ -117,8 +117,16 @@ func setupCommands() []*cli.Command {
 			Name:      "delete",
 			Usage:     "Delete a resource",
 			UsageText: "po delete [show|episode] NAME",
-			Category:  cl.ShowCmdGroup,
+			Category:  cl.ShowMgmtCmdGroup,
 			Action:    cl.NoOpCommand,
+			//Flags:     createFlags(),
+		},
+		// HACKING
+		{
+			Name:     "hack",
+			Usage:    "Hacking",
+			Category: cl.ShowMgmtCmdGroup,
+			Action:   cl.Hack,
 			//Flags:     createFlags(),
 		},
 	}

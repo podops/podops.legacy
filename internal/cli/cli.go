@@ -21,13 +21,13 @@ const (
 	presetsNameAndPath = ".po"
 
 	// BasicCmdGroup groups basic commands
-	BasicCmdGroup = "Basic Commands"
+	BasicCmdGroup = "\nBasic Commands"
 	// SettingsCmdGroup groups settings
-	SettingsCmdGroup = "Settings Commands"
+	SettingsCmdGroup = "\nSettings Commands"
 	// ShowCmdGroup groups basic show commands
-	ShowCmdGroup = "Show Commands"
+	ShowCmdGroup = "\nContent Creation Commands"
 	// ShowMgmtCmdGroup groups advanced show commands
-	ShowMgmtCmdGroup = "Show Management Commands"
+	ShowMgmtCmdGroup = "\nContent Management Commands"
 )
 
 type (
