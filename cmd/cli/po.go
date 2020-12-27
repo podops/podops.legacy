@@ -114,6 +114,14 @@ func setupCommands() []*cli.Command {
 			Flags:     createFlags(),
 		},
 		{
+			Name:      "build",
+			Usage:     "Start a new build",
+			UsageText: "po build",
+			Category:  cl.ShowMgmtCmdGroup,
+			Action:    cl.BuildCommand,
+			//Flags:     createFlags(),
+		},
+		{
 			Name:      "delete",
 			Usage:     "Delete a resource",
 			UsageText: "po delete [show|episode] NAME",

@@ -3,14 +3,10 @@ package cli
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"os"
-	"strings"
 
 	"github.com/txsvc/commons/pkg/util"
 	"github.com/urfave/cli/v2"
-	"gopkg.in/yaml.v2"
 
 	"github.com/podops/podops/pkg/metadata"
 	"github.com/podops/podops/podcast"
@@ -37,8 +33,6 @@ type (
 
 var (
 	client *podcast.Client
-
-	resourceLoaders map[string]ResourceLoaderFunc
 )
 
 func init() {
@@ -49,34 +43,6 @@ func init() {
 	if cl != nil {
 		client = cl
 	}
-
-	resourceLoaders = make(map[string]ResourceLoaderFunc)
-	resourceLoaders["show"] = loadShowResource
-	resourceLoaders["episode"] = loadEpisodeResource
-}
-
-// remove the local file with login credentials and other state information
-func close() error {
-	// remove the .po file if it exists
-	f, _ := os.Stat(presetsNameAndPath)
-	if f != nil {
-		err := os.Remove(presetsNameAndPath)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// PrintError formats a CLI error and prints it
-func PrintError(c *cli.Context, err error) {
-	msg := fmt.Sprintf("%s: %v", c.Command.Name, strings.ToLower(err.Error()))
-	fmt.Println(msg)
-}
-
-// NoOpCommand is just a placeholder
-func NoOpCommand(c *cli.Context) error {
-	return cli.Exit(fmt.Sprintf("Command '%s' is not implemented", c.Command.Name), 0)
 }
 
 // AuthCommand logs into the PodOps service and validates the token
@@ -247,12 +213,12 @@ func CreateCommand(c *cli.Context) error {
 	path := c.Args().First()
 	force := c.Bool("force")
 
-	resource, kind, guid, err := loadResource(path)
+	r, kind, guid, err := loadResource(path)
 	if err != nil {
 		return err
 	}
 
-	_, err = client.CreateResource(kind, guid, force, resource)
+	_, err = client.CreateResource(kind, guid, force, r)
 	if err != nil {
 		return err
 	}
@@ -273,12 +239,12 @@ func UpdateCommand(c *cli.Context) error {
 	path := c.Args().First()
 	force := c.Bool("force")
 
-	resource, kind, guid, err := loadResource(path)
+	r, kind, guid, err := loadResource(path)
 	if err != nil {
 		return err
 	}
 
-	_, err = client.UpdateResource(kind, guid, force, resource)
+	_, err = client.UpdateResource(kind, guid, force, r)
 	if err != nil {
 		return err
 	}
@@ -335,14 +301,11 @@ func TemplateCommand(c *cli.Context) error {
 	return nil
 }
 
-func dump(path string, doc interface{}) error {
-	data, err := yaml.Marshal(doc)
-	if err != nil {
+// BuildCommand starts a new build of the feed
+func BuildCommand(c *cli.Context) error {
+	if err := client.Valid(); err != nil {
 		return err
 	}
-
-	ioutil.WriteFile(path, data, 0644)
-	fmt.Printf("--- %s:\n\n%s\n\n", path, string(data))
 
 	return nil
 }

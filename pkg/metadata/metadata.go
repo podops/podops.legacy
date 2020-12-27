@@ -61,8 +61,8 @@ type (
 		Labels map[string]string `json:"labels" yaml:"labels,omitempty"`      // REQUIRED
 	}
 
-	// BasicResource holds only metadata
-	BasicResource struct {
+	// ResourceMetadata holds only the kind and metadata a resource
+	ResourceMetadata struct {
 		APIVersion string   `json:"apiVersion" yaml:"apiVersion" binding:"required"` // REQUIRED default: v1.0
 		Kind       string   `json:"kind" yaml:"kind" binding:"required"`             // REQUIRED default: show
 		Metadata   Metadata `json:"metadata" yaml:"metadata" binding:"required"`     // REQUIRED
@@ -131,7 +131,11 @@ type (
 	}
 )
 
-// PublishDate returns the timestamp in seconds
+//
+// Some helper functions to deal with metadata
+//
+
+// PublishDate converts a RFC1123Z formatted timestamp into UNIX timestamp
 func (e *Episode) PublishDate() int64 {
 	pd := e.Metadata.Labels[LabelDate]
 	if pd == "" {
@@ -143,4 +147,19 @@ func (e *Episode) PublishDate() int64 {
 	}
 
 	return t.Unix()
+}
+
+// GUID is a convenience method to access the resources guid
+func (e *Episode) GUID() string {
+	return e.Metadata.Labels[LabelGUID]
+}
+
+// GUID is a convenience method to access the resources guid
+func (r *ResourceMetadata) GUID() string {
+	return r.Metadata.Labels[LabelGUID]
+}
+
+// GUID is a convenience method to access the resources guid
+func (s *Show) GUID() string {
+	return s.Metadata.Labels[LabelGUID]
 }

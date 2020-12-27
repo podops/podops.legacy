@@ -15,7 +15,7 @@ import (
 
 type (
 	// ResourceLoaderFunc implements loading of resources
-	ResourceLoaderFunc func(data []byte) (interface{}, error)
+	ResourceLoaderFunc func(data []byte) (interface{}, string, error)
 )
 
 var (
@@ -66,33 +66,41 @@ func WriteResource(ctx context.Context, path string, create, force bool, rsrc in
 	return nil
 }
 
-// ReadResource reads a resource
-func ReadResource(ctx context.Context, path string) (interface{}, string, error) {
+// ReadResource reads a resource from Cloud Storage
+func ReadResource(ctx context.Context, path string) (interface{}, string, string, error) {
 
 	bkt := platform.Storage().Bucket(bucketProduction)
 	reader, err := bkt.Object(path).NewReader(ctx)
 	if err != nil {
-		return nil, "", err
+		return nil, "", "", err
 	}
 	data, err := ioutil.ReadAll(reader)
 	if err != nil {
-		return nil, "", err
-	}
-	r, err := loadBasicResource(data)
-	loader := resourceLoaders[r.Kind]
-	if loader == nil {
-		return nil, "", fmt.Errorf("Unsupported resource '%s'", r.Kind)
+		return nil, "", "", err
 	}
 
-	resource, err := loader(data)
-	if err != nil {
-		return nil, "", err
-	}
-	return resource, r.Kind, nil
+	return LoadResource(data)
 }
 
-func loadBasicResource(data []byte) (*metadata.BasicResource, error) {
-	var r metadata.BasicResource
+// LoadResource takes a byte array and determines its kind before unmarshalling it into its struct form
+func LoadResource(data []byte) (interface{}, string, string, error) {
+
+	r, err := LoadResourceMetadata(data)
+	loader := resourceLoaders[r.Kind]
+	if loader == nil {
+		return nil, "", "", fmt.Errorf("Unsupported resource '%s'", r.Kind)
+	}
+
+	resource, guid, err := loader(data)
+	if err != nil {
+		return nil, "", "", err
+	}
+	return resource, r.Kind, guid, nil
+}
+
+// LoadResourceMetadata reads only the metadata of a resource
+func LoadResourceMetadata(data []byte) (*metadata.ResourceMetadata, error) {
+	var r metadata.ResourceMetadata
 
 	err := yaml.Unmarshal([]byte(data), &r)
 	if err != nil {
@@ -101,32 +109,32 @@ func loadBasicResource(data []byte) (*metadata.BasicResource, error) {
 	return &r, nil
 }
 
-func loadShowResource(data []byte) (interface{}, error) {
+func loadShowResource(data []byte) (interface{}, string, error) {
 	var r metadata.Show
 
 	err := yaml.Unmarshal([]byte(data), &r)
 	if err != nil {
-		return nil, fmt.Errorf("Can not parse resource. %w", err)
+		return nil, "", fmt.Errorf("Can not parse resource. %w", err)
 	}
 	err = r.Validate()
 	if err != nil {
-		return nil, fmt.Errorf("Resource is not valid. Reason: %w", err)
+		return nil, "", fmt.Errorf("Resource is not valid. Reason: %w", err)
 	}
 
-	return &r, nil
+	return &r, r.GUID(), nil
 }
 
-func loadEpisodeResource(data []byte) (interface{}, error) {
+func loadEpisodeResource(data []byte) (interface{}, string, error) {
 	var r metadata.Episode
 
 	err := yaml.Unmarshal([]byte(data), &r)
 	if err != nil {
-		return nil, fmt.Errorf("Can not parse resource. %w", err)
+		return nil, "", fmt.Errorf("Can not parse resource. %w", err)
 	}
 	err = r.Validate()
 	if err != nil {
-		return nil, fmt.Errorf("Resource is not valid. Reason: %w", err)
+		return nil, "", fmt.Errorf("Resource is not valid. Reason: %w", err)
 	}
 
-	return &r, nil
+	return &r, r.GUID(), nil
 }

@@ -48,7 +48,7 @@ func Build(ctx context.Context, guid string) error {
 			return err
 		}
 
-		e, _, err := ReadResource(ctx, attr.Name)
+		e, _, _, err := ReadResource(ctx, attr.Name)
 		if err != nil {
 			return err
 		}
@@ -57,7 +57,7 @@ func Build(ctx context.Context, guid string) error {
 	sort.Sort(episodes)
 
 	// read the show
-	s, kind, err := ReadResource(ctx, fmt.Sprintf("%s/show-%s.yaml", guid, guid))
+	s, kind, _, err := ReadResource(ctx, fmt.Sprintf("%s/show-%s.yaml", guid, guid))
 	if err != nil {
 		return err
 	}
