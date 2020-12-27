@@ -10,7 +10,7 @@ import (
 
 	"github.com/txsvc/platform/pkg/platform"
 
-	"github.com/podops/podops/internal/api"
+	"github.com/podops/podops/internal/cdn"
 )
 
 func init() {
@@ -38,7 +38,7 @@ func main() {
 	r.Use(gin.Recovery())
 
 	// the only, catch-all route for https://cdn.podops.dev/*
-	r.NoRoute(api.RedirectToStorageEndpoint)
+	r.NoRoute(cdn.ServeContentEndpoint)
 
 	// start the router on port 8080, unless $PORT is set to something else
 	r.Run()

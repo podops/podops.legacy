@@ -1,7 +1,7 @@
-# podops
+# PodOps - Podcast Operations
+
 PodOps backend services
 
-###
+## Deployment
 
-* https://stackoverflow.com/questions/59811938/byte-range-support-in-gin-gonic
-* https://godoc.org/gopkg.in/yaml.v3
+

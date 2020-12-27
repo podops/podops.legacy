@@ -16,5 +16,4 @@ require (
 	google.golang.org/api v0.36.0
 	google.golang.org/appengine v1.6.7
 	gopkg.in/yaml.v2 v2.4.0
-	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
 )

@@ -17,7 +17,7 @@ const (
 	// DatastoreProductions collection PRODUCTION
 	DatastoreProductions = "PRODUCTIONS"
 
-	bucketUpload     = "upload.podops.dev"
+	bucketUpload     = "upload.podops.dev" // FIXME make this configurable, otherwise deployment to other locations/projects will not work
 	bucketProduction = "production.podops.dev"
 	bucketCDN        = "cdn.podops.dev"
 )
