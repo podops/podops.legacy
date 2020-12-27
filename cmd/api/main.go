@@ -59,6 +59,7 @@ func main() {
 	apiEndpoints.POST(api.ProductionRoute, "api.create", api.ProductionEndpoint)
 	apiEndpoints.POST(api.ResourceRoute, "api.create,api.update", api.ResourceEndpoint) // creates a resource, fails if it already exists
 	apiEndpoints.PUT(api.ResourceRoute, "api.update", api.ResourceEndpoint)             // updates a resource, fails if it does NOT exist
+	apiEndpoints.POST(api.BuildRoute, "api.update", api.BuildEndpoint)
 
 	// add CORS handler, allowing all. See https://github.com/gin-contrib/cors
 	svc.Use(cors.Default())

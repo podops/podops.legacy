@@ -29,6 +29,17 @@ type (
 		Title string `json:"title,omitempty" `
 	}
 
+	// BuildRequest initiates the build of the feed
+	BuildRequest struct {
+		GUID string `json:"guid" binding:"required"`
+	}
+
+	// BuildResponse returns the resulting URL
+	BuildResponse struct {
+		GUID string `json:"guid" binding:"required"`
+		URL  string `json:"url" binding:"required"`
+	}
+
 	// StatusObject is used to report status and errors in an API request.
 	// The struct can be used as a response object or be treated as an error object
 	StatusObject struct {

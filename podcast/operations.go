@@ -15,6 +15,8 @@ const (
 	resourceRoute = "/update/%s/%s/%s?f=%v" // "/update/:parent/:rsrc/:id"
 	// listRoute route to call ListEndpoint
 	listRoute = "/list"
+	// buildRoute route to call BuildEndpoint
+	buildRoute = "/build"
 )
 
 // CreateProduction invokes the CreateProductionEndpoint
@@ -73,4 +75,19 @@ func (cl *Client) UpdateResource(kind, guid string, force bool, rsrc interface{}
 		return status, err
 	}
 	return status, nil
+}
+
+// Build invokes the BuildEndpoint
+func (cl *Client) Build(guid string) (string, error) {
+	req := t.BuildRequest{
+		GUID: cl.GUID,
+	}
+	resp := t.BuildResponse{}
+
+	_, err := cl.Post(cl.apiNamespace+buildRoute, &req, &resp)
+	if err != nil {
+		return "", err
+	}
+
+	return resp.URL, nil
 }

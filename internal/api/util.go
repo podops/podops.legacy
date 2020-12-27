@@ -6,6 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/txsvc/platform/pkg/platform"
+	"github.com/txsvc/service/pkg/auth"
+	"google.golang.org/appengine"
 
 	t "github.com/podops/podops/internal/types"
 )
@@ -52,4 +54,21 @@ func ErrorResponse(c *gin.Context, status int, err error) {
 func HandleError(c *gin.Context, status int, e error) {
 	platform.ReportError(e)
 	ErrorResponse(c, status, e)
+}
+
+// GetClientID extracts the ClientID from the token
+func GetClientID(c *gin.Context) (string, error) {
+	token := auth.GetBearerToken(c)
+	if token == "" {
+		return "", fmt.Errorf("production: missing token")
+	}
+	a, err := auth.FindAuthorization(appengine.NewContext(c.Request), token)
+	if err != nil {
+		return "", err
+	}
+	if a == nil {
+		return "", fmt.Errorf("production: no authorization")
+	}
+
+	return a.ClientID, nil
 }

@@ -135,8 +135,8 @@ type (
 // Some helper functions to deal with metadata
 //
 
-// PublishDate converts a RFC1123Z formatted timestamp into UNIX timestamp
-func (e *Episode) PublishDate() int64 {
+// PublishDateTimestamp converts a RFC1123Z formatted timestamp into UNIX timestamp
+func (e *Episode) PublishDateTimestamp() int64 {
 	pd := e.Metadata.Labels[LabelDate]
 	if pd == "" {
 		return 0
@@ -147,6 +147,11 @@ func (e *Episode) PublishDate() int64 {
 	}
 
 	return t.Unix()
+}
+
+// PublishDate is a convenience method to access the pub date
+func (e *Episode) PublishDate() string {
+	return e.Metadata.Labels[LabelDate]
 }
 
 // GUID is a convenience method to access the resources guid

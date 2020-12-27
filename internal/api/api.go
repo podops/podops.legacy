@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/txsvc/service/pkg/auth"
 	"google.golang.org/appengine"
 
 	"github.com/podops/podops/internal/resources"
@@ -30,6 +29,8 @@ const (
 	ResourceRoute = "/update/:parent/:kind/:id"
 	// ListRoute route to ListProductionsEndpoint
 	ListRoute = "/list"
+	// BuildRoute route to BuildEndpoint
+	BuildRoute = "/build"
 )
 
 // ProductionEndpoint creates an new show and does all the background setup
@@ -42,7 +43,7 @@ func ProductionEndpoint(c *gin.Context) {
 		return
 	}
 
-	clientID, err := getClientID(c)
+	clientID, err := GetClientID(c)
 	if err != nil || clientID == "" {
 		HandleError(c, http.StatusBadRequest, err)
 		return
@@ -68,7 +69,7 @@ func ProductionEndpoint(c *gin.Context) {
 // ListProductionsEndpoint creates an new show and does all the background setup
 func ListProductionsEndpoint(c *gin.Context) {
 
-	clientID, err := getClientID(c)
+	clientID, err := GetClientID(c)
 	if err != nil || clientID == "" {
 		HandleError(c, http.StatusBadRequest, err)
 		return
@@ -153,18 +154,50 @@ func ResourceEndpoint(c *gin.Context) {
 	StandardResponse(c, http.StatusCreated, nil)
 }
 
-func getClientID(c *gin.Context) (string, error) {
-	token := auth.GetBearerToken(c)
-	if token == "" {
-		return "", fmt.Errorf("production: missing token")
-	}
-	a, err := auth.FindAuthorization(appengine.NewContext(c.Request), token)
+// BuildEndpoint starts the build of the feed
+func BuildEndpoint(c *gin.Context) {
+	var req t.BuildRequest
+
+	err := c.BindJSON(&req)
 	if err != nil {
-		return "", err
-	}
-	if a == nil {
-		return "", fmt.Errorf("production: no authorization")
+		HandleError(c, http.StatusInternalServerError, err)
+		return
 	}
 
-	return a.ClientID, nil
+	clientID, err := GetClientID(c)
+	if err != nil || clientID == "" {
+		HandleError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	ctx := appengine.NewContext(c.Request)
+
+	p, err := resources.GetProduction(ctx, req.GUID)
+	if err != nil {
+		HandleError(c, http.StatusBadRequest, err)
+		return
+	}
+	if p == nil {
+		HandleError(c, http.StatusBadRequest, fmt.Errorf("resource show: invalid guid '%s'", req.GUID))
+		return
+	}
+	if p.Owner != clientID {
+		// FIXME this is a simplification in the abscence of proper ACLs
+		HandleError(c, http.StatusBadRequest, fmt.Errorf("build: user '%s' not allowd to access production '%s'", clientID, req.GUID))
+		return
+	}
+
+	// start the build
+	err = resources.Build(ctx, req.GUID) // FIXME make this async !
+	if err != nil {
+		HandleError(c, http.StatusBadRequest, fmt.Errorf("build: error building production '%s'", req.GUID))
+		return
+	}
+
+	resp := t.BuildResponse{
+		GUID: req.GUID,
+		URL:  fmt.Sprintf("%s/%s/feed.xml", metadata.DefaultCDNEndpoint, req.GUID),
+	}
+
+	StandardResponse(c, http.StatusCreated, &resp)
 }
