@@ -39,7 +39,6 @@ func main() {
 
 	// the only, catch-all route for https://cdn.podops.dev/*
 	r.NoRoute(api.RedirectToStorageEndpoint)
-	//r.GET("/*/", api.RedirectToStorageEndpoint)
 
 	// start the router on port 8080, unless $PORT is set to something else
 	r.Run()

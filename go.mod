@@ -10,7 +10,7 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/pkg/errors v0.9.1
 	github.com/txsvc/commons v1.1.0
-	github.com/txsvc/platform v1.0.0
+	github.com/txsvc/platform v1.0.1
 	github.com/txsvc/service v1.0.0
 	github.com/urfave/cli/v2 v2.3.0
 	google.golang.org/api v0.36.0
