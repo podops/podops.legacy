@@ -3,6 +3,8 @@ package metadata
 import (
 	"fmt"
 	"time"
+
+	t "github.com/podops/podops/internal/types"
 )
 
 // DefaultShowMetadata creates a default set of labels etc for a Show resource
@@ -63,7 +65,7 @@ func DefaultShow(name, title, summary, guid string) *Show {
 			Title:   title,
 			Summary: summary,
 			Link: Resource{
-				URI: fmt.Sprintf("%s/s/%s", DefaultPortalEndpoint, name),
+				URI: fmt.Sprintf("%s/s/%s", t.DefaultPortalEndpoint, name),
 			},
 			Category: Category{
 				Name: "Technology",
@@ -79,7 +81,7 @@ func DefaultShow(name, title, summary, guid string) *Show {
 			Copyright: fmt.Sprintf("%s copyright", name),
 		},
 		Image: Resource{
-			URI: fmt.Sprintf("%s/%s/coverart.png", DefaultCDNEndpoint, guid),
+			URI: fmt.Sprintf("%s/%s/coverart.png", t.DefaultCDNEndpoint, guid),
 			Rel: "external",
 		},
 	}
@@ -100,16 +102,16 @@ func DefaultEpisode(name, parentName, guid, parentGUID string) *Episode {
 			Summary:     fmt.Sprintf("%s - Episode Subtitle or short summary", name),
 			EpisodeText: "A long-form description of the episode with notes etc.",
 			Link: Resource{
-				URI: fmt.Sprintf("%s/s/%s/%s", DefaultPortalEndpoint, parentName, name),
+				URI: fmt.Sprintf("%s/s/%s/%s", t.DefaultPortalEndpoint, parentName, name),
 			},
 			Duration: 1, // Seconds. Must not be 0, otherwise a validation error occurs.
 		},
 		Image: Resource{
-			URI: fmt.Sprintf("%s/%s/%s/coverart.png", DefaultCDNEndpoint, parentGUID, guid),
+			URI: fmt.Sprintf("%s/%s/%s/coverart.png", t.DefaultCDNEndpoint, parentGUID, guid),
 			Rel: "external",
 		},
 		Enclosure: Resource{
-			URI:  fmt.Sprintf("%s/%s/%s/%s.mp3", DefaultCDNEndpoint, parentGUID, guid, name),
+			URI:  fmt.Sprintf("%s/%s/%s/%s.mp3", t.DefaultCDNEndpoint, parentGUID, guid, name),
 			Type: "audio/mpeg",
 			Rel:  "external",
 			Size: 0, // bytes

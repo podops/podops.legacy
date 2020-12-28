@@ -6,15 +6,17 @@ import (
 	"sort"
 	"time"
 
+	"cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
 
-	"cloud.google.com/go/storage"
-
-	"github.com/podops/podops/pkg/metadata"
 	"github.com/txsvc/platform/pkg/platform"
+
+	t "github.com/podops/podops/internal/types"
+	"github.com/podops/podops/pkg/metadata"
 )
 
 type (
+	// EpisodeList holds the list of valid episodes that will be added to a podcast
 	EpisodeList []*metadata.Episode
 )
 
@@ -41,7 +43,7 @@ func Build(ctx context.Context, guid string) error {
 	q := &storage.Query{
 		Prefix: fmt.Sprintf("%s/episode", p.GUID),
 	}
-	it := platform.Storage().Bucket(bucketProduction).Objects(ctx, q)
+	it := platform.Storage().Bucket(t.BucketProduction).Objects(ctx, q)
 	for {
 		attr, err := it.Next()
 		if err == iterator.Done {
@@ -80,8 +82,8 @@ func Build(ctx context.Context, guid string) error {
 		return err
 	}
 
-	t, _ := time.Parse(time.RFC1123Z, episodes[0].PublishDate())
-	feed.AddPubDate(&t)
+	tt, _ := time.Parse(time.RFC1123Z, episodes[0].PublishDate())
+	feed.AddPubDate(&tt)
 
 	for _, e := range episodes {
 		item, err := e.Item()
@@ -92,7 +94,7 @@ func Build(ctx context.Context, guid string) error {
 	}
 
 	// dump the feed to the CDN location
-	obj := platform.Storage().Bucket(bucketCDN).Object(fmt.Sprintf("%s/feed.xml", guid))
+	obj := platform.Storage().Bucket(t.BucketCDN).Object(fmt.Sprintf("%s/feed.xml", guid))
 	writer := obj.NewWriter(ctx)
 	if _, err := writer.Write(feed.Bytes()); err != nil {
 		return err

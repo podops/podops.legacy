@@ -196,7 +196,7 @@ func BuildEndpoint(c *gin.Context) {
 
 	resp := t.BuildResponse{
 		GUID: req.GUID,
-		URL:  fmt.Sprintf("%s/%s/feed.xml", metadata.DefaultCDNEndpoint, req.GUID),
+		URL:  fmt.Sprintf("%s/%s/feed.xml", t.DefaultCDNEndpoint, req.GUID),
 	}
 
 	StandardResponse(c, http.StatusCreated, &resp)

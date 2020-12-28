@@ -5,13 +5,6 @@ import (
 )
 
 const (
-	// DefaultPortalEndpoint points to the portal
-	DefaultPortalEndpoint = "https://podops.dev"
-	// DefaultAPIEndpoint points to the API
-	DefaultAPIEndpoint = "https://api.podops.dev"
-	// DefaultCDNEndpoint point to the CDN
-	DefaultCDNEndpoint = "https://cdn.podops.dev"
-
 	//
 	// Required and optional labels:
 	//

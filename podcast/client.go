@@ -8,15 +8,13 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/txsvc/commons/pkg/env"
+	t "github.com/podops/podops/internal/types"
 )
 
 const (
 	// presetNameAndPath is the name and location of the config file
 	presetNameAndPath = ".po"
 
-	// DefaultServiceEndpoint is the service URL
-	DefaultServiceEndpoint = "https://api.podops.dev"
 	// DefaultNamespacePrefix is the API's namespace
 	DefaultNamespacePrefix = "/a/v1"
 )
@@ -41,7 +39,7 @@ type (
 // are safe for concurrent use by multiple goroutines.
 func NewClient(ctx context.Context, token string) (*Client, error) {
 	client := &Client{
-		ServiceEndpoint: env.GetString("API_ENDPOINT", DefaultServiceEndpoint),
+		ServiceEndpoint: t.DefaultAPIEndpoint,
 		Token:           token,
 		GUID:            "",
 		authorized:      false,
@@ -62,7 +60,7 @@ func NewClientFromFile(ctx context.Context, path string) (*Client, error) {
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		client = &Client{
-			ServiceEndpoint: env.GetString("API_ENDPOINT", DefaultServiceEndpoint),
+			ServiceEndpoint: t.DefaultAPIEndpoint,
 			Token:           "",
 			GUID:            "",
 			authorized:      false,
