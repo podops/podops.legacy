@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/appengine"
 
+	"github.com/podops/podops/internal/config"
 	"github.com/podops/podops/internal/resources"
 	t "github.com/podops/podops/internal/types"
 	"github.com/podops/podops/pkg/metadata"
@@ -196,7 +197,7 @@ func BuildEndpoint(c *gin.Context) {
 
 	resp := t.BuildResponse{
 		GUID: req.GUID,
-		URL:  fmt.Sprintf("%s/%s/feed.xml", t.DefaultCDNEndpoint, req.GUID),
+		URL:  fmt.Sprintf("%s/%s/feed.xml", config.DefaultCDNEndpoint, req.GUID),
 	}
 
 	StandardResponse(c, http.StatusCreated, &resp)

@@ -10,7 +10,7 @@ import (
 
 	"github.com/txsvc/platform/pkg/platform"
 
-	t "github.com/podops/podops/internal/types"
+	"github.com/podops/podops/internal/config"
 	"github.com/podops/podops/pkg/metadata"
 )
 
@@ -35,7 +35,7 @@ func WriteResource(ctx context.Context, path string, create, force bool, rsrc in
 
 	exists := true
 
-	bkt := platform.Storage().Bucket(t.BucketProduction)
+	bkt := platform.Storage().Bucket(config.BucketProduction)
 	obj := bkt.Object(path)
 
 	_, err := obj.Attrs(ctx)
@@ -70,7 +70,7 @@ func WriteResource(ctx context.Context, path string, create, force bool, rsrc in
 // ReadResource reads a resource from Cloud Storage
 func ReadResource(ctx context.Context, path string) (interface{}, string, string, error) {
 
-	bkt := platform.Storage().Bucket(t.BucketProduction)
+	bkt := platform.Storage().Bucket(config.BucketProduction)
 	reader, err := bkt.Object(path).NewReader(ctx)
 	if err != nil {
 		return nil, "", "", err

@@ -1,6 +1,8 @@
-package types
+package config
 
-import "github.com/txsvc/commons/pkg/env"
+import (
+	"github.com/txsvc/commons/pkg/env"
+)
 
 const (
 	defaultBucketUpload     = "upload.podops.dev"

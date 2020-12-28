@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	t "github.com/podops/podops/internal/types"
+	"github.com/podops/podops/internal/config"
 )
 
 const (
@@ -39,7 +39,7 @@ type (
 // are safe for concurrent use by multiple goroutines.
 func NewClient(ctx context.Context, token string) (*Client, error) {
 	client := &Client{
-		ServiceEndpoint: t.DefaultAPIEndpoint,
+		ServiceEndpoint: config.DefaultAPIEndpoint,
 		Token:           token,
 		GUID:            "",
 		authorized:      false,
@@ -60,7 +60,7 @@ func NewClientFromFile(ctx context.Context, path string) (*Client, error) {
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		client = &Client{
-			ServiceEndpoint: t.DefaultAPIEndpoint,
+			ServiceEndpoint: config.DefaultAPIEndpoint,
 			Token:           "",
 			GUID:            "",
 			authorized:      false,

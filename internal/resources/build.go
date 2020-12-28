@@ -11,7 +11,7 @@ import (
 
 	"github.com/txsvc/platform/pkg/platform"
 
-	t "github.com/podops/podops/internal/types"
+	"github.com/podops/podops/internal/config"
 	"github.com/podops/podops/pkg/metadata"
 )
 
@@ -43,7 +43,7 @@ func Build(ctx context.Context, guid string) error {
 	q := &storage.Query{
 		Prefix: fmt.Sprintf("%s/episode", p.GUID),
 	}
-	it := platform.Storage().Bucket(t.BucketProduction).Objects(ctx, q)
+	it := platform.Storage().Bucket(config.BucketProduction).Objects(ctx, q)
 	for {
 		attr, err := it.Next()
 		if err == iterator.Done {
@@ -94,7 +94,7 @@ func Build(ctx context.Context, guid string) error {
 	}
 
 	// dump the feed to the CDN location
-	obj := platform.Storage().Bucket(t.BucketCDN).Object(fmt.Sprintf("%s/feed.xml", guid))
+	obj := platform.Storage().Bucket(config.BucketCDN).Object(fmt.Sprintf("%s/feed.xml", guid))
 	writer := obj.NewWriter(ctx)
 	if _, err := writer.Write(feed.Bytes()); err != nil {
 		return err

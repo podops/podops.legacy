@@ -24,7 +24,7 @@ import (
 	"github.com/txsvc/commons/pkg/env"
 	"github.com/txsvc/platform/pkg/platform"
 
-	t "github.com/podops/podops/internal/types"
+	"github.com/podops/podops/internal/config"
 )
 
 const (
@@ -49,7 +49,7 @@ var bkt *storage.BucketHandle
 func init() {
 	redirectBase = env.GetString("REDIRECT_URL", "https://storage.googleapis.com/cdn.podops.dev")
 
-	bkt = platform.Storage().Bucket(t.BucketCDN)
+	bkt = platform.Storage().Bucket(config.BucketCDN)
 }
 
 // ServeContentEndpoint handles request for content
