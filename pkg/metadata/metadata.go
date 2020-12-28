@@ -1,7 +1,12 @@
 package metadata
 
 import (
+	"fmt"
+	"strings"
 	"time"
+
+	"github.com/podops/podops/internal/config"
+	"github.com/txsvc/commons/pkg/util"
 )
 
 const (
@@ -152,6 +157,11 @@ func (e *Episode) GUID() string {
 	return e.Metadata.Labels[LabelGUID]
 }
 
+// ParentGUID is a convenience method to access the resources parent guid
+func (e *Episode) ParentGUID() string {
+	return e.Metadata.Labels[LabelParentGUID]
+}
+
 // GUID is a convenience method to access the resources guid
 func (r *ResourceMetadata) GUID() string {
 	return r.Metadata.Labels[LabelGUID]
@@ -160,4 +170,24 @@ func (r *ResourceMetadata) GUID() string {
 // GUID is a convenience method to access the resources guid
 func (s *Show) GUID() string {
 	return s.Metadata.Labels[LabelGUID]
+}
+
+// ResolveURI re-writes the URI
+func (r *Resource) ResolveURI(guid string) string {
+	if r.Rel == "" || r.Rel == "external" {
+		return r.URI // return as-is
+	}
+	if r.Rel == "local" {
+		return fmt.Sprintf("%s/%s", config.DefaultCDNEndpoint, r.URI)
+	}
+	if r.Rel == "import" {
+		id := util.Fingerprint(r.URI)
+		parts := strings.Split(r.URI, ".")
+		if len(parts) == 0 {
+			return fmt.Sprintf("%s", id)
+		}
+		return fmt.Sprintf("%s/%s/%s.%s", config.DefaultCDNEndpoint, guid, id, parts[len(parts)-1])
+	}
+
+	return r.URI
 }

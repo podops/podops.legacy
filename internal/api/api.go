@@ -189,7 +189,7 @@ func BuildEndpoint(c *gin.Context) {
 	}
 
 	// start the build
-	err = resources.Build(ctx, req.GUID) // FIXME make this async !
+	err = resources.Build(ctx, req.GUID, false) // FIXME make this async, make validateOnly a flag
 	if err != nil {
 		HandleError(c, http.StatusBadRequest, fmt.Errorf("build: error building production '%s'", req.GUID))
 		return

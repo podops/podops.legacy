@@ -34,7 +34,7 @@ func (s *Show) Podcast() (*rss.Channel, error) {
 		pf.IAuthor = s.Description.Author
 	}
 	pf.AddCategory(s.Description.Category.Name, s.Description.Category.SubCategory)
-	pf.AddImage(s.Image.URI)
+	pf.AddImage(s.Image.ResolveURI(s.GUID()))
 	pf.IOwner = &rss.Author{
 		Name:  s.Description.Owner.Name,
 		Email: s.Description.Owner.Email,
@@ -81,8 +81,8 @@ func (e *Episode) Item() (*rss.Item, error) {
 		Description: e.Description.Summary,
 	}
 
-	ef.AddEnclosure(e.Enclosure.URI, mediaTypeMap[e.Enclosure.Type], (int64)(e.Enclosure.Size))
-	ef.AddImage(e.Image.URI)
+	ef.AddEnclosure(e.Enclosure.ResolveURI(e.ParentGUID()), mediaTypeMap[e.Enclosure.Type], (int64)(e.Enclosure.Size))
+	ef.AddImage(e.Image.ResolveURI(e.ParentGUID()))
 	ef.AddPubDate(&pubDate)
 	ef.AddSummary(e.Description.EpisodeText)
 	ef.AddDuration((int64)(e.Description.Duration))

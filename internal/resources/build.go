@@ -27,7 +27,7 @@ func (e EpisodeList) Less(i, j int) bool {
 }
 
 // Build gathers all resources and builds the feed
-func Build(ctx context.Context, guid string) error {
+func Build(ctx context.Context, guid string, validateOnly bool) error {
 
 	var episodes EpisodeList
 
@@ -91,6 +91,11 @@ func Build(ctx context.Context, guid string) error {
 			return err
 		}
 		feed.AddItem(item)
+	}
+
+	if validateOnly {
+		fmt.Printf(feed.String())
+		return nil
 	}
 
 	// dump the feed to the CDN location

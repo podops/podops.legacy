@@ -15,7 +15,7 @@ func Hack(c *cli.Context) error {
 	}
 
 	fmt.Println("Hacking...")
-	resources.Build(context.Background(), client.GUID)
+	resources.Build(context.Background(), client.GUID, true)
 
 	return nil
 }
