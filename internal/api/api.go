@@ -8,6 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/appengine"
 
+	"github.com/txsvc/commons/pkg/util"
+
 	"github.com/podops/podops/internal/config"
 	"github.com/podops/podops/internal/resources"
 	t "github.com/podops/podops/internal/types"
@@ -139,10 +141,17 @@ func ResourceEndpoint(c *gin.Context) {
 
 		p.Title = show.Description.Title
 		p.Summary = show.Description.Summary
+		p.Updated = util.Timestamp()
 
 		err = resources.UpdateProduction(ctx, p)
 		if err != nil {
 			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
+
+		err = resources.EnsureAsset(ctx, show.GUID(), &show.Image)
+		if err != nil {
+			HandleError(c, http.StatusBadRequest, err)
 			return
 		}
 
@@ -155,6 +164,20 @@ func ResourceEndpoint(c *gin.Context) {
 			return
 		}
 		payload = &episode
+
+		// verify episode image
+		err = resources.EnsureAsset(ctx, episode.ParentGUID(), &episode.Image)
+		if err != nil {
+			HandleError(c, http.StatusBadRequest, err)
+			return
+		}
+
+		// verify episode audio file
+		err = resources.EnsureAsset(ctx, episode.ParentGUID(), &episode.Enclosure)
+		if err != nil {
+			HandleError(c, http.StatusBadRequest, err)
+			return
+		}
 	} else {
 		HandleError(c, http.StatusBadRequest, fmt.Errorf("resource: invalid kind '%s", kind))
 		return
@@ -203,6 +226,14 @@ func BuildEndpoint(c *gin.Context) {
 	if p.Owner != clientID {
 		// FIXME this is a simplification in the abscence of proper ACLs
 		HandleError(c, http.StatusBadRequest, fmt.Errorf("build: user '%s' not allowd to access production '%s'", clientID, req.GUID))
+		return
+	}
+
+	// update the PRODUCTION record
+	p.BuildDate = util.Timestamp()
+	err = resources.UpdateProduction(ctx, p)
+	if err != nil {
+		HandleError(c, http.StatusInternalServerError, err)
 		return
 	}
 

@@ -62,6 +62,13 @@ const (
 	EpisodeTypeTrailer = "Trailer"
 	// EpisodeTypeBonus type of episode is 'bonus'
 	EpisodeTypeBonus = "Bonus"
+
+	// ResourceTypeExternal references an external URL
+	ResourceTypeExternal = "external"
+	// ResourceTypeLocal references a local resource
+	ResourceTypeLocal = "local"
+	// ResourceTypeImport references an external resources that will be imported into the CDN
+	ResourceTypeImport = "import"
 )
 
 type (
@@ -189,20 +196,26 @@ func (s *Show) GUID() string {
 
 // ResolveURI re-writes the URI
 func (r *Resource) ResolveURI(guid string) string {
-	if r.Rel == "" || r.Rel == "external" {
+	if r.Rel == "" || r.Rel == ResourceTypeExternal {
 		return r.URI // return as-is
 	}
-	if r.Rel == "local" {
+	if r.Rel == ResourceTypeLocal {
 		return fmt.Sprintf("%s/%s/%s", config.DefaultCDNEndpoint, guid, r.URI)
 	}
-	if r.Rel == "import" {
-		id := util.Fingerprint(r.URI)
-		parts := strings.Split(r.URI, ".")
-		if len(parts) == 0 {
-			return fmt.Sprintf("%s", id)
-		}
-		return fmt.Sprintf("%s/%s/%s.%s", config.DefaultCDNEndpoint, guid, id, parts[len(parts)-1])
+	if r.Rel == ResourceTypeImport {
+		id := r.FingerprintURI(guid)
+		return fmt.Sprintf("%s/%s", config.DefaultCDNEndpoint, id)
 	}
-
+	// FIXME should this be possible?
 	return r.URI
+}
+
+// FingerprintURI re-writes the URI
+func (r *Resource) FingerprintURI(guid string) string {
+	id := util.Fingerprint(r.URI)
+	parts := strings.Split(r.URI, ".")
+	if len(parts) == 0 {
+		return fmt.Sprintf("%s", id)
+	}
+	return fmt.Sprintf("%s/%s.%s", guid, id, parts[len(parts)-1])
 }

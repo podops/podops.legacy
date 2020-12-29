@@ -57,10 +57,8 @@ func WriteResource(ctx context.Context, path string, create, force bool, rsrc in
 	}
 
 	writer := obj.NewWriter(ctx)
+	defer writer.Close()
 	if _, err := writer.Write(data); err != nil {
-		return err
-	}
-	if err := writer.Close(); err != nil {
 		return err
 	}
 
