@@ -30,23 +30,38 @@ const (
 	//		block:		Yes OPTIONAL 'item.itunes.block' Anything else than 'Yes' has no effect
 	//
 
-	LabelLanguage   = "language"
-	LabelExplicit   = "explicit"
-	LabelType       = "type"
-	LabelBlock      = "block"
-	LabelComplete   = "complete"
-	LabelGUID       = "guid"
+	// LabelLanguage ISO-639 two-letter language code. channel.language
+	LabelLanguage = "language"
+	// LabelExplicit ["true"|"false"] channel.itunes.explicit
+	LabelExplicit = "explicit"
+	// LabelType ["Episodic"|"Serial"] channel.itunes.type
+	LabelType = "type"
+	// LabelBlock ["Yes"] channel.itunes.block
+	LabelBlock = "block"
+	// LabelComplete ["Yes"] channel.itunes.complete
+	LabelComplete = "complete"
+	// LabelGUID resources GUID
+	LabelGUID = "guid"
+	// LabelParentGUID guid of the resources parent resource
 	LabelParentGUID = "parent_guid"
-	LabelDate       = "date"
-	LabelSeason     = "season"
-	LabelEpisode    = "episode"
+	// LabelDate used as e.g. publish date of an episode
+	LabelDate = "date"
+	// LabelSeason defaults to "1"
+	LabelSeason = "season"
+	// LabelEpisode positive integer 1..
+	LabelEpisode = "episode"
 
+	// ShowTypeEpisodic type of podcast is episodic
 	ShowTypeEpisodic = "Episodic"
-	ShowTypeSerial   = "Serial"
+	// ShowTypeSerial type of podcast is serial
+	ShowTypeSerial = "Serial"
 
-	EpisodeTypeFull    = "Full"
+	// EpisodeTypeFull type of episode is 'full'
+	EpisodeTypeFull = "Full"
+	// EpisodeTypeTrailer type of episode is 'trailer'
 	EpisodeTypeTrailer = "Trailer"
-	EpisodeTypeBonus   = "Bonus"
+	// EpisodeTypeBonus type of episode is 'bonus'
+	EpisodeTypeBonus = "Bonus"
 )
 
 type (

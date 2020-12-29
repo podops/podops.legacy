@@ -3,11 +3,14 @@ package metadata
 import "fmt"
 
 const (
+	// AssertionWarning indicates a potential issue
 	AssertionWarning = 0
-	AssertionError   = 1
+	// AssertionError indicates an error in the validation
+	AssertionError = 1
 )
 
 type (
+	// Assertion is used to collect validation information
 	Assertion struct {
 		Type int    // 0 == warning, 1 == error
 		Txt  string // description of the problem
