@@ -64,8 +64,8 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 		Created: now,
 		Updated: now,
 	}
-	k := productionKey(guid)
-	_, err = platform.DataStore().Put(ctx, k, p)
+
+	err = UpdateProduction(ctx, p)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 	show := metadata.DefaultShow(name, title, summary, guid)
 	err = WriteResource(ctx, fmt.Sprintf("%s/show-%s.yaml", guid, guid), true, false, &show)
 	if err != nil {
-		platform.DataStore().Delete(ctx, k)
+		platform.DataStore().Delete(ctx, productionKey(guid))
 		return nil, err
 	}
 
@@ -86,12 +86,19 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 // GetProduction returns a production based on the GUID
 func GetProduction(ctx context.Context, guid string) (*Production, error) {
 	var p Production
-	k := productionKey(guid)
 
-	if err := platform.DataStore().Get(ctx, k, &p); err != nil {
+	if err := platform.DataStore().Get(ctx, productionKey(guid), &p); err != nil {
 		return nil, err
 	}
 	return &p, nil
+}
+
+// UpdateProduction does what the name suggests
+func UpdateProduction(ctx context.Context, p *Production) error {
+	if _, err := platform.DataStore().Put(ctx, productionKey(p.GUID), p); err != nil {
+		return err
+	}
+	return nil
 }
 
 // FindProductionByName does a lookup using the productions name instead of its key

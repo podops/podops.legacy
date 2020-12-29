@@ -193,7 +193,7 @@ func (r *Resource) ResolveURI(guid string) string {
 		return r.URI // return as-is
 	}
 	if r.Rel == "local" {
-		return fmt.Sprintf("%s/%s", config.DefaultCDNEndpoint, r.URI)
+		return fmt.Sprintf("%s/%s/%s", config.DefaultCDNEndpoint, guid, r.URI)
 	}
 	if r.Rel == "import" {
 		id := util.Fingerprint(r.URI)

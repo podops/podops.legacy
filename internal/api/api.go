@@ -118,6 +118,7 @@ func ResourceEndpoint(c *gin.Context) {
 	}
 
 	var payload interface{}
+	ctx := appengine.NewContext(c.Request)
 
 	if kind == "show" {
 		var show metadata.Show
@@ -128,6 +129,23 @@ func ResourceEndpoint(c *gin.Context) {
 			return
 		}
 		payload = &show
+
+		// update the PRODUCTION entry based on resource
+		p, err := resources.GetProduction(ctx, show.GUID())
+		if err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
+
+		p.Title = show.Description.Title
+		p.Summary = show.Description.Summary
+
+		err = resources.UpdateProduction(ctx, p)
+		if err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
+
 	} else if kind == "episode" {
 		var episode metadata.Episode
 
@@ -146,7 +164,7 @@ func ResourceEndpoint(c *gin.Context) {
 	if c.Request.Method == "PUT" {
 		createFlag = false
 	}
-	err := resources.WriteResource(appengine.NewContext(c.Request), fmt.Sprintf("%s/%s-%s.yaml", parent, kind, guid), createFlag, forceFlag, payload)
+	err := resources.WriteResource(ctx, fmt.Sprintf("%s/%s-%s.yaml", parent, kind, guid), createFlag, forceFlag, payload)
 	if err != nil {
 		HandleError(c, http.StatusBadRequest, err)
 		return
