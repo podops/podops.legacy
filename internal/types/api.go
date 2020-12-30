@@ -46,6 +46,12 @@ type (
 		Status  int    `json:"status" binding:"required"`
 		Message string `json:"message" binding:"required"`
 	}
+
+	// ImportRequest is used by the import task
+	ImportRequest struct {
+		Source string `json:"src" binding:"required"`
+		Dest   string `json:"dest" binding:"required"`
+	}
 )
 
 func (so *StatusObject) Error() string {

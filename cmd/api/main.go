@@ -16,6 +16,7 @@ import (
 	"github.com/txsvc/service/pkg/svc"
 
 	"github.com/podops/podops/internal/api"
+	"github.com/podops/podops/internal/resources"
 )
 
 func init() {
@@ -52,6 +53,10 @@ func main() {
 	admin := svc.Group(api.AdminNamespacePrefix)
 	admin.POST(api.AuthenticationRoute, auth.CreateJWTAuthorizationEndpoint)
 	admin.GET(api.AuthenticationRoute, auth.ValidateJWTAuthorizationEndpoint)
+
+	// Task Endpoints
+	tasks := svc.Group(api.TaskNamespacePrefix)
+	tasks.POST(resources.ImportTask, resources.ImportTaskEndpoint)
 
 	// API endpoints with authentication
 	apiEndpoints := svc.SecureGroup(api.NamespacePrefix, jwt.MiddlewareFunc())

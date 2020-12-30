@@ -8,6 +8,9 @@ dispatch:
   - url: "*/_a/*"
     service: api
 
+  - url: "*/_t/*"
+    service: api
+
   - url: "cdn.podops.dev/*"
     service: cdn
 

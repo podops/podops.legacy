@@ -21,6 +21,8 @@ const (
 	AdminNamespacePrefix = "/_a"
 	// NamespacePrefix namespace for the CLI. Should not be used directly.
 	NamespacePrefix = "/a/v1"
+	// TaskNamespacePrefix namespace for internal Cloud Task callbacks
+	TaskNamespacePrefix = "/_t"
 
 	// All the API & CLI endpoint routes
 

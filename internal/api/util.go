@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -71,4 +72,17 @@ func GetClientID(c *gin.Context) (string, error) {
 	}
 
 	return a.ClientID, nil
+}
+
+// ExtractBodyAsString extracts a requests body, assuming it is a string
+func ExtractBodyAsString(c *gin.Context) (string, error) {
+
+	if c.Request.Body != nil {
+		body, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			return "", err
+		}
+		return string(body), nil
+	}
+	return "", nil
 }

@@ -24,7 +24,6 @@ var (
 )
 
 func init() {
-
 	resourceLoaders = make(map[string]ResourceLoaderFunc)
 	resourceLoaders["show"] = loadShowResource
 	resourceLoaders["episode"] = loadEpisodeResource

@@ -21,15 +21,15 @@ const (
 type (
 	// Production holds the shows main data
 	Production struct {
-		GUID    string `json:"guid"`
-		Owner   string `json:"owner"`
-		Name    string `json:"name"`
-		Title   string `json:"title"`
-		Summary string `json:"summary"`
-		Feed    string `json:"feed"`
-		NewFeed string `json:"newFeed"`
-		//PubDate   int64  `json:"pub_date"` // FIXME drop this attribute
-		BuildDate int64 `json:"build_date"`
+		GUID      string `json:"guid"`
+		Owner     string `json:"owner"`
+		Name      string `json:"name"`
+		Title     string `json:"title"`
+		Summary   string `json:"summary"`
+		Feed      string `json:"feed"`
+		NewFeed   string `json:"newFeed"`
+		PubDate   int64  `json:"pub_date"` // FIXME drop this attribute
+		BuildDate int64  `json:"build_date"`
 		// internal
 		Created int64 `json:"-"`
 		Updated int64 `json:"-"`

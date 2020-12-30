@@ -3,7 +3,6 @@ package resources
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"sort"
 	"time"
@@ -12,8 +11,10 @@ import (
 	"google.golang.org/api/iterator"
 
 	"github.com/txsvc/platform/pkg/platform"
+	"github.com/txsvc/platform/pkg/services"
 
 	"github.com/podops/podops/internal/config"
+	t "github.com/podops/podops/internal/types"
 	"github.com/podops/podops/pkg/metadata"
 )
 
@@ -130,34 +131,19 @@ func EnsureAsset(ctx context.Context, guid string, a *metadata.Resource) error {
 		return nil
 	}
 	if a.Rel == metadata.ResourceTypeImport {
-		_, err := pingURL(a.URI)
+		_, err := pingURL(a.URI) // ping the URL already here to avoid queueing a request that will fail later anyways
 		if err != nil {
 			return err
 		}
-		//fmt.Printf("-- %v", header)
-		// FIXME for now we simply download it each time
 
-		resp, err := http.Get(a.URI)
+		// dispatch a request for background import
+		req := t.ImportRequest{
+			Source: a.URI,
+			Dest:   a.FingerprintURI(guid),
+		}
+
+		_, err = services.CreateTask(ctx, importTaskWithPrefix, &req)
 		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			return fmt.Errorf("Can not retrieve '%s': %s", a.URI, resp.Status)
-		}
-		// FIXME this might not work for large files
-		data, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return fmt.Errorf("Can not retrieve '%s': %v", a.URI, err)
-		}
-
-		id := a.FingerprintURI(guid)
-		obj := platform.Storage().Bucket(config.BucketCDN).Object(id)
-
-		writer := obj.NewWriter(ctx)
-		defer writer.Close()
-		if _, err := writer.Write(data); err != nil {
 			return err
 		}
 	}
