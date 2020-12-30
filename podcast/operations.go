@@ -1,7 +1,10 @@
 package podcast
 
 import (
+	"bytes"
 	"fmt"
+	"log"
+	"net/http"
 
 	t "github.com/podops/podops/internal/types"
 )
@@ -17,10 +20,15 @@ const (
 	listRoute = "/list"
 	// buildRoute route to call BuildEndpoint
 	buildRoute = "/build"
+	// uploadRoute route to UploadEndpoint
+	uploadRoute = "/upload"
 )
 
 // CreateProduction invokes the CreateProductionEndpoint
 func (cl *Client) CreateProduction(name, title, summary string) (*t.ProductionResponse, error) {
+	if err := cl.HasToken(); err != nil {
+		return nil, err
+	}
 
 	if name == "" {
 		return nil, fmt.Errorf("resource: name must not be empty")
@@ -44,8 +52,11 @@ func (cl *Client) CreateProduction(name, title, summary string) (*t.ProductionRe
 
 // List retrieves a list of resources
 func (cl *Client) List() (*t.ProductionsResponse, error) {
-	var resp t.ProductionsResponse
+	if err := cl.HasToken(); err != nil {
+		return nil, err
+	}
 
+	var resp t.ProductionsResponse
 	_, err := cl.Get(cl.apiNamespace+listRoute, &resp)
 	if err != nil {
 		return nil, err
@@ -55,6 +66,9 @@ func (cl *Client) List() (*t.ProductionsResponse, error) {
 
 // CreateResource invokes the ResourceEndpoint
 func (cl *Client) CreateResource(kind, guid string, force bool, rsrc interface{}) (int, error) {
+	if err := cl.Validated(); err != nil {
+		return http.StatusBadRequest, err
+	}
 
 	resp := t.StatusObject{}
 	status, err := cl.Post(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
@@ -67,6 +81,9 @@ func (cl *Client) CreateResource(kind, guid string, force bool, rsrc interface{}
 
 // UpdateResource invokes the ResourceEndpoint
 func (cl *Client) UpdateResource(kind, guid string, force bool, rsrc interface{}) (int, error) {
+	if err := cl.Validated(); err != nil {
+		return http.StatusBadRequest, err
+	}
 
 	resp := t.StatusObject{}
 	status, err := cl.Put(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
@@ -79,6 +96,10 @@ func (cl *Client) UpdateResource(kind, guid string, force bool, rsrc interface{}
 
 // Build invokes the BuildEndpoint
 func (cl *Client) Build(guid string) (string, error) {
+	if err := cl.Validated(); err != nil {
+		return "", err
+	}
+
 	req := t.BuildRequest{
 		GUID: cl.GUID,
 	}
@@ -90,4 +111,34 @@ func (cl *Client) Build(guid string) (string, error) {
 	}
 
 	return resp.URL, nil
+}
+
+// UploadResource invokes the UploadEndpoint
+func (cl *Client) UploadResource(path string, force bool) error {
+	if err := cl.Validated(); err != nil {
+		return err
+	}
+
+	req, err := cl.fileUploadRequest(cl.ServiceEndpoint+cl.apiNamespace+uploadRoute, cl.GUID, path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	body := &bytes.Buffer{}
+	_, err = body.ReadFrom(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	resp.Body.Close()
+
+	if resp.StatusCode > http.StatusNoContent {
+		return fmt.Errorf("Error uploading '%s': %s", path, resp.Status)
+	}
+
+	return nil
 }

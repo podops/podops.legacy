@@ -4,15 +4,20 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	t "github.com/podops/podops/internal/types"
 )
 
 // Get is used to request data from the API. No payload, only queries!
 func (cl *Client) Get(cmd string, response interface{}) (int, error) {
+	url := cl.ServiceEndpoint + cmd
 
-	req, err := http.NewRequest("GET", cl.ServiceEndpoint+cmd, nil)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
@@ -22,13 +27,14 @@ func (cl *Client) Get(cmd string, response interface{}) (int, error) {
 
 // Post is used to invoke an API method using http POST
 func (cl *Client) Post(cmd string, request, response interface{}) (int, error) {
+	url := cl.ServiceEndpoint + cmd
 
 	m, err := json.Marshal(&request)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	req, err := http.NewRequest("POST", cl.ServiceEndpoint+cmd, bytes.NewBuffer(m))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(m))
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
@@ -38,13 +44,14 @@ func (cl *Client) Post(cmd string, request, response interface{}) (int, error) {
 
 // Put is used to invoke an API method using http PUT
 func (cl *Client) Put(cmd string, request, response interface{}) (int, error) {
+	url := cl.ServiceEndpoint + cmd
 
 	m, err := json.Marshal(&request)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	req, err := http.NewRequest("PUT", cl.ServiceEndpoint+cmd, bytes.NewBuffer(m))
+	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(m))
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
@@ -91,4 +98,34 @@ func (cl *Client) invoke(req *http.Request, response interface{}) (int, error) {
 	}
 
 	return resp.StatusCode, nil
+}
+
+// FIXME does not work for VERY large files !
+
+// Creates a new file upload http request with optional extra params
+func (cl *Client) fileUploadRequest(uri, guid, path string) (*http.Request, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile("asset", filepath.Base(path))
+	if err != nil {
+		return nil, err
+	}
+	_, err = io.Copy(part, file)
+
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", uri+"/"+guid, body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("Authorization", "Bearer "+cl.Token)
+
+	return req, err
 }

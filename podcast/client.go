@@ -28,7 +28,6 @@ type (
 		ServiceEndpoint string `json:"url" binding:"required"`
 		Token           string `json:"token" binding:"required"`
 		GUID            string `json:"guid" binding:"required"`
-		authorized      bool
 		apiNamespace    string
 	}
 )
@@ -38,13 +37,7 @@ type (
 // Clients should be reused instead of created as needed. The methods of Client
 // are safe for concurrent use by multiple goroutines.
 func NewClient(ctx context.Context, token string) (*Client, error) {
-	client := &Client{
-		ServiceEndpoint: config.DefaultAPIEndpoint,
-		Token:           token,
-		GUID:            "",
-		authorized:      false,
-		apiNamespace:    DefaultNamespacePrefix,
-	}
+	client := defaultClient(token)
 	if err := client.Validate(); err != nil {
 		return nil, err
 	}
@@ -59,14 +52,7 @@ func NewClientFromFile(ctx context.Context, path string) (*Client, error) {
 	var client *Client
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		client = &Client{
-			ServiceEndpoint: config.DefaultAPIEndpoint,
-			Token:           "",
-			GUID:            "",
-			authorized:      false,
-			apiNamespace:    DefaultNamespacePrefix,
-		}
-		return client, nil
+		return defaultClient(""), nil
 	}
 
 	jsonFile, err := os.Open(path)
@@ -79,11 +65,16 @@ func NewClientFromFile(ctx context.Context, path string) (*Client, error) {
 	json.Unmarshal(byteValue, &client)
 	client.apiNamespace = DefaultNamespacePrefix
 
-	if err := client.Validate(); err != nil {
-		return nil, err
-	}
-
 	return client, nil
+}
+
+func defaultClient(token string) *Client {
+	return &Client{
+		ServiceEndpoint: config.DefaultAPIEndpoint,
+		Token:           token,
+		GUID:            "",
+		apiNamespace:    DefaultNamespacePrefix,
+	}
 }
 
 // Close does whatever kind of clean-up is necessary
@@ -97,29 +88,30 @@ func (cl *Client) Store(path string) {
 	ioutil.WriteFile(path, defaults, 0644)
 }
 
-// IsAuthorized does a quick verification
-func (cl *Client) IsAuthorized() bool {
-	return cl.authorized
+// HasToken verifies that remote commands can be executed
+func (cl *Client) HasToken() error {
+	if cl.Token == "" {
+		return fmt.Errorf("Not authorized. Use 'po auth' first") // FIXME generic text, not CLI specific
+	}
+	return nil
 }
 
-// Valid verifies that remote commands can be executed
-func (cl *Client) Valid() error {
-	if !cl.authorized {
+// Validated verifies that remote commands can be executed
+func (cl *Client) Validated() error {
+	if cl.Token == "" {
 		return fmt.Errorf("Not authorized. Use 'po auth' first") // FIXME generic text, not CLI specific
 	}
 	if cl.GUID == "" {
-		return fmt.Errorf("No show selected. Use 'po show' first")
+		return fmt.Errorf("No show selected. Use 'po show' and/or 'po set NAME' first")
 	}
 	return nil
 }
 
 // Validate verifies the token against the backend service
 func (cl *Client) Validate() error {
-
 	if cl.Token == "" {
 		return fmt.Errorf("validation: missing token")
 	}
-
 	status, err := cl.Get(authenticationRoute, nil)
 	if err != nil {
 		return err
@@ -128,6 +120,5 @@ func (cl *Client) Validate() error {
 		// the only valid positive response
 		return fmt.Errorf("validation: not authorized %d", status)
 	}
-	cl.authorized = true
 	return nil
 }

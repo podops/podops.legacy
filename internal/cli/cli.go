@@ -37,6 +37,7 @@ var (
 
 func init() {
 	cl, err := podcast.NewClientFromFile(context.Background(), presetsNameAndPath)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,8 +62,6 @@ func AuthCommand(c *cli.Context) error {
 			fmt.Println("\nNot authorized")
 			return nil
 		}
-
-		// store the token if valid
 		cl.Store(presetsNameAndPath)
 
 		fmt.Println("\nAuthentication successful")
@@ -87,9 +86,6 @@ func LogoutCommand(c *cli.Context) error {
 
 // NewProductionCommand requests a new show
 func NewProductionCommand(c *cli.Context) error {
-	if !client.IsAuthorized() {
-		return fmt.Errorf("Not authorized. Use 'po auth' first")
-	}
 
 	name := c.Args().First()
 	title := c.String("title")
@@ -123,9 +119,6 @@ func NewProductionCommand(c *cli.Context) error {
 
 // ListProductionCommand requests a new show
 func ListProductionCommand(c *cli.Context) error {
-	if !client.IsAuthorized() {
-		return fmt.Errorf("Not authorized. Use 'po auth' first")
-	}
 
 	l, err := client.List()
 	if err != nil {
@@ -151,9 +144,6 @@ func ListProductionCommand(c *cli.Context) error {
 
 // SetProductionCommand lists the current show/production, switch to another show/production
 func SetProductionCommand(c *cli.Context) error {
-	if !client.IsAuthorized() {
-		return fmt.Errorf("Not authorized. Use 'po auth' first")
-	}
 
 	l, err := client.List()
 	if err != nil {
@@ -203,9 +193,6 @@ func SetProductionCommand(c *cli.Context) error {
 
 // CreateCommand creates a resource from a file, directory or URL
 func CreateCommand(c *cli.Context) error {
-	if err := client.Valid(); err != nil {
-		return err
-	}
 
 	if c.NArg() != 1 {
 		return fmt.Errorf("Wrong number of arguments. Expected 1, got %d", c.NArg())
@@ -229,9 +216,6 @@ func CreateCommand(c *cli.Context) error {
 
 // UpdateCommand updates a resource from a file, directory or URL
 func UpdateCommand(c *cli.Context) error {
-	if err := client.Valid(); err != nil {
-		return err
-	}
 
 	if c.NArg() != 1 {
 		return fmt.Errorf("Wrong number of arguments. Expected 1, got %d", c.NArg())
@@ -303,9 +287,6 @@ func TemplateCommand(c *cli.Context) error {
 
 // BuildCommand starts a new build of the feed
 func BuildCommand(c *cli.Context) error {
-	if err := client.Valid(); err != nil {
-		return err
-	}
 
 	// FIXME support the 'NAME' option
 
@@ -315,5 +296,23 @@ func BuildCommand(c *cli.Context) error {
 	}
 
 	fmt.Println(fmt.Sprintf("Build production '%s' successful.\nAccess the feed at %s", client.GUID, url))
+	return nil
+}
+
+// UploadCommand uploads an asset from a file
+func UploadCommand(c *cli.Context) error {
+
+	if c.NArg() != 1 {
+		return fmt.Errorf("Wrong number of arguments. Expected 1, got %d", c.NArg())
+	}
+	name := c.Args().First()
+	force := c.Bool("force")
+
+	err := client.UploadResource(name, force)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(fmt.Sprintf("Uploaded '%s'", name))
 	return nil
 }

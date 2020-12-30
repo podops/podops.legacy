@@ -32,7 +32,6 @@ func main() {
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
-	//sort.Sort(cli.CommandsByName(app.Commands))
 
 	// runthe CLI
 	err := app.Run(os.Args)
@@ -114,12 +113,19 @@ func setupCommands() []*cli.Command {
 			Flags:     createFlags(),
 		},
 		{
+			Name:      "upload",
+			Usage:     "Upload an asset from a file",
+			UsageText: "upload FILENAME",
+			Category:  cl.ShowCmdGroup,
+			Action:    cl.UploadCommand,
+			Flags:     createFlags(),
+		},
+		{
 			Name:      "build",
 			Usage:     "Start a new build",
 			UsageText: "po build",
 			Category:  cl.ShowMgmtCmdGroup,
 			Action:    cl.BuildCommand,
-			//Flags:     createFlags(),
 		},
 		{
 			Name:      "delete",
@@ -127,7 +133,6 @@ func setupCommands() []*cli.Command {
 			UsageText: "po delete [show|episode] NAME",
 			Category:  cl.ShowMgmtCmdGroup,
 			Action:    cl.NoOpCommand,
-			//Flags:     createFlags(),
 		},
 		// HACKING
 		{
@@ -135,10 +140,20 @@ func setupCommands() []*cli.Command {
 			Usage:    "Hacking",
 			Category: cl.ShowMgmtCmdGroup,
 			Action:   cl.Hack,
-			//Flags:     createFlags(),
 		},
 	}
 	return c
+}
+
+func globalFlags() []cli.Flag {
+	f := []cli.Flag{
+		&cli.BoolFlag{
+			Name:    "debug",
+			Usage:   "Prints debug information",
+			Aliases: []string{"d"},
+		},
+	}
+	return f
 }
 
 func newShowFlags() []cli.Flag {
@@ -161,7 +176,7 @@ func createFlags() []cli.Flag {
 	f := []cli.Flag{
 		&cli.BoolFlag{
 			Name:    "force",
-			Usage:   "Force create/update",
+			Usage:   "Force create/update/upload",
 			Aliases: []string{"f"},
 		},
 	}

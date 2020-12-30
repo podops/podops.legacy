@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
@@ -9,6 +10,7 @@ import (
 	"google.golang.org/appengine"
 
 	"github.com/txsvc/commons/pkg/util"
+	"github.com/txsvc/platform/pkg/platform"
 
 	"github.com/podops/podops/internal/config"
 	"github.com/podops/podops/internal/resources"
@@ -36,6 +38,8 @@ const (
 	ListRoute = "/list"
 	// BuildRoute route to BuildEndpoint
 	BuildRoute = "/build"
+	// UploadRoute route to UploadEndpoint
+	UploadRoute = "/upload/:guid"
 )
 
 // ProductionEndpoint creates an new show and does all the background setup
@@ -252,4 +256,44 @@ func BuildEndpoint(c *gin.Context) {
 	}
 
 	StandardResponse(c, http.StatusCreated, &resp)
+}
+
+// UploadEndpoint implements content upload
+func UploadEndpoint(c *gin.Context) {
+	mr, err := c.Request.MultipartReader()
+	if err != nil {
+		HandleError(c, http.StatusInternalServerError, err)
+		return
+	}
+
+	guid := c.Param("guid")
+	if guid == "" {
+		HandleError(c, http.StatusBadRequest, fmt.Errorf("upload: invalid route, expected ':guid'"))
+		return
+	}
+
+	for {
+		p, err := mr.NextPart()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			HandleError(c, http.StatusInternalServerError, err)
+			return
+		}
+
+		if p.FormName() == "asset" {
+			bkt := platform.Storage().Bucket(config.BucketCDN)
+			obj := bkt.Object(fmt.Sprintf("%s/%s", guid, p.FileName()))
+			writer := obj.NewWriter(appengine.NewContext(c.Request))
+			defer writer.Close()
+
+			if _, err := io.Copy(writer, p); err != nil {
+				HandleError(c, http.StatusInternalServerError, err)
+				return
+			}
+		}
+	}
+
+	c.Status(http.StatusOK)
 }
