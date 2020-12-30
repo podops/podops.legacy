@@ -122,10 +122,7 @@ func EnsureAsset(ctx context.Context, guid string, a *metadata.Resource) error {
 	}
 	if a.Rel == metadata.ResourceTypeLocal {
 		path := fmt.Sprintf("%s/%s", guid, a.URI)
-		obj := platform.Storage().Bucket(config.BucketCDN).Object(path)
-
-		_, err := obj.Attrs(ctx)
-		if err == storage.ErrObjectNotExist {
+		if !Exists(ctx, path) {
 			return fmt.Errorf("Can not find '%s'", a.URI)
 		}
 		return nil
@@ -136,13 +133,13 @@ func EnsureAsset(ctx context.Context, guid string, a *metadata.Resource) error {
 			return err
 		}
 
-		// dispatch a request for background import
-		req := t.ImportRequest{
-			Source: a.URI,
-			Dest:   a.FingerprintURI(guid),
+		path := a.FingerprintURI(guid)
+		if Exists(ctx, path) { // do nothing as the asset is present
+			return nil // FIXME verify that the asset is unchanged, otherwise re-import
 		}
 
-		_, err = services.CreateTask(ctx, importTaskWithPrefix, &req)
+		// dispatch a request for background import
+		_, err = services.CreateTask(ctx, importTaskWithPrefix, &t.ImportRequest{Source: a.URI, Dest: path})
 		if err != nil {
 			return err
 		}

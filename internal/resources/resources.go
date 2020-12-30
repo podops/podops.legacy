@@ -107,6 +107,16 @@ func LoadResourceMetadata(data []byte) (*metadata.ResourceMetadata, error) {
 	return &r, nil
 }
 
+// Exists verifies the resource exists
+func Exists(ctx context.Context, path string) bool {
+	obj := platform.Storage().Bucket(config.BucketCDN).Object(path)
+	_, err := obj.Attrs(ctx)
+	if err == storage.ErrObjectNotExist {
+		return false
+	}
+	return true
+}
+
 func loadShowResource(data []byte) (interface{}, string, error) {
 	var r metadata.Show
 

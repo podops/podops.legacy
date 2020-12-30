@@ -89,39 +89,6 @@ func importResource(ctx context.Context, src, dest string) int {
 	return http.StatusOK
 }
 
-/*
-func importResource(ctx context.Context, src, dest string) int {
-	resp, err := http.Get(src)
-	if err != nil {
-		return resp.StatusCode
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		platform.ReportError(fmt.Errorf("Can not retrieve '%s': %s", src, resp.Status))
-		return http.StatusBadRequest
-	}
-
-	// FIXME this might not work for large files
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		platform.ReportError(fmt.Errorf("Can not retrieve '%s': %v", src, err))
-		return http.StatusBadRequest
-	}
-
-	obj := platform.Storage().Bucket(config.BucketCDN).Object(dest)
-	writer := obj.NewWriter(ctx)
-	defer writer.Close()
-
-	if _, err := writer.Write(data); err != nil {
-		platform.ReportError(fmt.Errorf("Can not write '%s': %v", dest, err))
-		return http.StatusBadRequest
-	}
-
-	return http.StatusOK
-}
-*/
-
 // ExtractMetadataFromResponse extracts the metadata from http.Response
 func ExtractMetadataFromResponse(resp *http.Response) *ContentMetadata {
 	meta := ContentMetadata{
