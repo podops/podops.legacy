@@ -11,6 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/podops/podops"
+	a "github.com/podops/podops/apiv1"
 )
 
 const (
@@ -112,7 +113,7 @@ func NewProductionCommand(c *cli.Context) error {
 		return nil
 	}
 
-	show := DefaultShow(client.ServiceEndpoint, p.Name, title, summary, p.GUID)
+	show := a.DefaultShow(client.ServiceEndpoint, p.Name, title, summary, p.GUID)
 	err = dump(fmt.Sprintf("show-%s.yaml", p.GUID), show)
 	if err != nil {
 		PrintError(c, err)
@@ -275,7 +276,7 @@ func TemplateCommand(c *cli.Context) error {
 	// create the yamls
 	if template == "show" {
 
-		show := DefaultShow(client.ServiceEndpoint, name, "TITLE", "SUMMARY", guid)
+		show := a.DefaultShow(client.ServiceEndpoint, name, "TITLE", "SUMMARY", guid)
 		err := dump(fmt.Sprintf("show-%s.yaml", guid), show)
 		if err != nil {
 			PrintError(c, err)
@@ -283,7 +284,7 @@ func TemplateCommand(c *cli.Context) error {
 		}
 	} else {
 
-		episode := DefaultEpisode(client.ServiceEndpoint, name, parent, guid, parentGUID)
+		episode := a.DefaultEpisode(client.ServiceEndpoint, name, parent, guid, parentGUID)
 		err := dump(fmt.Sprintf("episode-%s.yaml", guid), episode)
 		if err != nil {
 			PrintError(c, err)

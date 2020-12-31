@@ -1,10 +1,8 @@
-package commands
+package apiv1
 
 import (
 	"fmt"
 	"time"
-
-	a "github.com/podops/podops/apiv1"
 )
 
 // DefaultShowMetadata creates a default set of labels etc for a Show resource
@@ -18,12 +16,12 @@ func DefaultShowMetadata(guid string) map[string]string {
 
 	l := make(map[string]string)
 
-	l[a.LabelLanguage] = "en"
-	l[a.LabelExplicit] = "no"
-	l[a.LabelType] = a.ShowTypeEpisodic
-	l[a.LabelBlock] = "no"
-	l[a.LabelComplete] = "no"
-	l[a.LabelGUID] = guid
+	l[LabelLanguage] = "en"
+	l[LabelExplicit] = "no"
+	l[LabelType] = ShowTypeEpisodic
+	l[LabelBlock] = "no"
+	l[LabelComplete] = "no"
+	l[LabelGUID] = guid
 
 	return l
 }
@@ -40,47 +38,47 @@ func DefaultEpisodeMetadata(guid, parentGUID string) map[string]string {
 
 	l := make(map[string]string)
 
-	l[a.LabelGUID] = guid
-	l[a.LabelParentGUID] = parentGUID
-	l[a.LabelDate] = time.Now().UTC().Format(time.RFC1123Z)
-	l[a.LabelSeason] = "1"
-	l[a.LabelEpisode] = "1"
-	l[a.LabelExplicit] = "no"
-	l[a.LabelType] = a.EpisodeTypeFull
-	l[a.LabelBlock] = "no"
+	l[LabelGUID] = guid
+	l[LabelParentGUID] = parentGUID
+	l[LabelDate] = time.Now().UTC().Format(time.RFC1123Z)
+	l[LabelSeason] = "1"
+	l[LabelEpisode] = "1"
+	l[LabelExplicit] = "no"
+	l[LabelType] = EpisodeTypeFull
+	l[LabelBlock] = "no"
 
 	return l
 }
 
 // DefaultShow creates a default show struc
-func DefaultShow(baseURL, name, title, summary, guid string) *a.Show {
-	return &a.Show{
+func DefaultShow(baseURL, name, title, summary, guid string) *Show {
+	return &Show{
 		APIVersion: "v1",
 		Kind:       "show",
-		Metadata: a.Metadata{
+		Metadata: Metadata{
 			Name:   name,
 			Labels: DefaultShowMetadata(guid),
 		},
-		Description: a.ShowDescription{
+		Description: ShowDescription{
 			Title:   title,
 			Summary: summary,
-			Link: a.Resource{
+			Link: Resource{
 				URI: fmt.Sprintf("%s/s/%s", baseURL, name),
 			},
-			Category: a.Category{
+			Category: Category{
 				Name: "Technology",
 				SubCategory: []string{
 					"Podcasting",
 				},
 			},
-			Owner: a.Owner{
+			Owner: Owner{
 				Name:  fmt.Sprintf("%s owner", name),
 				Email: fmt.Sprintf("hello@%s.me", name),
 			},
 			Author:    fmt.Sprintf("%s author", name),
 			Copyright: fmt.Sprintf("%s copyright", name),
 		},
-		Image: a.Resource{
+		Image: Resource{
 			URI: fmt.Sprintf("%s/podcast-cover.png", guid),
 			Rel: "local",
 		},
@@ -88,29 +86,29 @@ func DefaultShow(baseURL, name, title, summary, guid string) *a.Show {
 }
 
 // DefaultEpisode creates a default episode struc
-func DefaultEpisode(baseURL, name, parentName, guid, parentGUID string) *a.Episode {
+func DefaultEpisode(baseURL, name, parentName, guid, parentGUID string) *Episode {
 
-	return &a.Episode{
+	return &Episode{
 		APIVersion: "v1",
 		Kind:       "episode",
-		Metadata: a.Metadata{
+		Metadata: Metadata{
 			Name:   name,
 			Labels: DefaultEpisodeMetadata(guid, parentGUID),
 		},
-		Description: a.EpisodeDescription{
+		Description: EpisodeDescription{
 			Title:       fmt.Sprintf("%s - Episode Title", name),
 			Summary:     fmt.Sprintf("%s - Episode Subtitle or short summary", name),
 			EpisodeText: "A long-form description of the episode with notes etc.",
-			Link: a.Resource{
+			Link: Resource{
 				URI: fmt.Sprintf("%s/s/%s/%s", baseURL, parentName, name),
 			},
 			Duration: 1, // Seconds. Must not be 0, otherwise a validation error occurs.
 		},
-		Image: a.Resource{
+		Image: Resource{
 			URI: fmt.Sprintf("%s/episode-cover.png", parentGUID),
 			Rel: "local",
 		},
-		Enclosure: a.Resource{
+		Enclosure: Resource{
 			URI:  fmt.Sprintf("%s/%s.mp3", parentGUID, name),
 			Type: "audio/mpeg",
 			Rel:  "local",
