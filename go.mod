@@ -5,8 +5,6 @@ go 1.15
 require (
 	cloud.google.com/go/datastore v1.3.0
 	cloud.google.com/go/storage v1.12.0
-	github.com/gin-contrib/cors v1.3.1
-	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.6.3
 	github.com/txsvc/commons v1.1.0
 	github.com/txsvc/platform v1.0.1

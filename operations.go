@@ -1,4 +1,4 @@
-package podcast
+package podops
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	t "github.com/podops/podops/internal/types"
+	a "github.com/podops/podops/apiv1"
 )
 
 const (
@@ -25,7 +25,7 @@ const (
 )
 
 // CreateProduction invokes the CreateProductionEndpoint
-func (cl *Client) CreateProduction(name, title, summary string) (*t.ProductionResponse, error) {
+func (cl *Client) CreateProduction(name, title, summary string) (*a.ProductionResponse, error) {
 	if err := cl.HasToken(); err != nil {
 		return nil, err
 	}
@@ -34,13 +34,13 @@ func (cl *Client) CreateProduction(name, title, summary string) (*t.ProductionRe
 		return nil, fmt.Errorf("resource: name must not be empty")
 	}
 
-	req := t.ProductionRequest{
+	req := a.ProductionRequest{
 		Name:    name,
 		Title:   title,
 		Summary: summary,
 	}
 
-	resp := t.ProductionResponse{}
+	resp := a.ProductionResponse{}
 	_, err := cl.Post(cl.apiNamespace+productionRoute, &req, &resp)
 
 	if err != nil {
@@ -51,13 +51,13 @@ func (cl *Client) CreateProduction(name, title, summary string) (*t.ProductionRe
 }
 
 // List retrieves a list of resources
-func (cl *Client) List() (*t.ProductionsResponse, error) {
+func (cl *Client) List() (*a.ProductionsResponse, error) {
 	if err := cl.HasToken(); err != nil {
 		return nil, err
 	}
 
-	var resp t.ProductionsResponse
-	_, err := cl.Get(cl.apiNamespace+listRoute, &resp)
+	var resp a.ProductionsResponse
+	_, err := cl.get(cl.apiNamespace+listRoute, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (cl *Client) CreateResource(kind, guid string, force bool, rsrc interface{}
 		return http.StatusBadRequest, err
 	}
 
-	resp := t.StatusObject{}
+	resp := a.StatusObject{}
 	status, err := cl.Post(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
 
 	if err != nil {
@@ -85,7 +85,7 @@ func (cl *Client) UpdateResource(kind, guid string, force bool, rsrc interface{}
 		return http.StatusBadRequest, err
 	}
 
-	resp := t.StatusObject{}
+	resp := a.StatusObject{}
 	status, err := cl.Put(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
 
 	if err != nil {
@@ -100,10 +100,10 @@ func (cl *Client) Build(guid string) (string, error) {
 		return "", err
 	}
 
-	req := t.BuildRequest{
+	req := a.BuildRequest{
 		GUID: cl.GUID,
 	}
-	resp := t.BuildResponse{}
+	resp := a.BuildResponse{}
 
 	_, err := cl.Post(cl.apiNamespace+buildRoute, &req, &resp)
 	if err != nil {

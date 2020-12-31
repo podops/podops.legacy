@@ -1,4 +1,4 @@
-package cli
+package commands
 
 // https://github.com/urfave/cli/blob/master/docs/v2/manual.md
 
@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v2"
 
-	"github.com/podops/podops/internal/resources"
+	a "github.com/podops/podops/apiv1"
 )
 
 // remove the local file with login credentials and other state information
@@ -33,27 +33,6 @@ func PrintError(c *cli.Context, err error) {
 	fmt.Println(msg)
 }
 
-// NoOpCommand is just a placeholder
-func NoOpCommand(c *cli.Context) error {
-	return cli.Exit(fmt.Sprintf("Command '%s' is not implemented", c.Command.Name), 0)
-}
-
-func loadResource(path string) (interface{}, string, string, error) {
-	// FIXME: only local yaml is supported at the moment !
-
-	data, err := ioutil.ReadFile(path)
-	if err != nil {
-		return nil, "", "", fmt.Errorf("Can not read file '%s'. %w", path, err)
-	}
-
-	r, kind, guid, err := resources.LoadResource(data)
-	if err != nil {
-		return nil, "", "", err
-	}
-
-	return r, kind, guid, nil
-}
-
 func dump(path string, doc interface{}) error {
 	data, err := yaml.Marshal(doc)
 	if err != nil {
@@ -64,4 +43,20 @@ func dump(path string, doc interface{}) error {
 	fmt.Printf("--- %s:\n\n%s\n\n", path, string(data))
 
 	return nil
+}
+
+func loadResource(path string) (interface{}, string, string, error) {
+	// FIXME: only local yaml is supported at the moment !
+
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, "", "", fmt.Errorf("Can not read file '%s'. %w", path, err)
+	}
+
+	r, kind, guid, err := a.LoadResource(data)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	return r, kind, guid, nil
 }

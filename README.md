@@ -1,7 +1,5 @@
 # PodOps - Podcast Operations
 
-PodOps backend services
-
-## Deployment
+PodOps client and CLI
 
 

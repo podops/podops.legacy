@@ -1,11 +1,10 @@
-package metadata
+package apiv1
 
 import (
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/podops/podops/internal/config"
 	"github.com/txsvc/commons/pkg/util"
 )
 
@@ -195,16 +194,16 @@ func (s *Show) GUID() string {
 }
 
 // ResolveURI re-writes the URI
-func (r *Resource) ResolveURI(guid string) string {
+func (r *Resource) ResolveURI(cdn, guid string) string {
 	if r.Rel == "" || r.Rel == ResourceTypeExternal {
 		return r.URI // return as-is
 	}
 	if r.Rel == ResourceTypeLocal {
-		return fmt.Sprintf("%s/%s/%s", config.DefaultCDNEndpoint, guid, r.URI)
+		return fmt.Sprintf("%s/%s/%s", cdn, guid, r.URI)
 	}
 	if r.Rel == ResourceTypeImport {
 		id := r.FingerprintURI(guid)
-		return fmt.Sprintf("%s/%s", config.DefaultCDNEndpoint, id)
+		return fmt.Sprintf("%s/%s", cdn, id)
 	}
 	// FIXME should this be possible?
 	return r.URI

@@ -1,20 +1,22 @@
-package cli
+package commands
 
 import (
 	"context"
 	"fmt"
 	"log"
+	"os/user"
+	"path/filepath"
 
 	"github.com/txsvc/commons/pkg/util"
 	"github.com/urfave/cli/v2"
 
-	"github.com/podops/podops/pkg/metadata"
-	"github.com/podops/podops/podcast"
+	"github.com/podops/podops"
 )
 
 const (
 	// presetsNameAndPath is the name and location of the config file
-	presetsNameAndPath = ".po"
+	presetsName        = "config"
+	presetsNameAndPath = ".po/config"
 
 	// BasicCmdGroup groups basic commands
 	BasicCmdGroup = "\nBasic Commands"
@@ -26,17 +28,15 @@ const (
 	ShowMgmtCmdGroup = "\nContent Management Commands"
 )
 
-type (
-	// ResourceLoaderFunc implements loading of resources
-	ResourceLoaderFunc func(data []byte) (interface{}, error)
-)
-
 var (
-	client *podcast.Client
+	client *podops.Client
 )
 
 func init() {
-	cl, err := podcast.NewClientFromFile(context.Background(), presetsNameAndPath)
+	usr, _ := user.Current()
+	homeDir := filepath.Join(usr.HomeDir, presetsNameAndPath)
+
+	cl, err := podops.NewClientFromFile(context.Background(), homeDir)
 
 	if err != nil {
 		log.Fatal(err)
@@ -44,6 +44,11 @@ func init() {
 	if cl != nil {
 		client = cl
 	}
+}
+
+// NoOpCommand is just a placeholder
+func NoOpCommand(c *cli.Context) error {
+	return cli.Exit(fmt.Sprintf("Command '%s' is not implemented", c.Command.Name), 0)
 }
 
 // AuthCommand logs into the PodOps service and validates the token
@@ -57,12 +62,16 @@ func AuthCommand(c *cli.Context) error {
 		}
 
 		// create a new client and force token verification
-		cl, err := podcast.NewClient(context.Background(), token)
+		cl, err := podops.NewClient(context.Background(), token)
 		if err != nil {
 			fmt.Println("\nNot authorized")
 			return nil
 		}
-		cl.Store(presetsNameAndPath)
+		err = cl.Store(presetsName)
+		if err != nil {
+			fmt.Printf("\nCould not write config. %v\n", err)
+			return nil
+		}
 
 		fmt.Println("\nAuthentication successful")
 	} else {
@@ -103,7 +112,7 @@ func NewProductionCommand(c *cli.Context) error {
 		return nil
 	}
 
-	show := metadata.DefaultShow(p.Name, title, summary, p.GUID)
+	show := DefaultShow(client.ServiceEndpoint, p.Name, title, summary, p.GUID)
 	err = dump(fmt.Sprintf("show-%s.yaml", p.GUID), show)
 	if err != nil {
 		PrintError(c, err)
@@ -112,7 +121,7 @@ func NewProductionCommand(c *cli.Context) error {
 
 	// update the client
 	client.GUID = p.GUID
-	client.Store(presetsNameAndPath)
+	client.Store(presetsName)
 
 	return nil
 }
@@ -177,7 +186,7 @@ func SetProductionCommand(c *cli.Context) error {
 	for _, details := range l.List {
 		if name == details.Name {
 			client.GUID = details.GUID
-			client.Store(presetsNameAndPath)
+			client.Store(presetsName)
 
 			fmt.Println(fmt.Sprintf("Selected '%s'", name))
 			fmt.Println("NAME\t\tGUID\t\tTITLE")
@@ -266,7 +275,7 @@ func TemplateCommand(c *cli.Context) error {
 	// create the yamls
 	if template == "show" {
 
-		show := metadata.DefaultShow(name, "TITLE", "SUMMARY", guid)
+		show := DefaultShow(client.ServiceEndpoint, name, "TITLE", "SUMMARY", guid)
 		err := dump(fmt.Sprintf("show-%s.yaml", guid), show)
 		if err != nil {
 			PrintError(c, err)
@@ -274,7 +283,7 @@ func TemplateCommand(c *cli.Context) error {
 		}
 	} else {
 
-		episode := metadata.DefaultEpisode(name, parent, guid, parentGUID)
+		episode := DefaultEpisode(client.ServiceEndpoint, name, parent, guid, parentGUID)
 		err := dump(fmt.Sprintf("episode-%s.yaml", guid), episode)
 		if err != nil {
 			PrintError(c, err)

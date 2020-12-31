@@ -8,7 +8,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	cl "github.com/podops/podops/internal/cli"
+	cmd "github.com/podops/podops/cmd/cli/commands"
 )
 
 const (
@@ -46,30 +46,30 @@ func setupCommands() []*cli.Command {
 		{
 			Name:     "list",
 			Usage:    "List all shows/productions",
-			Category: cl.BasicCmdGroup,
-			Action:   cl.ListProductionCommand,
+			Category: cmd.BasicCmdGroup,
+			Action:   cmd.ListProductionCommand,
 		},
 		{
 			Name:      "set",
 			Usage:     "List the current show/production, switch to another show/production",
 			UsageText: setUsageText,
-			Category:  cl.BasicCmdGroup,
-			Action:    cl.SetProductionCommand,
+			Category:  cmd.BasicCmdGroup,
+			Action:    cmd.SetProductionCommand,
 		},
 		{
 			Name:      "new-show",
 			Usage:     "Setup a new show/production",
 			UsageText: "new-show NAME",
-			Category:  cl.BasicCmdGroup,
-			Action:    cl.NewProductionCommand,
+			Category:  cmd.BasicCmdGroup,
+			Action:    cmd.NewProductionCommand,
 			Flags:     newShowFlags(),
 		},
 		{
 			Name:      "template",
 			Usage:     "Create a resource template with default values",
 			UsageText: "template [show|episode]",
-			Category:  cl.BasicCmdGroup,
-			Action:    cl.TemplateCommand,
+			Category:  cmd.BasicCmdGroup,
+			Action:    cmd.TemplateCommand,
 			Flags:     templateFlags(),
 		},
 
@@ -78,68 +78,61 @@ func setupCommands() []*cli.Command {
 			Name:      "auth",
 			Usage:     "Login to the PodOps service",
 			UsageText: "auth TOKEN",
-			Category:  cl.SettingsCmdGroup,
-			Action:    cl.AuthCommand,
+			Category:  cmd.SettingsCmdGroup,
+			Action:    cmd.AuthCommand,
 		},
 		{
 			Name:     "logout",
 			Usage:    "Logout and clear all session information",
-			Category: cl.SettingsCmdGroup,
-			Action:   cl.LogoutCommand,
+			Category: cmd.SettingsCmdGroup,
+			Action:   cmd.LogoutCommand,
 		},
 		// Show/production commands
 		{
 			Name:      "get",
 			Usage:     "Lists a single resource/a collection of resources",
 			UsageText: getUsageText,
-			Category:  cl.ShowCmdGroup,
-			Action:    cl.NoOpCommand,
+			Category:  cmd.ShowCmdGroup,
+			Action:    cmd.NoOpCommand,
 			//Flags:     createFlags(),
 		},
 		{
 			Name:      "create",
 			Usage:     "Create a resource from a file, directory or URL",
 			UsageText: "create FILENAME",
-			Category:  cl.ShowCmdGroup,
-			Action:    cl.CreateCommand,
+			Category:  cmd.ShowCmdGroup,
+			Action:    cmd.CreateCommand,
 			Flags:     createFlags(),
 		},
 		{
 			Name:      "update",
 			Usage:     "Update a resource from a file, directory or URL",
 			UsageText: "update FILENAME",
-			Category:  cl.ShowCmdGroup,
-			Action:    cl.UpdateCommand,
+			Category:  cmd.ShowCmdGroup,
+			Action:    cmd.UpdateCommand,
 			Flags:     createFlags(),
 		},
 		{
 			Name:      "upload",
 			Usage:     "Upload an asset from a file",
 			UsageText: "upload FILENAME",
-			Category:  cl.ShowCmdGroup,
-			Action:    cl.UploadCommand,
+			Category:  cmd.ShowCmdGroup,
+			Action:    cmd.UploadCommand,
 			Flags:     createFlags(),
 		},
 		{
 			Name:      "build",
 			Usage:     "Start a new build",
 			UsageText: "po build",
-			Category:  cl.ShowMgmtCmdGroup,
-			Action:    cl.BuildCommand,
+			Category:  cmd.ShowMgmtCmdGroup,
+			Action:    cmd.BuildCommand,
 		},
 		{
 			Name:      "delete",
 			Usage:     "Delete a resource",
 			UsageText: "po delete [show|episode] NAME",
-			Category:  cl.ShowMgmtCmdGroup,
-			Action:    cl.NoOpCommand,
-		},
-		// HACKING
-		{
-			Name:     "hack",
-			Usage:    "Hacking",
-			Category: cl.ShowMgmtCmdGroup,
-			Action:   cl.Hack,
+			Category:  cmd.ShowMgmtCmdGroup,
+			Action:    cmd.NoOpCommand,
 		},
 	}
 	return c

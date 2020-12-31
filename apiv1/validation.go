@@ -1,4 +1,4 @@
-package metadata
+package apiv1
 
 import "fmt"
 

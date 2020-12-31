@@ -1,4 +1,4 @@
-package types
+package apiv1
 
 import "fmt"
 
