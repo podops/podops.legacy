@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	a "github.com/podops/podops/apiv1"
-	"github.com/txsvc/service/pkg/auth"
 )
 
 const (
@@ -28,7 +27,7 @@ const (
 // CreateToken creates an access token on the service
 // FIXME this is not tested
 func (cl *Client) CreateToken(secret, realm, clientID, userID, scope string, duration int64) (string, error) {
-	req := auth.AuthorizationRequest{
+	req := a.AuthorizationRequest{
 		Secret:     secret,
 		Realm:      realm,
 		ClientID:   clientID,
@@ -37,7 +36,7 @@ func (cl *Client) CreateToken(secret, realm, clientID, userID, scope string, dur
 		Scope:      scope,
 		Duration:   duration,
 	}
-	resp := auth.AuthorizationResponse{}
+	resp := a.AuthorizationResponse{}
 
 	// create temporary client because we have to swap an existing token with secret
 	tempClient, _ := NewClient("")
