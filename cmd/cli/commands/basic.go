@@ -36,7 +36,7 @@ func NewProductionCommand(c *cli.Context) error {
 
 	// update the client
 	client.GUID = p.GUID
-	client.Store(presetsName)
+	client.Store(configName)
 
 	return nil
 }
@@ -101,7 +101,7 @@ func SetProductionCommand(c *cli.Context) error {
 	for _, details := range l.List {
 		if name == details.Name {
 			client.GUID = details.GUID
-			client.Store(presetsName)
+			client.Store(configName)
 
 			fmt.Println(fmt.Sprintf("Selected '%s'", name))
 			fmt.Println("NAME\t\tGUID\t\tTITLE")

@@ -2,7 +2,6 @@ package podops
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,8 +12,9 @@ import (
 	"os/user"
 	"path/filepath"
 
-	a "github.com/podops/podops/apiv1"
 	"github.com/txsvc/commons/pkg/env"
+
+	a "github.com/podops/podops/apiv1"
 )
 
 const (
@@ -46,10 +46,12 @@ var (
 //
 // Clients should be reused instead of created as needed. The methods of Client
 // are safe for concurrent use by multiple goroutines.
-func NewClient(ctx context.Context, token string) (*Client, error) {
+func NewClient(token string) (*Client, error) {
 	client := defaultClient(token)
-	if err := client.Validate(); err != nil {
-		return nil, err
+	if token != "" {
+		if err := client.Validate(); err != nil {
+			return nil, err
+		}
 	}
 	return client, nil
 }
@@ -58,7 +60,7 @@ func NewClient(ctx context.Context, token string) (*Client, error) {
 //
 // Clients should be reused instead of created as needed. The methods of Client
 // are safe for concurrent use by multiple goroutines.
-func NewClientFromFile(ctx context.Context, path string) (*Client, error) {
+func NewClientFromFile(path string) (*Client, error) {
 	var client *Client
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -151,7 +153,7 @@ func (cl *Client) get(cmd string, response interface{}) (int, error) {
 }
 
 // Post is used to invoke an API method using http POST
-func (cl *Client) Post(cmd string, request, response interface{}) (int, error) {
+func (cl *Client) post(cmd string, request, response interface{}) (int, error) {
 	url := cl.ServiceEndpoint + cmd
 
 	m, err := json.Marshal(&request)
@@ -168,7 +170,7 @@ func (cl *Client) Post(cmd string, request, response interface{}) (int, error) {
 }
 
 // Put is used to invoke an API method using http PUT
-func (cl *Client) Put(cmd string, request, response interface{}) (int, error) {
+func (cl *Client) put(cmd string, request, response interface{}) (int, error) {
 	url := cl.ServiceEndpoint + cmd
 
 	m, err := json.Marshal(&request)

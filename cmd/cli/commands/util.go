@@ -6,20 +6,25 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/user"
+	"path/filepath"
 	"strings"
 
 	"github.com/urfave/cli/v2"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	a "github.com/podops/podops/apiv1"
 )
 
 // remove the local file with login credentials and other state information
 func close() error {
-	// remove the .po file if it exists
-	f, _ := os.Stat(presetsNameAndPath)
+	// remove the .po/config file if it exists
+	usr, _ := user.Current()
+	fullPath := filepath.Join(usr.HomeDir, configNameAndPath)
+
+	f, _ := os.Stat(fullPath)
 	if f != nil {
-		err := os.Remove(presetsNameAndPath)
+		err := os.Remove(fullPath)
 		if err != nil {
 			return err
 		}

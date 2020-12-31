@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	a "github.com/podops/podops/apiv1"
+	"github.com/txsvc/service/pkg/auth"
 )
 
 const (
@@ -23,6 +24,35 @@ const (
 	// uploadRoute route to UploadEndpoint
 	uploadRoute = "/upload"
 )
+
+// CreateToken creates an access token on the service
+// FIXME this is not tested
+func (cl *Client) CreateToken(secret, realm, clientID, userID, scope string, duration int64) (string, error) {
+	req := auth.AuthorizationRequest{
+		Secret:     secret,
+		Realm:      realm,
+		ClientID:   clientID,
+		ClientType: "user",
+		UserID:     userID,
+		Scope:      scope,
+		Duration:   duration,
+	}
+	resp := auth.AuthorizationResponse{}
+
+	// create temporary client because we have to swap an existing token with secret
+	tempClient, _ := NewClient("")
+	tempClient.Token = secret
+	status, err := tempClient.post(authenticationRoute, &req, &resp)
+
+	if err != nil {
+		return "", fmt.Errorf("create token exception: %v", err)
+	}
+	if status != http.StatusOK {
+		return "", fmt.Errorf("create token exception: %d", status)
+	}
+
+	return resp.Token, nil
+}
 
 // CreateProduction invokes the CreateProductionEndpoint
 func (cl *Client) CreateProduction(name, title, summary string) (*a.ProductionResponse, error) {
@@ -41,7 +71,7 @@ func (cl *Client) CreateProduction(name, title, summary string) (*a.ProductionRe
 	}
 
 	resp := a.ProductionResponse{}
-	_, err := cl.Post(cl.apiNamespace+productionRoute, &req, &resp)
+	_, err := cl.post(cl.apiNamespace+productionRoute, &req, &resp)
 
 	if err != nil {
 		return nil, err
@@ -71,7 +101,7 @@ func (cl *Client) CreateResource(kind, guid string, force bool, rsrc interface{}
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.Post(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
+	status, err := cl.post(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -86,7 +116,7 @@ func (cl *Client) UpdateResource(kind, guid string, force bool, rsrc interface{}
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.Put(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
+	status, err := cl.put(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -105,7 +135,7 @@ func (cl *Client) Build(guid string) (string, error) {
 	}
 	resp := a.BuildResponse{}
 
-	_, err := cl.Post(cl.apiNamespace+buildRoute, &req, &resp)
+	_, err := cl.post(cl.apiNamespace+buildRoute, &req, &resp)
 	if err != nil {
 		return "", err
 	}

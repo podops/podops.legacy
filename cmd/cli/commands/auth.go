@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/urfave/cli/v2"
@@ -20,12 +19,12 @@ func AuthCommand(c *cli.Context) error {
 		}
 
 		// create a new client and force token verification
-		cl, err := podops.NewClient(context.Background(), token)
+		cl, err := podops.NewClient(token)
 		if err != nil {
 			fmt.Println("\nNot authorized")
 			return nil
 		}
-		err = cl.Store(presetsName)
+		err = cl.Store(configName)
 		if err != nil {
 			fmt.Printf("\nCould not write config. %v\n", err)
 			return nil

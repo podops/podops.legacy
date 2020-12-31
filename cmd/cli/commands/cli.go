@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os/user"
@@ -13,9 +12,9 @@ import (
 )
 
 const (
-	// presetsNameAndPath is the name and location of the config file
-	presetsName        = "config"
-	presetsNameAndPath = ".po/config"
+	// configNameAndPath is the name and location of the config file
+	configName        = "config"
+	configNameAndPath = ".po/config"
 
 	// BasicCmdGroup groups basic commands
 	BasicCmdGroup = "\nBasic Commands"
@@ -33,9 +32,9 @@ var (
 
 func init() {
 	usr, _ := user.Current()
-	homeDir := filepath.Join(usr.HomeDir, presetsNameAndPath)
+	homeDir := filepath.Join(usr.HomeDir, configNameAndPath)
 
-	cl, err := podops.NewClientFromFile(context.Background(), homeDir)
+	cl, err := podops.NewClientFromFile(homeDir)
 
 	if err != nil {
 		log.Fatal(err)

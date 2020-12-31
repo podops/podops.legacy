@@ -11,7 +11,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/txsvc/service/pkg/auth"
+	"github.com/podops/podops"
 )
 
 var (
@@ -33,7 +33,12 @@ func main() {
 	flag.Int64Var(&duration, "duration", 30, "Validity of the token in days")
 	flag.Parse()
 
-	token, err := auth.CreateJWTToken(secret, realm, clientID, userID, scope, duration)
+	cl, err := podops.NewClient("")
+	if err != nil {
+		log.Fatal("Error:" + err.Error())
+		os.Exit(1)
+	}
+	token, err := cl.CreateToken(secret, realm, clientID, userID, scope, duration)
 	if err != nil {
 		log.Fatal("Error:" + err.Error())
 		os.Exit(1)
