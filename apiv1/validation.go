@@ -37,7 +37,7 @@ func (e *Episode) Validate() error {
 	var issues []*Assertion
 
 	issues = assertString(e.APIVersion, "v1", issues)
-	issues = assertString(e.Kind, "show", issues)
+	issues = assertString(e.Kind, "episode", issues)
 	issues = assertExists(e.Metadata, "metadata", issues)
 	issues = assertExists(e.Description, "description", issues)
 	issues = assertExists(e.Image, "image", issues)
