@@ -15,75 +15,100 @@ type (
 		Type int    // 0 == warning, 1 == error
 		Txt  string // description of the problem
 	}
+
+	// Validation collects assertions
+	Validation struct {
+		Name     string
+		Issues   []*Assertion
+		Errors   int
+		Warnings int
+	}
 )
 
-// Validate verifies the integrity of the struct. Aborts on first error.
-func (s *Show) Validate() error {
-	var issues []*Assertion
-
-	issues = assertString(s.APIVersion, "v1", issues)
-	issues = assertString(s.Kind, "show", issues)
-	issues = assertExists(s.Metadata, "metadata", issues)
-	issues = assertExists(s.Description, "description", issues)
-	issues = assertExists(s.Image, "image", issues)
-
-	// FIXME: return an error or something
-
-	return nil
-}
-
-// Validate verifies the integrity of the struct. Aborts on first error.
-func (e *Episode) Validate() error {
-	var issues []*Assertion
-
-	issues = assertString(e.APIVersion, "v1", issues)
-	issues = assertString(e.Kind, "episode", issues)
-	issues = assertExists(e.Metadata, "metadata", issues)
-	issues = assertExists(e.Description, "description", issues)
-	issues = assertExists(e.Image, "image", issues)
-	issues = assertExists(e.Enclosure, "enclosure", issues)
-
-	// FIXME: return an error or something
-
-	return nil
-}
-
-func assertString(src, expected string, issues []*Assertion) []*Assertion {
+// AssertStringError verifies a string
+func (v *Validation) AssertStringError(src, expected string) {
 	if len(src) != len(expected) {
 		issue := &Assertion{
 			Type: AssertionError,
-			Txt:  fmt.Sprintf("Expected '%s', found '%s'", src, expected),
+			Txt:  fmt.Sprintf("Expected '%s', found '%s'", expected, src),
 		}
-		return append(issues, issue)
+		v.Issues = append(v.Issues, issue)
+		v.Errors++
+		return
 	}
 
 	if src != expected {
 		issue := &Assertion{
 			Type: AssertionError,
-			Txt:  fmt.Sprintf("Expected '%s', found '%s'", src, expected),
+			Txt:  fmt.Sprintf("Expected '%s', found '%s'", expected, src),
 		}
-		return append(issues, issue)
+		v.Issues = append(v.Issues, issue)
+		v.Errors++
 	}
-	return issues
 }
 
-func assertExists(src interface{}, expected string, issues []*Assertion) []*Assertion {
+// AssertExistsError verifies that a struct exists
+func (v *Validation) AssertExistsError(src interface{}, expected string) {
 	if src == nil {
 		issue := &Assertion{
 			Type: AssertionError,
 			Txt:  fmt.Sprintf("Expected '%s', found 'nil'", expected),
 		}
-		return append(issues, issue)
+		v.Issues = append(v.Issues, issue)
+		v.Errors++
 	}
-	return issues
 }
 
-/*
-Show struct {
-		APIVersion  string          `json:"apiVersion" yaml:"apiVersion" binding:"required"`   // REQUIRED default: v1.0
-		Kind        string          `json:"kind" yaml:"kind" binding:"required"`               // REQUIRED default: show
-		Metadata    Metadata        `json:"metadata" yaml:"metadata" binding:"required"`       // REQUIRED
-		Description ShowDescription `json:"description" yaml:"description" binding:"required"` // REQUIRED
-		Image       Resource        `json:"image" yaml:"image" binding:"required"`             // REQUIRED 'channel.itunes.image'
+// NErrors returns the number of erros
+func (v *Validation) NErrors() int {
+	return v.Errors
+}
+
+// Error returns an error if NError > 0, nil otherwise
+func (v *Validation) Error() error {
+	if v.Errors == 0 {
+		return nil
 	}
-*/
+	return fmt.Errorf("validation: '%s' has %d errors", v.Name, v.Errors)
+}
+
+// NWarnings returns the number of warnings
+func (v *Validation) NWarnings() int {
+	return v.Warnings
+}
+
+// NewValidation initializes and returns a new validation
+func NewValidation(name string) *Validation {
+	v := Validation{
+		Name:   name,
+		Issues: make([]*Assertion, 0),
+	}
+	return &v
+}
+
+// Validate verifies the integrity of the struct. Aborts on first error.
+func (s *Show) Validate() error {
+	v := NewValidation("show")
+
+	v.AssertStringError(s.APIVersion, "v1")
+	v.AssertStringError(s.Kind, "show")
+	v.AssertExistsError(s.Metadata, "metadata")
+	v.AssertExistsError(s.Description, "description")
+	v.AssertExistsError(s.Image, "image")
+
+	return v.Error()
+}
+
+// Validate verifies the integrity of the struct. Aborts on first error.
+func (e *Episode) Validate() error {
+	v := NewValidation("episode")
+
+	v.AssertStringError(e.APIVersion, "v1")
+	v.AssertStringError(e.Kind, "episode")
+	v.AssertExistsError(e.Metadata, "metadata")
+	v.AssertExistsError(e.Description, "description")
+	v.AssertExistsError(e.Image, "image")
+	v.AssertExistsError(e.Enclosure, "enclosure")
+
+	return v.Error()
+}
