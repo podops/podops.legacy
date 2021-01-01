@@ -14,6 +14,7 @@ func (s *Show) Validate(v *Validator) *Validator {
 	// Show specific metadata, tracking the scaffolding functions
 	v.Validate(&s.Metadata)
 	v.AssertContains(s.Metadata.Labels, LabelLanguage, "Metadata")
+	v.AssertISO639(s.Metadata.Labels[LabelLanguage])
 	v.AssertContains(s.Metadata.Labels, LabelExplicit, "Metadata")
 	v.AssertContains(s.Metadata.Labels, LabelType, "Metadata")
 	v.AssertContains(s.Metadata.Labels, LabelBlock, "Metadata")
