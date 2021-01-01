@@ -80,6 +80,7 @@ func NewClientFromFile(path string) (*Client, error) {
 		json.Unmarshal(byteValue, &client)
 
 		client.apiNamespace = DefaultNamespacePrefix
+		client.ServiceEndpoint = defaultAPIEndpoint
 	}
 
 	return client, nil
