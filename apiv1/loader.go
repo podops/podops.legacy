@@ -57,9 +57,9 @@ func loadShowResource(data []byte) (interface{}, string, error) {
 	if err != nil {
 		return nil, "", fmt.Errorf("Can not parse resource. %w", err)
 	}
-	err = r.Validate()
-	if err != nil {
-		return nil, "", fmt.Errorf("Resource is not valid. Reason: %w", err)
+	v := r.Validate(NewValidator("show"))
+	if !v.IsValid() {
+		return nil, "", fmt.Errorf(v.Error())
 	}
 
 	return &r, r.GUID(), nil
@@ -72,9 +72,9 @@ func loadEpisodeResource(data []byte) (interface{}, string, error) {
 	if err != nil {
 		return nil, "", fmt.Errorf("Can not parse resource. %w", err)
 	}
-	err = r.Validate()
-	if err != nil {
-		return nil, "", fmt.Errorf("Resource is not valid. Reason: %w", err)
+	v := r.Validate(NewValidator("episode"))
+	if !v.IsValid() {
+		return nil, "", fmt.Errorf(v.Error())
 	}
 
 	return &r, r.GUID(), nil
