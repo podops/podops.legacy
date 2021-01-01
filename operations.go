@@ -94,13 +94,13 @@ func (cl *Client) List() (*a.ProductionsResponse, error) {
 }
 
 // CreateResource invokes the ResourceEndpoint
-func (cl *Client) CreateResource(kind, guid string, force bool, rsrc interface{}) (int, error) {
+func (cl *Client) CreateResource(kind, rsrcGUID string, force bool, rsrc interface{}) (int, error) {
 	if err := cl.HasTokenAndGUID(); err != nil {
 		return http.StatusBadRequest, err
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.post(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
+	status, err := cl.post(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -109,13 +109,13 @@ func (cl *Client) CreateResource(kind, guid string, force bool, rsrc interface{}
 }
 
 // UpdateResource invokes the ResourceEndpoint
-func (cl *Client) UpdateResource(kind, guid string, force bool, rsrc interface{}) (int, error) {
+func (cl *Client) UpdateResource(kind, rsrcGUID string, force bool, rsrc interface{}) (int, error) {
 	if err := cl.HasTokenAndGUID(); err != nil {
 		return http.StatusBadRequest, err
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.put(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, guid, force), rsrc, &resp)
+	status, err := cl.put(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -130,7 +130,7 @@ func (cl *Client) Build(guid string) (string, error) {
 	}
 
 	req := a.BuildRequest{
-		GUID: cl.GUID,
+		GUID: guid,
 	}
 	resp := a.BuildResponse{}
 

@@ -10,7 +10,6 @@ stuff.md
 /hack
 show-*.yaml
 episode-*.yaml
-/examples
 
 # Binaries
 cmd/token/token

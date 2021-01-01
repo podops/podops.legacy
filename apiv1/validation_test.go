@@ -1,9 +1,23 @@
 package apiv1
 
 import (
+	"strings"
 	"testing"
+
+	"github.com/johngb/langreg"
 )
 
+func TestISO(t *testing.T) {
+	src := "de"
+	lang := src
+	if !strings.Contains(src, "_") {
+		lang = src + "_" + strings.ToUpper(src)
+	}
+	if !langreg.IsValidLangRegCode(lang) {
+		t.Errorf("Invalid code '%s'", lang)
+	}
+
+}
 func TestTemplateShow(t *testing.T) {
 	s := DefaultShow("BASE_URL", "NAME", "TITLE", "SUMMARY", "GUID")
 	v := s.Validate(NewValidator("show"))

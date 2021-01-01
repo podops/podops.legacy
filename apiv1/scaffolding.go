@@ -16,7 +16,7 @@ func DefaultShowMetadata(guid string) map[string]string {
 
 	l := make(map[string]string)
 
-	l[LabelLanguage] = "en"
+	l[LabelLanguage] = "en_US"
 	l[LabelExplicit] = "no"
 	l[LabelType] = ShowTypeEpisodic
 	l[LabelBlock] = "no"
@@ -79,8 +79,8 @@ func DefaultShow(baseURL, name, title, summary, guid string) *Show {
 			Copyright: fmt.Sprintf("%s copyright", name),
 		},
 		Image: Resource{
-			URI: fmt.Sprintf("%s/podcast-cover.png", guid),
-			Rel: "local",
+			URI: "https://cdn.podops.dev/default/cover.png",
+			Rel: "external",
 		},
 	}
 }
@@ -105,8 +105,8 @@ func DefaultEpisode(baseURL, name, parentName, guid, parentGUID string) *Episode
 			Duration: 1, // Seconds. Must not be 0, otherwise a validation error occurs.
 		},
 		Image: Resource{
-			URI: fmt.Sprintf("%s/episode-cover.png", parentGUID),
-			Rel: "local",
+			URI: "https://cdn.podops.dev/default/episode.png",
+			Rel: "external",
 		},
 		Enclosure: Resource{
 			URI:  fmt.Sprintf("%s/%s.mp3", parentGUID, name),

@@ -9,6 +9,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"os/user"
 	"path/filepath"
 
 	"github.com/txsvc/commons/pkg/env"
@@ -107,6 +108,18 @@ func (cl *Client) Store(path string) error {
 	}
 
 	return ioutil.WriteFile(path, config, 0644)
+}
+
+// DefaultConfigLocation returns the suggested default location for the config file
+func DefaultConfigLocation() string {
+	usr, _ := user.Current()
+	return filepath.Join(usr.HomeDir, ".po/config")
+}
+
+// SetProduction sets the context of further operations
+func (cl *Client) SetProduction(guid string) {
+	cl.GUID = guid
+	// FIXME make sure we own the GUID
 }
 
 // Validate verifies the token against the backend service
