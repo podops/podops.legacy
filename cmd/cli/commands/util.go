@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/user"
-	"path/filepath"
 	"strings"
 
 	"github.com/urfave/cli/v2"
@@ -15,22 +13,6 @@ import (
 
 	a "github.com/podops/podops/apiv1"
 )
-
-// remove the local file with login credentials and other state information
-func close() error {
-	// remove the .po/config file if it exists
-	usr, _ := user.Current()
-	fullPath := filepath.Join(usr.HomeDir, configNameAndPath)
-
-	f, _ := os.Stat(fullPath)
-	if f != nil {
-		err := os.Remove(fullPath)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
 
 // PrintError formats a CLI error and prints it
 func PrintError(c *cli.Context, err error) {
@@ -64,4 +46,18 @@ func loadResource(path string) (interface{}, string, string, error) {
 	}
 
 	return r, kind, guid, nil
+}
+
+// removeConfig removes the config file if one exists
+func removeConfig() error {
+	f, err := os.Stat(defaultPathAndName)
+	if err != nil {
+		return err
+	}
+	if f != nil {
+		if err := os.Remove(defaultPathAndName); err != nil {
+			return err
+		}
+	}
+	return nil
 }

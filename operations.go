@@ -95,7 +95,7 @@ func (cl *Client) List() (*a.ProductionsResponse, error) {
 
 // CreateResource invokes the ResourceEndpoint
 func (cl *Client) CreateResource(kind, guid string, force bool, rsrc interface{}) (int, error) {
-	if err := cl.Validated(); err != nil {
+	if err := cl.HasTokenAndGUID(); err != nil {
 		return http.StatusBadRequest, err
 	}
 
@@ -110,7 +110,7 @@ func (cl *Client) CreateResource(kind, guid string, force bool, rsrc interface{}
 
 // UpdateResource invokes the ResourceEndpoint
 func (cl *Client) UpdateResource(kind, guid string, force bool, rsrc interface{}) (int, error) {
-	if err := cl.Validated(); err != nil {
+	if err := cl.HasTokenAndGUID(); err != nil {
 		return http.StatusBadRequest, err
 	}
 
@@ -125,7 +125,7 @@ func (cl *Client) UpdateResource(kind, guid string, force bool, rsrc interface{}
 
 // Build invokes the BuildEndpoint
 func (cl *Client) Build(guid string) (string, error) {
-	if err := cl.Validated(); err != nil {
+	if err := cl.HasTokenAndGUID(); err != nil {
 		return "", err
 	}
 
@@ -144,7 +144,7 @@ func (cl *Client) Build(guid string) (string, error) {
 
 // UploadResource invokes the UploadEndpoint
 func (cl *Client) UploadResource(path string, force bool) error {
-	if err := cl.Validated(); err != nil {
+	if err := cl.HasTokenAndGUID(); err != nil {
 		return err
 	}
 

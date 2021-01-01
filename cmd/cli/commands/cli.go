@@ -6,16 +6,13 @@ import (
 	"os/user"
 	"path/filepath"
 
+	"github.com/txsvc/commons/pkg/env"
 	"github.com/urfave/cli/v2"
 
 	"github.com/podops/podops"
 )
 
 const (
-	// configNameAndPath is the name and location of the config file
-	configName        = "config"
-	configNameAndPath = ".po/config"
-
 	// BasicCmdGroup groups basic commands
 	BasicCmdGroup = "\nBasic Commands"
 	// SettingsCmdGroup groups settings
@@ -24,17 +21,30 @@ const (
 	ShowCmdGroup = "\nContent Creation Commands"
 	// ShowMgmtCmdGroup groups advanced show commands
 	ShowMgmtCmdGroup = "\nContent Management Commands"
+
+	// configNameAndPath is the name and location of the config file
+	configName = "config"
+	configPath = ".po"
 )
 
 var (
-	client *podops.Client
+	client             *podops.Client
+	defaultPath        string
+	defaultPathAndName string
 )
 
 func init() {
-	usr, _ := user.Current()
-	homeDir := filepath.Join(usr.HomeDir, configNameAndPath)
+	path := env.GetString("PODOPS_CREDENTIALS", "")
+	if path == "" {
+		usr, _ := user.Current()
+		defaultPath = filepath.Join(usr.HomeDir, configPath)
+		defaultPathAndName = filepath.Join(defaultPath, configName)
+	} else {
+		defaultPath = filepath.Dir(path)
+		defaultPathAndName = path
+	}
 
-	cl, err := podops.NewClientFromFile(homeDir)
+	cl, err := podops.NewClientFromFile(defaultPathAndName)
 
 	if err != nil {
 		log.Fatal(err)

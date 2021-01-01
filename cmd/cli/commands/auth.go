@@ -13,8 +13,8 @@ func AuthCommand(c *cli.Context) error {
 	token := c.Args().First()
 
 	if token != "" {
-		// remove the old settings first
-		if err := close(); err != nil {
+		// remove old config if it exists
+		if err := removeConfig(); err != nil {
 			return err
 		}
 
@@ -24,7 +24,7 @@ func AuthCommand(c *cli.Context) error {
 			fmt.Println("\nNot authorized")
 			return nil
 		}
-		err = cl.Store(configName)
+		err = cl.Store(defaultPathAndName)
 		if err != nil {
 			fmt.Printf("\nCould not write config. %v\n", err)
 			return nil
@@ -40,11 +40,9 @@ func AuthCommand(c *cli.Context) error {
 
 // LogoutCommand clears all session information
 func LogoutCommand(c *cli.Context) error {
-	if err := close(); err != nil {
+	if err := removeConfig(); err != nil {
 		return err
 	}
-	client.Close()
-	client = nil
 
 	fmt.Println("\nLogout successful")
 	return nil

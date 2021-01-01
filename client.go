@@ -9,7 +9,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"os/user"
 	"path/filepath"
 
 	"github.com/txsvc/commons/pkg/env"
@@ -38,9 +37,13 @@ type (
 )
 
 var (
-	// DefaultAPIEndpoint points to the API
-	defaultAPIEndpoint string = env.GetString("API_ENDPOINT", DefaultAPIEndpoint)
+	defaultAPIEndpoint string
 )
+
+func init() {
+	// DefaultAPIEndpoint points to the API
+	defaultAPIEndpoint = env.GetString("API_ENDPOINT", DefaultAPIEndpoint)
+}
 
 // NewClient creates a new podcast client.
 //
@@ -64,18 +67,19 @@ func NewClientFromFile(path string) (*Client, error) {
 	var client *Client
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return defaultClient(""), nil
-	}
+		client = defaultClient("")
+	} else {
+		jsonFile, err := os.Open(path)
+		if err != nil {
+			return nil, err
+		}
+		defer jsonFile.Close()
 
-	jsonFile, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer jsonFile.Close()
+		byteValue, _ := ioutil.ReadAll(jsonFile)
+		json.Unmarshal(byteValue, &client)
 
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	json.Unmarshal(byteValue, &client)
-	client.apiNamespace = DefaultNamespacePrefix
+		client.apiNamespace = DefaultNamespacePrefix
+	}
 
 	return client, nil
 }
@@ -89,39 +93,20 @@ func defaultClient(token string) *Client {
 	}
 }
 
-// Close does whatever kind of clean-up is necessary
-func (cl *Client) Close() {
-	// FIXME: just a placeholder for now
-}
-
 // Store persists the Client state
-func (cl *Client) Store(name string) error {
+func (cl *Client) Store(path string) error {
 	config, _ := json.Marshal(cl)
 
-	usr, _ := user.Current()
-	homeDir := filepath.Join(usr.HomeDir, ".po")
-	os.MkdirAll(homeDir, os.ModePerm)
-
-	return ioutil.WriteFile(filepath.Join(homeDir, name), config, 0644)
-}
-
-// HasToken verifies that remote commands can be executed
-func (cl *Client) HasToken() error {
-	if cl.Token == "" {
-		return fmt.Errorf("Not authorized. Use 'po auth' first") // FIXME generic text, not CLI specific
+	// create the location if it does not exist
+	baseDir := filepath.Dir(path)
+	if baseDir != "." && baseDir != ".." {
+		// path is contains a location
+		if err := os.MkdirAll(baseDir, os.ModePerm); err != nil {
+			return err
+		}
 	}
-	return nil
-}
 
-// Validated verifies that remote commands can be executed
-func (cl *Client) Validated() error {
-	if cl.Token == "" {
-		return fmt.Errorf("Not authorized. Use 'po auth' first") // FIXME generic text, not CLI specific
-	}
-	if cl.GUID == "" {
-		return fmt.Errorf("No show selected. Use 'po show' and/or 'po set NAME' first")
-	}
-	return nil
+	return ioutil.WriteFile(path, config, 0644)
 }
 
 // Validate verifies the token against the backend service
@@ -136,6 +121,25 @@ func (cl *Client) Validate() error {
 	if status != http.StatusAccepted {
 		// the only valid positive response
 		return fmt.Errorf("validation: not authorized %d", status)
+	}
+	return nil
+}
+
+// HasToken verifies that remote commands can be executed
+func (cl *Client) HasToken() error {
+	if cl.Token == "" {
+		return fmt.Errorf("Not authorized. Use 'po auth' first") // FIXME generic text, not CLI specific
+	}
+	return nil
+}
+
+// HasTokenAndGUID verifies the presence of a token and GUID
+func (cl *Client) HasTokenAndGUID() error {
+	if cl.Token == "" {
+		return fmt.Errorf("Not authorized. Use 'po auth' first") // FIXME generic text, not CLI specific
+	}
+	if cl.GUID == "" {
+		return fmt.Errorf("No show selected. Use 'po show' and/or 'po set NAME' first")
 	}
 	return nil
 }
