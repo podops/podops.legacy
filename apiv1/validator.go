@@ -174,7 +174,20 @@ func (v *Validator) AsError() error {
 
 // Error returns an error text
 func (v *Validator) Error() string {
-	return fmt.Sprintf("validation '%s' has %d errors, %d warnings", v.Name, v.Errors, v.Warnings)
+	//return fmt.Sprintf("validation '%s' has %d errors, %d warnings", v.Name, v.Errors, v.Warnings)
+	return v.Report()
+}
+
+// Report returns a description of all issues
+func (v *Validator) Report() string {
+	if v.Errors == 0 {
+		return "validation '%s' has zero errors/warnings"
+	}
+	r := "\n"
+	for i, issue := range v.Issues {
+		r = r + fmt.Sprintf("Issue %d: %s\n", i+1, issue.Txt)
+	}
+	return r
 }
 
 // NewValidator initializes and returns a new Validator
