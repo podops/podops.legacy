@@ -13,9 +13,9 @@ const (
 	// AuthenticationRoute is used to verify a token
 	authenticationRoute = "/_a/token"
 	// productionRoute route to call ProductionEndpoint
-	productionRoute = "/new"
+	productionRoute = "/production"
 	// resourceRoute route to call ResourceEndpoint
-	resourceRoute = "/update/%s/%s/%s?f=%v" // "/update/:parent/:rsrc/:id"
+	resourceRoute = "/update/%s/%s/%s?f=%v" // "/update/:prod/:kind/:id"
 	// listProductionsRoute route to call ListProductionsEndpoint
 	listProductionsRoute = "/productions"
 	// buildRoute route to call BuildEndpoint
