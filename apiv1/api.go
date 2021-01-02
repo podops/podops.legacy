@@ -5,18 +5,17 @@ import (
 )
 
 type (
-	// ProductionRequest defines the request
-	ProductionRequest struct {
-		Name    string `json:"name" binding:"required"`
-		Title   string `json:"title" binding:"required"`
-		Summary string `json:"summary" binding:"required"`
-		GUID    string `json:"guid,omitempty"`
-	}
-
-	// ProductionResponse defines the request
-	ProductionResponse struct {
-		Name string `json:"name" binding:"required"`
-		GUID string `json:"guid" binding:"required"`
+	// Production defines the request
+	Production struct {
+		Name      string `json:"name" binding:"required"`
+		GUID      string `json:"guid,omitempty"`
+		Owner     string `json:"owner"`
+		Title     string `json:"title"`
+		Summary   string `json:"summary"`
+		BuildDate int64  `json:"build_date"`
+		// internal
+		Created int64 `json:"-"`
+		Updated int64 `json:"-"`
 	}
 
 	// ProductionsResponse returns a list of productions

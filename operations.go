@@ -54,7 +54,7 @@ func (cl *Client) CreateToken(secret, realm, clientID, userID, scope string, dur
 }
 
 // CreateProduction invokes the CreateProductionEndpoint
-func (cl *Client) CreateProduction(name, title, summary string) (*a.ProductionResponse, error) {
+func (cl *Client) CreateProduction(name, title, summary string) (*a.Production, error) {
 	if err := cl.HasToken(); err != nil {
 		return nil, err
 	}
@@ -63,13 +63,13 @@ func (cl *Client) CreateProduction(name, title, summary string) (*a.ProductionRe
 		return nil, fmt.Errorf("resource: name must not be empty")
 	}
 
-	req := a.ProductionRequest{
+	req := a.Production{
 		Name:    name,
 		Title:   title,
 		Summary: summary,
 	}
 
-	resp := a.ProductionResponse{}
+	resp := a.Production{}
 	_, err := cl.post(cl.apiNamespace+productionRoute, &req, &resp)
 
 	if err != nil {
