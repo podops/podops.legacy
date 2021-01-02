@@ -5,7 +5,7 @@ import (
 )
 
 type (
-	// Production defines the request
+	// Production is the parent struct of all other resources.
 	Production struct {
 		Name      string `json:"name" binding:"required"`
 		GUID      string `json:"guid,omitempty"`
@@ -18,16 +18,9 @@ type (
 		Updated int64 `json:"-"`
 	}
 
-	// ProductionsResponse returns a list of productions
-	ProductionsResponse struct {
-		List []ProductionDetails `json:"list" `
-	}
-
-	// ProductionDetails provides details about a production
-	ProductionDetails struct {
-		Name  string `json:"name" binding:"required"`
-		GUID  string `json:"guid" binding:"required"`
-		Title string `json:"title,omitempty" `
+	// ProductionList returns a list of productions
+	ProductionList struct {
+		Productions []*Production `json:"productions" `
 	}
 
 	// BuildRequest initiates the build of the feed

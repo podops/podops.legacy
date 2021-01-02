@@ -16,8 +16,8 @@ const (
 	productionRoute = "/new"
 	// resourceRoute route to call ResourceEndpoint
 	resourceRoute = "/update/%s/%s/%s?f=%v" // "/update/:parent/:rsrc/:id"
-	// listRoute route to call ListEndpoint
-	listRoute = "/list"
+	// listProductionsRoute route to call ListProductionsEndpoint
+	listProductionsRoute = "/productions"
 	// buildRoute route to call BuildEndpoint
 	buildRoute = "/build"
 	// uploadRoute route to UploadEndpoint
@@ -79,14 +79,14 @@ func (cl *Client) CreateProduction(name, title, summary string) (*a.Production, 
 	return &resp, nil
 }
 
-// List retrieves a list of resources
-func (cl *Client) List() (*a.ProductionsResponse, error) {
+// Productions retrieves a list of productions
+func (cl *Client) Productions() (*a.ProductionList, error) {
 	if err := cl.HasToken(); err != nil {
 		return nil, err
 	}
 
-	var resp a.ProductionsResponse
-	_, err := cl.get(cl.apiNamespace+listRoute, &resp)
+	var resp a.ProductionList
+	_, err := cl.get(cl.apiNamespace+listProductionsRoute, &resp)
 	if err != nil {
 		return nil, err
 	}

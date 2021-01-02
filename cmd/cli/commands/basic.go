@@ -44,17 +44,17 @@ func NewProductionCommand(c *cli.Context) error {
 // ListProductionCommand requests a new show
 func ListProductionCommand(c *cli.Context) error {
 
-	l, err := client.List()
+	l, err := client.Productions()
 	if err != nil {
 		PrintError(c, err)
 		return nil
 	}
 
-	if len(l.List) == 0 {
+	if len(l.Productions) == 0 {
 		fmt.Println("No shows to list.")
 	} else {
 		fmt.Println("NAME\t\tGUID\t\tTITLE")
-		for _, details := range l.List {
+		for _, details := range l.Productions {
 			if details.GUID == client.GUID {
 				fmt.Printf("*%s\t\t%s\t%s\n", details.Name, details.GUID, details.Title)
 			} else {
@@ -69,13 +69,13 @@ func ListProductionCommand(c *cli.Context) error {
 // SetProductionCommand lists the current show/production, switch to another show/production
 func SetProductionCommand(c *cli.Context) error {
 
-	l, err := client.List()
+	l, err := client.Productions()
 	if err != nil {
 		PrintError(c, err)
 		return nil
 	}
 
-	if len(l.List) == 0 {
+	if len(l.Productions) == 0 {
 		fmt.Println("No shows available.")
 		return nil
 	}
@@ -86,7 +86,7 @@ func SetProductionCommand(c *cli.Context) error {
 			fmt.Println("No shows selected. Use 'po set NAME' first")
 			return nil
 		}
-		for _, details := range l.List {
+		for _, details := range l.Productions {
 			if details.GUID == client.GUID {
 				fmt.Println("NAME\t\tGUID\t\tTITLE")
 				fmt.Printf("%s\t\t%s\t%s\n", details.Name, details.GUID, details.Title)
@@ -98,7 +98,7 @@ func SetProductionCommand(c *cli.Context) error {
 
 	}
 
-	for _, details := range l.List {
+	for _, details := range l.Productions {
 		if name == details.Name {
 			client.GUID = details.GUID
 			client.Store(defaultPathAndName)
