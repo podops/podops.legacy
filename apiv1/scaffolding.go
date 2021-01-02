@@ -62,7 +62,7 @@ func DefaultShow(baseURL, name, title, summary, guid string) *Show {
 		Description: ShowDescription{
 			Title:   title,
 			Summary: summary,
-			Link: Resource{
+			Link: Asset{
 				URI: fmt.Sprintf("%s/s/%s", baseURL, name),
 			},
 			Category: Category{
@@ -78,7 +78,7 @@ func DefaultShow(baseURL, name, title, summary, guid string) *Show {
 			Author:    fmt.Sprintf("%s author", name),
 			Copyright: fmt.Sprintf("%s copyright", name),
 		},
-		Image: Resource{
+		Image: Asset{
 			URI: "https://cdn.podops.dev/default/cover.png",
 			Rel: "external",
 		},
@@ -99,16 +99,16 @@ func DefaultEpisode(baseURL, name, parentName, guid, parentGUID string) *Episode
 			Title:       fmt.Sprintf("%s - Episode Title", name),
 			Summary:     fmt.Sprintf("%s - Episode Subtitle or short summary", name),
 			EpisodeText: "A long-form description of the episode with notes etc.",
-			Link: Resource{
+			Link: Asset{
 				URI: fmt.Sprintf("%s/s/%s/%s", baseURL, parentName, name),
 			},
 			Duration: 1, // Seconds. Must not be 0, otherwise a validation error occurs.
 		},
-		Image: Resource{
+		Image: Asset{
 			URI: "https://cdn.podops.dev/default/episode.png",
 			Rel: "external",
 		},
-		Enclosure: Resource{
+		Enclosure: Asset{
 			URI:  fmt.Sprintf("%s/%s.mp3", parentGUID, name),
 			Type: "audio/mpeg",
 			Rel:  "local",

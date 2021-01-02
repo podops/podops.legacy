@@ -66,6 +66,27 @@ func ListProductionCommand(c *cli.Context) error {
 	return nil
 }
 
+// ListResourcesCommand requests a new show
+func ListResourcesCommand(c *cli.Context) error {
+
+	l, err := client.Resources(client.GUID, "")
+	if err != nil {
+		PrintError(c, err)
+		return nil
+	}
+
+	if len(l.Resources) == 0 {
+		fmt.Println("No resources to list.")
+	} else {
+		fmt.Println("NAME\t\tGUID\t\tKIND")
+		for _, details := range l.Resources {
+			fmt.Printf("%s\t\t%s\t%s\n", details.Name, details.GUID, details.Kind)
+		}
+	}
+
+	return nil
+}
+
 // SetProductionCommand lists the current show/production, switch to another show/production
 func SetProductionCommand(c *cli.Context) error {
 

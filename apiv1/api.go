@@ -23,6 +23,23 @@ type (
 		Productions []*Production `json:"productions" `
 	}
 
+	// Resource is used to maintain a repository of all existing resources across all shows
+	Resource struct {
+		Name       string `json:"name"`
+		GUID       string `json:"guid"`
+		Kind       string `json:"kind"`
+		ParentGUID string `json:"parent_guid"`
+		Location   string `json:"location"` // path to the .yaml
+		// internal
+		Created int64 `json:"-"`
+		Updated int64 `json:"-"`
+	}
+
+	// ResourceList returns a list of resources
+	ResourceList struct {
+		Resources []*Resource `json:"resources" `
+	}
+
 	// BuildRequest initiates the build of the feed
 	BuildRequest struct {
 		GUID string `json:"guid" binding:"required"`

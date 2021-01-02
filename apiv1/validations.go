@@ -74,7 +74,7 @@ func (m *Metadata) Validate(v *Validator) *Validator {
 //	Rel    string `json:"rel,omitempty" yaml:"rel,omitempty"`       // OPTIONAL
 //	Type   string `json:"type,omitempty" yaml:"type,omitempty"`     // OPTIONAL
 //	Size   int    `json:"size,omitempty" yaml:"size,omitempty"`     // OPTIONAL
-func (r *Resource) Validate(v *Validator) *Validator {
+func (r *Asset) Validate(v *Validator) *Validator {
 	v.AssertStringExists(r.URI, "URI")
 
 	return v

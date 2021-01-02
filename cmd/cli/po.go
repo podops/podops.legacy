@@ -93,7 +93,7 @@ func setupCommands() []*cli.Command {
 			Usage:     "Lists a single resource/a collection of resources",
 			UsageText: getUsageText,
 			Category:  cmd.ShowCmdGroup,
-			Action:    cmd.NoOpCommand,
+			Action:    cmd.ListResourcesCommand,
 			//Flags:     createFlags(),
 		},
 		{

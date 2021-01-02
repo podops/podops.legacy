@@ -12,12 +12,16 @@ import (
 const (
 	// AuthenticationRoute is used to verify a token
 	authenticationRoute = "/_a/token"
+
 	// productionRoute route to call ProductionEndpoint
 	productionRoute = "/production"
-	// resourceRoute route to call ResourceEndpoint
-	resourceRoute = "/update/%s/%s/%s?f=%v" // "/update/:prod/:kind/:id"
 	// listProductionsRoute route to call ListProductionsEndpoint
 	listProductionsRoute = "/productions"
+
+	// resourceRoute route to call ResourceEndpoint
+	updateResourceRoute = "/resource/%s/%s/%s?f=%v" // "/update/:prod/:kind/:id"
+	listResourcesRoute  = "/resource/%s/%s"
+
 	// buildRoute route to call BuildEndpoint
 	buildRoute = "/build"
 	// uploadRoute route to UploadEndpoint
@@ -93,6 +97,23 @@ func (cl *Client) Productions() (*a.ProductionList, error) {
 	return &resp, nil
 }
 
+// Resources retrieves a list of resources
+func (cl *Client) Resources(prod, kind string) (*a.ResourceList, error) {
+	if err := cl.HasToken(); err != nil {
+		return nil, err
+	}
+	if kind == "" {
+		kind = "ALL"
+	}
+
+	var resp a.ResourceList
+	_, err := cl.get(cl.apiNamespace+fmt.Sprintf(listResourcesRoute, prod, kind), &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 // CreateResource invokes the ResourceEndpoint
 func (cl *Client) CreateResource(kind, rsrcGUID string, force bool, rsrc interface{}) (int, error) {
 	if err := cl.HasTokenAndGUID(); err != nil {
@@ -100,7 +121,7 @@ func (cl *Client) CreateResource(kind, rsrcGUID string, force bool, rsrc interfa
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.post(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
+	status, err := cl.post(cl.apiNamespace+fmt.Sprintf(updateResourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -115,7 +136,7 @@ func (cl *Client) UpdateResource(kind, rsrcGUID string, force bool, rsrc interfa
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.put(cl.apiNamespace+fmt.Sprintf(resourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
+	status, err := cl.put(cl.apiNamespace+fmt.Sprintf(updateResourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err

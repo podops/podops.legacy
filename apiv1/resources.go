@@ -80,7 +80,7 @@ type (
 		Labels map[string]string `json:"labels" yaml:"labels,omitempty"`      // REQUIRED
 	}
 
-	// ResourceMetadata holds only the kind and metadata a resource
+	// ResourceMetadata holds only the kind and metadata of a resource
 	ResourceMetadata struct {
 		APIVersion string   `json:"apiVersion" yaml:"apiVersion" binding:"required"` // REQUIRED default: v1.0
 		Kind       string   `json:"kind" yaml:"kind" binding:"required"`             // REQUIRED default: show
@@ -93,7 +93,7 @@ type (
 		Kind        string          `json:"kind" yaml:"kind" binding:"required"`               // REQUIRED default: show
 		Metadata    Metadata        `json:"metadata" yaml:"metadata" binding:"required"`       // REQUIRED
 		Description ShowDescription `json:"description" yaml:"description" binding:"required"` // REQUIRED
-		Image       Resource        `json:"image" yaml:"image" binding:"required"`             // REQUIRED 'channel.itunes.image'
+		Image       Asset           `json:"image" yaml:"image" binding:"required"`             // REQUIRED 'channel.itunes.image'
 	}
 
 	// Episode holds all metadata related to a podcast episode
@@ -102,29 +102,29 @@ type (
 		Kind        string             `json:"kind" yaml:"kind" binding:"required"`               // REQUIRED default: episode
 		Metadata    Metadata           `json:"metadata" yaml:"metadata" binding:"required"`       // REQUIRED
 		Description EpisodeDescription `json:"description" yaml:"description" binding:"required"` // REQUIRED
-		Image       Resource           `json:"image" yaml:"image" binding:"required"`             // REQUIRED 'item.itunes.image'
-		Enclosure   Resource           `json:"enclosure" yaml:"enclosure" binding:"required"`     // REQUIRED
+		Image       Asset              `json:"image" yaml:"image" binding:"required"`             // REQUIRED 'item.itunes.image'
+		Enclosure   Asset              `json:"enclosure" yaml:"enclosure" binding:"required"`     // REQUIRED
 	}
 
 	// ShowDescription holds essential show metadata
 	ShowDescription struct {
-		Title     string    `json:"title" yaml:"title" binding:"required"`          // REQUIRED 'channel.title' 'channel.itunes.title'
-		Summary   string    `json:"summary" yaml:"summary" binding:"required"`      // REQUIRED 'channel.description'
-		Link      Resource  `json:"link" yaml:"link"`                               // RECOMMENDED 'channel.link'
-		Category  Category  `json:"category" yaml:"category" binding:"required"`    // REQUIRED channel.category
-		Owner     Owner     `json:"owner" yaml:"owner"`                             // RECOMMENDED 'channel.itunes.owner'
-		Author    string    `json:"author" yaml:"author"`                           // RECOMMENDED 'channel.itunes.author'
-		Copyright string    `json:"copyright,omitempty" yaml:"copyright,omitempty"` // OPTIONAL 'channel.copyright'
-		NewFeed   *Resource `json:"newFeed,omitempty" yaml:"newFeed,omitempty"`     // OPTIONAL channel.itunes.new-feed-url -> move to label
+		Title     string   `json:"title" yaml:"title" binding:"required"`          // REQUIRED 'channel.title' 'channel.itunes.title'
+		Summary   string   `json:"summary" yaml:"summary" binding:"required"`      // REQUIRED 'channel.description'
+		Link      Asset    `json:"link" yaml:"link"`                               // RECOMMENDED 'channel.link'
+		Category  Category `json:"category" yaml:"category" binding:"required"`    // REQUIRED channel.category
+		Owner     Owner    `json:"owner" yaml:"owner"`                             // RECOMMENDED 'channel.itunes.owner'
+		Author    string   `json:"author" yaml:"author"`                           // RECOMMENDED 'channel.itunes.author'
+		Copyright string   `json:"copyright,omitempty" yaml:"copyright,omitempty"` // OPTIONAL 'channel.copyright'
+		NewFeed   *Asset   `json:"newFeed,omitempty" yaml:"newFeed,omitempty"`     // OPTIONAL channel.itunes.new-feed-url -> move to label
 	}
 
 	// EpisodeDescription holds essential episode metadata
 	EpisodeDescription struct {
-		Title       string   `json:"title" yaml:"title" binding:"required"`                                 // REQUIRED 'item.title' 'item.itunes.title'
-		Summary     string   `json:"summary" yaml:"summary" binding:"required"`                             // REQUIRED 'item.description'
-		EpisodeText string   `json:"episodeText,omitempty" yaml:"episodeText,omitempty" binding:"required"` // REQUIRED 'item.itunes.summary'
-		Link        Resource `json:"link" yaml:"link"`                                                      // RECOMMENDED 'item.link'
-		Duration    int      `json:"duration" yaml:"duration" binding:"required"`                           // REQUIRED 'item.itunes.duration'
+		Title       string `json:"title" yaml:"title" binding:"required"`                                 // REQUIRED 'item.title' 'item.itunes.title'
+		Summary     string `json:"summary" yaml:"summary" binding:"required"`                             // REQUIRED 'item.description'
+		EpisodeText string `json:"episodeText,omitempty" yaml:"episodeText,omitempty" binding:"required"` // REQUIRED 'item.itunes.summary'
+		Link        Asset  `json:"link" yaml:"link"`                                                      // RECOMMENDED 'item.link'
+		Duration    int    `json:"duration" yaml:"duration" binding:"required"`                           // REQUIRED 'item.itunes.duration'
 	}
 
 	// Owner describes the owner of the show/podcast
@@ -139,8 +139,8 @@ type (
 		SubCategory []string `json:"subcategory" yaml:"subcategory,omitempty"` // OPTIONAL
 	}
 
-	// Resource provides a link to a media resource
-	Resource struct {
+	// Asset provides a link to a media resource
+	Asset struct {
 		URI    string `json:"uri" yaml:"uri" binding:"required"`        // REQUIRED
 		Title  string `json:"title,omitempty" yaml:"title,omitempty"`   // OPTIONAL
 		Anchor string `json:"anchor,omitempty" yaml:"anchor,omitempty"` // OPTIONAL
@@ -194,7 +194,7 @@ func (s *Show) GUID() string {
 }
 
 // ResolveURI re-writes the URI
-func (r *Resource) ResolveURI(cdn, guid string) string {
+func (r *Asset) ResolveURI(cdn, guid string) string {
 	if r.Rel == "" || r.Rel == ResourceTypeExternal {
 		return r.URI // return as-is
 	}
@@ -210,7 +210,7 @@ func (r *Resource) ResolveURI(cdn, guid string) string {
 }
 
 // FingerprintURI re-writes the URI
-func (r *Resource) FingerprintURI(guid string) string {
+func (r *Asset) FingerprintURI(guid string) string {
 	id := util.Fingerprint(r.URI)
 	parts := strings.Split(r.URI, ".")
 	if len(parts) == 0 {
