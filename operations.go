@@ -19,6 +19,7 @@ const (
 	listProductionsRoute = "/productions"
 
 	// resourceRoute route to call ResourceEndpoint
+	getResourceRoute    = "/resource/%s/%s/%s"      // "/update/:prod/:kind/:id"
 	updateResourceRoute = "/resource/%s/%s/%s?f=%v" // "/update/:prod/:kind/:id"
 	listResourcesRoute  = "/resource/%s/%s"
 
@@ -112,6 +113,23 @@ func (cl *Client) Resources(prod, kind string) (*a.ResourceList, error) {
 		return nil, err
 	}
 	return &resp, nil
+}
+
+// Resource returns a resource file
+func (cl *Client) Resource(prod, kind, guid string, rsrc interface{}) error {
+	if err := cl.HasToken(); err != nil {
+		return err
+	}
+
+	status, err := cl.get(cl.apiNamespace+fmt.Sprintf(getResourceRoute, prod, kind, guid), rsrc)
+	if status == http.StatusBadRequest {
+		return fmt.Errorf("Not found: '%s/%s-%s'", prod, kind, guid)
+	}
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // CreateResource invokes the ResourceEndpoint

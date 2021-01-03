@@ -245,7 +245,7 @@ func (cl *Client) invoke(req *http.Request, response interface{}) (int, error) {
 	return resp.StatusCode, nil
 }
 
-// FIXME does not work for VERY large files !
+// FIXME this implementation does not work for VERY large files !
 
 // Creates a new file upload http request with optional extra params
 func (cl *Client) fileUploadRequest(uri, guid, path string) (*http.Request, error) {

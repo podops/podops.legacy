@@ -68,6 +68,11 @@ const (
 	ResourceTypeLocal = "local"
 	// ResourceTypeImport references an external resources that will be imported into the CDN
 	ResourceTypeImport = "import"
+
+	// ResourceShow is a const referencing a resource of type "show"
+	ResourceShow = "show"
+	// ResourceEpisode is a const referencing a resource of type "episode"
+	ResourceEpisode = "episode"
 )
 
 type (
@@ -195,9 +200,7 @@ func (s *Show) GUID() string {
 
 // ResolveURI re-writes the URI
 func (r *Asset) ResolveURI(cdn, guid string) string {
-	if r.Rel == "" || r.Rel == ResourceTypeExternal {
-		return r.URI // return as-is
-	}
+
 	if r.Rel == ResourceTypeLocal {
 		return fmt.Sprintf("%s/%s/%s", cdn, guid, r.URI)
 	}
@@ -205,7 +208,11 @@ func (r *Asset) ResolveURI(cdn, guid string) string {
 		id := r.FingerprintURI(guid)
 		return fmt.Sprintf("%s/%s", cdn, id)
 	}
-	// FIXME should this be possible?
+	if r.Rel == "" || r.Rel == ResourceTypeExternal {
+		return r.URI
+	}
+
+	// anything else, just return the URI as is ...
 	return r.URI
 }
 

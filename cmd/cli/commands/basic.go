@@ -2,8 +2,10 @@ package commands
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/urfave/cli/v2"
+	"gopkg.in/yaml.v3"
 
 	a "github.com/podops/podops/apiv1"
 )
@@ -69,19 +71,44 @@ func ListProductionCommand(c *cli.Context) error {
 // ListResourcesCommand requests a new show
 func ListResourcesCommand(c *cli.Context) error {
 
-	l, err := client.Resources(client.GUID, "")
-	if err != nil {
-		PrintError(c, err)
-		return nil
-	}
+	kind := strings.ToLower(c.Args().First())
 
-	if len(l.Resources) == 0 {
-		fmt.Println("No resources to list.")
-	} else {
-		fmt.Println("NAME\t\tGUID\t\tKIND")
-		for _, details := range l.Resources {
-			fmt.Printf("%s\t\t%s\t%s\n", details.Name, details.GUID, details.Kind)
+	if c.NArg() < 2 {
+		// get a list of resources
+		l, err := client.Resources(client.GUID, kind)
+		if err != nil {
+			PrintError(c, err)
+			return nil
 		}
+
+		if len(l.Resources) == 0 {
+			fmt.Println("No resources to list.")
+		} else {
+			fmt.Println("NAME\t\tGUID\t\tKIND")
+			for _, details := range l.Resources {
+				fmt.Printf("%s\t\t%s\t%s\n", details.Name, details.GUID, details.Kind)
+			}
+		}
+	} else {
+		// get a single resource
+		guid := c.Args().Get(1)
+
+		var rsrc interface{}
+		err := client.Resource(client.GUID, kind, guid, &rsrc)
+		if err != nil {
+			PrintError(c, err)
+			return nil
+		}
+
+		// FIXME verify that rsrc.Kind == kind
+
+		data, err := yaml.Marshal(rsrc)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("\n--- %s/%s-%s:\n\n%s\n\n", client.GUID, kind, guid, string(data))
+
 	}
 
 	return nil
