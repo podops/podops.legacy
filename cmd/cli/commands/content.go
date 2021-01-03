@@ -12,7 +12,7 @@ import (
 // TemplateCommand creates a resource template with all default values
 func TemplateCommand(c *cli.Context) error {
 	template := c.Args().First()
-	if template != "show" && template != "episode" {
+	if template != a.ResourceShow && template != a.ResourceEpisode {
 		fmt.Println(fmt.Sprintf("\nDon't know how to create '%s'", template))
 		return nil
 	}
@@ -41,7 +41,7 @@ func TemplateCommand(c *cli.Context) error {
 		show := a.DefaultShow(client.ServiceEndpoint, name, "TITLE", "SUMMARY", guid)
 		err := dump(fmt.Sprintf("show-%s.yaml", guid), show)
 		if err != nil {
-			PrintError(c, err)
+			printError(c, err)
 			return nil
 		}
 	} else {
@@ -49,7 +49,7 @@ func TemplateCommand(c *cli.Context) error {
 		episode := a.DefaultEpisode(client.ServiceEndpoint, name, parent, guid, parentGUID)
 		err := dump(fmt.Sprintf("episode-%s.yaml", guid), episode)
 		if err != nil {
-			PrintError(c, err)
+			printError(c, err)
 			return nil
 		}
 	}
@@ -103,6 +103,20 @@ func UpdateCommand(c *cli.Context) error {
 	return nil
 }
 
+// BuildCommand starts a new build of the feed
+func BuildCommand(c *cli.Context) error {
+
+	// FIXME support the 'NAME' option
+
+	url, err := client.Build(client.GUID)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(fmt.Sprintf("Build production '%s' successful.\nAccess the feed at %s", client.GUID, url))
+	return nil
+}
+
 // UploadCommand uploads an asset from a file
 func UploadCommand(c *cli.Context) error {
 
@@ -112,7 +126,7 @@ func UploadCommand(c *cli.Context) error {
 	name := c.Args().First()
 	force := c.Bool("force")
 
-	err := client.UploadResource(name, force)
+	err := client.Upload(name, force)
 	if err != nil {
 		return err
 	}

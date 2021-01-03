@@ -47,7 +47,7 @@ func setupCommands() []*cli.Command {
 			Name:     "list",
 			Usage:    "List all shows/productions",
 			Category: cmd.BasicCmdGroup,
-			Action:   cmd.ListProductionCommand,
+			Action:   cmd.ListProductionsCommand,
 		},
 		{
 			Name:      "set",

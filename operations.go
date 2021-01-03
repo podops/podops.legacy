@@ -29,6 +29,12 @@ const (
 	uploadRoute = "/upload"
 )
 
+// SetProduction sets the context of further operations
+func (cl *Client) SetProduction(guid string) {
+	cl.GUID = guid
+	// FIXME make sure we own the GUID
+}
+
 // CreateToken creates an access token on the service
 // FIXME this is not tested
 func (cl *Client) CreateToken(secret, realm, clientID, userID, scope string, duration int64) (string, error) {
@@ -98,21 +104,19 @@ func (cl *Client) Productions() (*a.ProductionList, error) {
 	return &resp, nil
 }
 
-// Resources retrieves a list of resources
-func (cl *Client) Resources(prod, kind string) (*a.ResourceList, error) {
-	if err := cl.HasToken(); err != nil {
-		return nil, err
-	}
-	if kind == "" {
-		kind = "ALL"
+// CreateResource invokes the ResourceEndpoint
+func (cl *Client) CreateResource(kind, rsrcGUID string, force bool, rsrc interface{}) (int, error) {
+	if err := cl.HasTokenAndGUID(); err != nil {
+		return http.StatusBadRequest, err
 	}
 
-	var resp a.ResourceList
-	_, err := cl.get(cl.apiNamespace+fmt.Sprintf(listResourcesRoute, prod, kind), &resp)
+	resp := a.StatusObject{}
+	status, err := cl.post(cl.apiNamespace+fmt.Sprintf(updateResourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
+
 	if err != nil {
-		return nil, err
+		return status, err
 	}
-	return &resp, nil
+	return status, nil
 }
 
 // Resource returns a resource file
@@ -132,19 +136,21 @@ func (cl *Client) Resource(prod, kind, guid string, rsrc interface{}) error {
 	return nil
 }
 
-// CreateResource invokes the ResourceEndpoint
-func (cl *Client) CreateResource(kind, rsrcGUID string, force bool, rsrc interface{}) (int, error) {
-	if err := cl.HasTokenAndGUID(); err != nil {
-		return http.StatusBadRequest, err
+// Resources retrieves a list of resources
+func (cl *Client) Resources(prod, kind string) (*a.ResourceList, error) {
+	if err := cl.HasToken(); err != nil {
+		return nil, err
+	}
+	if kind == "" {
+		kind = "ALL"
 	}
 
-	resp := a.StatusObject{}
-	status, err := cl.post(cl.apiNamespace+fmt.Sprintf(updateResourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
-
+	var resp a.ResourceList
+	_, err := cl.get(cl.apiNamespace+fmt.Sprintf(listResourcesRoute, prod, kind), &resp)
 	if err != nil {
-		return status, err
+		return nil, err
 	}
-	return status, nil
+	return &resp, nil
 }
 
 // UpdateResource invokes the ResourceEndpoint
@@ -181,8 +187,8 @@ func (cl *Client) Build(guid string) (string, error) {
 	return resp.URL, nil
 }
 
-// UploadResource invokes the UploadEndpoint
-func (cl *Client) UploadResource(path string, force bool) error {
+// Upload invokes the UploadEndpoint
+func (cl *Client) Upload(path string, force bool) error {
 	if err := cl.HasTokenAndGUID(); err != nil {
 		return err
 	}

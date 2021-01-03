@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+const (
+	// Version specifies the verion of the API and its structs
+	Version = "v1"
+)
+
 type (
 	// Production is the parent struct of all other resources.
 	Production struct {

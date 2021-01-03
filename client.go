@@ -117,12 +117,6 @@ func DefaultConfigLocation() string {
 	return filepath.Join(usr.HomeDir, ".po/config")
 }
 
-// SetProduction sets the context of further operations
-func (cl *Client) SetProduction(guid string) {
-	cl.GUID = guid
-	// FIXME make sure we own the GUID
-}
-
 // Validate verifies the token against the backend service
 func (cl *Client) Validate() error {
 	if cl.Token == "" {

@@ -19,8 +19,8 @@ var (
 
 func init() {
 	resourceLoaders = make(map[string]ResourceLoaderFunc)
-	resourceLoaders["show"] = loadShowResource
-	resourceLoaders["episode"] = loadEpisodeResource
+	resourceLoaders[ResourceShow] = loadShowResource
+	resourceLoaders[ResourceEpisode] = loadEpisodeResource
 }
 
 // LoadResource takes a byte array and determines its kind before unmarshalling it into its struct form
@@ -57,7 +57,7 @@ func loadShowResource(data []byte) (interface{}, string, error) {
 	if err != nil {
 		return nil, "", fmt.Errorf("Can not parse resource. %w", err)
 	}
-	v := r.Validate(NewValidator("show"))
+	v := r.Validate(NewValidator(ResourceShow))
 	if !v.IsValid() {
 		return nil, "", fmt.Errorf(v.Error())
 	}
@@ -72,7 +72,7 @@ func loadEpisodeResource(data []byte) (interface{}, string, error) {
 	if err != nil {
 		return nil, "", fmt.Errorf("Can not parse resource. %w", err)
 	}
-	v := r.Validate(NewValidator("episode"))
+	v := r.Validate(NewValidator(ResourceEpisode))
 	if !v.IsValid() {
 		return nil, "", fmt.Errorf(v.Error())
 	}

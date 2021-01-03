@@ -34,12 +34,12 @@ func DefaultShowMetadata(guid string) map[string]string {
 //	explicit:	True | False REQUIRED 'channel.itunes.explicit'
 //	type:		Full | Trailer | Bonus REQUIRED 'item.itunes.episodeType'
 //	block:		Yes OPTIONAL 'item.itunes.block' Anything else than 'Yes' has no effect
-func DefaultEpisodeMetadata(guid, parentGUID string) map[string]string {
+func DefaultEpisodeMetadata(guid, parent string) map[string]string {
 
 	l := make(map[string]string)
 
 	l[LabelGUID] = guid
-	l[LabelParentGUID] = parentGUID
+	l[LabelParentGUID] = parent
 	l[LabelDate] = time.Now().UTC().Format(time.RFC1123Z)
 	l[LabelSeason] = "1"
 	l[LabelEpisode] = "1"
@@ -53,8 +53,8 @@ func DefaultEpisodeMetadata(guid, parentGUID string) map[string]string {
 // DefaultShow creates a default show struc
 func DefaultShow(baseURL, name, title, summary, guid string) *Show {
 	return &Show{
-		APIVersion: "v1",
-		Kind:       "show",
+		APIVersion: Version,
+		Kind:       ResourceShow,
 		Metadata: Metadata{
 			Name:   name,
 			Labels: DefaultShowMetadata(guid),
@@ -86,14 +86,14 @@ func DefaultShow(baseURL, name, title, summary, guid string) *Show {
 }
 
 // DefaultEpisode creates a default episode struc
-func DefaultEpisode(baseURL, name, parentName, guid, parentGUID string) *Episode {
+func DefaultEpisode(baseURL, name, parentName, guid, parent string) *Episode {
 
 	return &Episode{
-		APIVersion: "v1",
-		Kind:       "episode",
+		APIVersion: Version,
+		Kind:       ResourceEpisode,
 		Metadata: Metadata{
 			Name:   name,
-			Labels: DefaultEpisodeMetadata(guid, parentGUID),
+			Labels: DefaultEpisodeMetadata(guid, parent),
 		},
 		Description: EpisodeDescription{
 			Title:       fmt.Sprintf("%s - Episode Title", name),
@@ -109,7 +109,7 @@ func DefaultEpisode(baseURL, name, parentName, guid, parentGUID string) *Episode
 			Rel: "external",
 		},
 		Enclosure: Asset{
-			URI:  fmt.Sprintf("%s/%s.mp3", parentGUID, name),
+			URI:  fmt.Sprintf("%s/%s.mp3", parent, name),
 			Type: "audio/mpeg",
 			Rel:  "local",
 			Size: 1, // bytes

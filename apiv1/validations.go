@@ -8,8 +8,8 @@ package apiv1
 //	Description ShowDescription `json:"description" yaml:"description" binding:"required"` // REQUIRED
 //	Image       Resource        `json:"image" yaml:"image" binding:"required"`             // REQUIRED 'channel.itunes.image'
 func (s *Show) Validate(v *Validator) *Validator {
-	v.AssertStringError(s.APIVersion, "v1")
-	v.AssertStringError(s.Kind, "show")
+	v.AssertStringError(s.APIVersion, Version)
+	v.AssertStringError(s.Kind, ResourceShow)
 
 	// Show specific metadata, tracking the scaffolding functions
 	v.Validate(&s.Metadata)
@@ -35,8 +35,8 @@ func (s *Show) Validate(v *Validator) *Validator {
 //	Image       Resource           `json:"image" yaml:"image" binding:"required"`             // REQUIRED 'item.itunes.image'
 //	Enclosure   Resource           `json:"enclosure" yaml:"enclosure" binding:"required"`     // REQUIRED
 func (e *Episode) Validate(v *Validator) *Validator {
-	v.AssertStringError(e.APIVersion, "v1")
-	v.AssertStringError(e.Kind, "episode")
+	v.AssertStringError(e.APIVersion, Version)
+	v.AssertStringError(e.Kind, ResourceEpisode)
 
 	// Episode specific metadata, tracking the scaffolding functions
 	v.Validate(&e.Metadata)

@@ -48,7 +48,7 @@ const (
 	// LabelSeason defaults to "1"
 	LabelSeason = "season"
 	// LabelEpisode positive integer 1..
-	LabelEpisode = "episode"
+	LabelEpisode = ResourceEpisode
 
 	// ShowTypeEpisodic type of podcast is episodic
 	ShowTypeEpisodic = "Episodic"
@@ -69,9 +69,9 @@ const (
 	// ResourceTypeImport references an external resources that will be imported into the CDN
 	ResourceTypeImport = "import"
 
-	// ResourceShow is a const referencing a resource of type "show"
+	// ResourceShow is referencing a resource of type "show"
 	ResourceShow = "show"
-	// ResourceEpisode is a const referencing a resource of type "episode"
+	// ResourceEpisode is referencing a resource of type "episode"
 	ResourceEpisode = "episode"
 )
 
@@ -216,7 +216,7 @@ func (r *Asset) ResolveURI(cdn, guid string) string {
 	return r.URI
 }
 
-// FingerprintURI re-writes the URI
+// FingerprintURI is used in rewriting the URI when Rel == IMPORT
 func (r *Asset) FingerprintURI(guid string) string {
 	id := util.Fingerprint(r.URI)
 	parts := strings.Split(r.URI, ".")

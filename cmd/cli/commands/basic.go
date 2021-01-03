@@ -25,14 +25,14 @@ func NewProductionCommand(c *cli.Context) error {
 
 	p, err := client.CreateProduction(name, title, summary)
 	if err != nil {
-		PrintError(c, err)
+		printError(c, err)
 		return nil
 	}
 
 	show := a.DefaultShow(client.ServiceEndpoint, p.Name, title, summary, p.GUID)
 	err = dump(fmt.Sprintf("show-%s.yaml", p.GUID), show)
 	if err != nil {
-		PrintError(c, err)
+		printError(c, err)
 		return nil
 	}
 
@@ -43,12 +43,12 @@ func NewProductionCommand(c *cli.Context) error {
 	return nil
 }
 
-// ListProductionCommand requests a new show
-func ListProductionCommand(c *cli.Context) error {
+// ListProductionsCommand retrieves all shows
+func ListProductionsCommand(c *cli.Context) error {
 
 	l, err := client.Productions()
 	if err != nil {
-		PrintError(c, err)
+		printError(c, err)
 		return nil
 	}
 
@@ -68,58 +68,12 @@ func ListProductionCommand(c *cli.Context) error {
 	return nil
 }
 
-// ListResourcesCommand requests a new show
-func ListResourcesCommand(c *cli.Context) error {
-
-	kind := strings.ToLower(c.Args().First())
-
-	if c.NArg() < 2 {
-		// get a list of resources
-		l, err := client.Resources(client.GUID, kind)
-		if err != nil {
-			PrintError(c, err)
-			return nil
-		}
-
-		if len(l.Resources) == 0 {
-			fmt.Println("No resources to list.")
-		} else {
-			fmt.Println("NAME\t\tGUID\t\tKIND")
-			for _, details := range l.Resources {
-				fmt.Printf("%s\t\t%s\t%s\n", details.Name, details.GUID, details.Kind)
-			}
-		}
-	} else {
-		// get a single resource
-		guid := c.Args().Get(1)
-
-		var rsrc interface{}
-		err := client.Resource(client.GUID, kind, guid, &rsrc)
-		if err != nil {
-			PrintError(c, err)
-			return nil
-		}
-
-		// FIXME verify that rsrc.Kind == kind
-
-		data, err := yaml.Marshal(rsrc)
-		if err != nil {
-			return err
-		}
-
-		fmt.Printf("\n--- %s/%s-%s:\n\n%s\n\n", client.GUID, kind, guid, string(data))
-
-	}
-
-	return nil
-}
-
 // SetProductionCommand lists the current show/production, switch to another show/production
 func SetProductionCommand(c *cli.Context) error {
 
 	l, err := client.Productions()
 	if err != nil {
-		PrintError(c, err)
+		printError(c, err)
 		return nil
 	}
 
@@ -159,6 +113,52 @@ func SetProductionCommand(c *cli.Context) error {
 	}
 
 	fmt.Println(fmt.Sprintf("Can not select '%s'", name))
+
+	return nil
+}
+
+// ListResourcesCommand requests a new show
+func ListResourcesCommand(c *cli.Context) error {
+
+	kind := strings.ToLower(c.Args().First())
+
+	if c.NArg() < 2 {
+		// get a list of resources
+		l, err := client.Resources(client.GUID, kind)
+		if err != nil {
+			printError(c, err)
+			return nil
+		}
+
+		if len(l.Resources) == 0 {
+			fmt.Println("No resources to list.")
+		} else {
+			fmt.Println("NAME\t\tGUID\t\tKIND")
+			for _, details := range l.Resources {
+				fmt.Printf("%s\t\t%s\t%s\n", details.Name, details.GUID, details.Kind)
+			}
+		}
+	} else {
+		// get a single resource
+		guid := c.Args().Get(1)
+
+		var rsrc interface{}
+		err := client.Resource(client.GUID, kind, guid, &rsrc)
+		if err != nil {
+			printError(c, err)
+			return nil
+		}
+
+		// FIXME verify that rsrc.Kind == kind
+
+		data, err := yaml.Marshal(rsrc)
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("\n--- %s/%s-%s:\n\n%s\n\n", client.GUID, kind, guid, string(data))
+
+	}
 
 	return nil
 }
