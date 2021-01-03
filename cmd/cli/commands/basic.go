@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/urfave/cli/v2"
@@ -160,5 +161,29 @@ func ListResourcesCommand(c *cli.Context) error {
 
 	}
 
+	return nil
+}
+
+// DeleteResourcesCommand deletes a resource
+func DeleteResourcesCommand(c *cli.Context) error {
+
+	if c.NArg() != 2 {
+		return fmt.Errorf("Wrong number of arguments. Expected 2, got %d", c.NArg())
+	}
+
+	kind := strings.ToLower(c.Args().First())
+	guid := c.Args().Get(1)
+
+	status, err := client.Delete(client.GUID, kind, guid)
+	if status > http.StatusAccepted && err == nil {
+		fmt.Println(fmt.Sprintf("Could not delete resource '%s/%s-%s'", client.GUID, kind, guid))
+		return nil
+	}
+	if err != nil {
+		printError(c, err)
+		return err
+	}
+
+	fmt.Println(fmt.Sprintf("Successfully delete resource '%s/%s-%s'", client.GUID, kind, guid))
 	return nil
 }

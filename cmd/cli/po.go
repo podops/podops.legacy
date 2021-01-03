@@ -132,7 +132,7 @@ func setupCommands() []*cli.Command {
 			Usage:     "Delete a resource",
 			UsageText: "po delete [show|episode] NAME",
 			Category:  cmd.ShowMgmtCmdGroup,
-			Action:    cmd.NoOpCommand,
+			Action:    cmd.DeleteResourcesCommand,
 		},
 	}
 	return c

@@ -22,6 +22,7 @@ const (
 	getResourceRoute    = "/resource/%s/%s/%s"      // "/update/:prod/:kind/:id"
 	updateResourceRoute = "/resource/%s/%s/%s?f=%v" // "/update/:prod/:kind/:id"
 	listResourcesRoute  = "/resource/%s/%s"
+	deleteResourceRoute = "/resource/%s/%s/%s"
 
 	// buildRoute route to call BuildEndpoint
 	buildRoute = "/build"
@@ -162,6 +163,19 @@ func (cl *Client) UpdateResource(kind, rsrcGUID string, force bool, rsrc interfa
 	resp := a.StatusObject{}
 	status, err := cl.put(cl.apiNamespace+fmt.Sprintf(updateResourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
 
+	if err != nil {
+		return status, err
+	}
+	return status, nil
+}
+
+// Delete deletes a resources
+func (cl *Client) Delete(prod, kind, guid string) (int, error) {
+	if err := cl.HasToken(); err != nil {
+		return http.StatusBadRequest, err
+	}
+
+	status, err := cl.delete(cl.apiNamespace+fmt.Sprintf(deleteResourceRoute, prod, kind, guid), nil)
 	if err != nil {
 		return status, err
 	}

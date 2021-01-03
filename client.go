@@ -198,6 +198,29 @@ func (cl *Client) put(cmd string, request, response interface{}) (int, error) {
 	return cl.invoke(req, response)
 }
 
+// DELETE is used to request the deletion of a resource. Maybe apayload, no response!
+func (cl *Client) delete(cmd string, request interface{}) (int, error) {
+	url := cl.ServiceEndpoint + cmd
+
+	var req *http.Request
+	var err error
+
+	if request != nil {
+		m, err := json.Marshal(&request)
+		if err != nil {
+			return http.StatusInternalServerError, err
+		}
+		req, err = http.NewRequest("DELETE", url, bytes.NewBuffer(m))
+	} else {
+		req, err = http.NewRequest("DELETE", url, nil)
+	}
+	if err != nil {
+		return http.StatusBadRequest, err
+	}
+
+	return cl.invoke(req, nil)
+}
+
 func (cl *Client) invoke(req *http.Request, response interface{}) (int, error) {
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
