@@ -29,7 +29,7 @@ func LoadResource(data []byte) (interface{}, string, string, error) {
 	r, err := LoadResourceMetadata(data)
 	loader := resourceLoaders[r.Kind]
 	if loader == nil {
-		return nil, "", "", fmt.Errorf("Unsupported resource '%s'", r.Kind)
+		return nil, "", "", fmt.Errorf("unsupported resource '%s'", r.Kind)
 	}
 
 	resource, guid, err := loader(data)
@@ -45,7 +45,7 @@ func LoadResourceMetadata(data []byte) (*ResourceMetadata, error) {
 
 	err := yaml.Unmarshal([]byte(data), &r)
 	if err != nil {
-		return nil, fmt.Errorf("Can not parse resource. %w", err)
+		return nil, fmt.Errorf("can not parse resource: %w", err)
 	}
 	return &r, nil
 }
@@ -55,7 +55,7 @@ func loadShowResource(data []byte) (interface{}, string, error) {
 
 	err := yaml.Unmarshal([]byte(data), &r)
 	if err != nil {
-		return nil, "", fmt.Errorf("Can not parse resource. %w", err)
+		return nil, "", fmt.Errorf("can not parse resource: %w", err)
 	}
 	v := r.Validate(NewValidator(ResourceShow))
 	if !v.IsValid() {
@@ -70,7 +70,7 @@ func loadEpisodeResource(data []byte) (interface{}, string, error) {
 
 	err := yaml.Unmarshal([]byte(data), &r)
 	if err != nil {
-		return nil, "", fmt.Errorf("Can not parse resource. %w", err)
+		return nil, "", fmt.Errorf("can not parse resource: %w", err)
 	}
 	v := r.Validate(NewValidator(ResourceEpisode))
 	if !v.IsValid() {

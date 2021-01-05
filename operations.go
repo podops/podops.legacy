@@ -72,7 +72,7 @@ func (cl *Client) CreateProduction(name, title, summary string) (*a.Production, 
 	}
 
 	if name == "" {
-		return nil, fmt.Errorf("resource: name must not be empty")
+		return nil, fmt.Errorf("name must not be empty")
 	}
 
 	req := a.Production{
@@ -128,7 +128,7 @@ func (cl *Client) GetResource(prod, kind, guid string, rsrc interface{}) error {
 
 	status, err := cl.get(cl.apiNamespace+fmt.Sprintf(getResourceRoute, prod, kind, guid), rsrc)
 	if status == http.StatusBadRequest {
-		return fmt.Errorf("Not found: '%s/%s-%s'", prod, kind, guid)
+		return fmt.Errorf("not found: '%s/%s-%s'", prod, kind, guid)
 	}
 	if err != nil {
 		return err
@@ -225,7 +225,7 @@ func (cl *Client) Upload(path string, force bool) error {
 	resp.Body.Close()
 
 	if resp.StatusCode > http.StatusNoContent {
-		return fmt.Errorf("Error uploading '%s': %s", path, resp.Status)
+		return fmt.Errorf("error uploading '%s': %s", path, resp.Status)
 	}
 
 	return nil

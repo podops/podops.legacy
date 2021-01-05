@@ -22,15 +22,12 @@ func AuthCommand(c *cli.Context) error {
 		cl, err := podops.NewClient(token)
 		if err != nil {
 			fmt.Println("\nNot authorized")
-			fmt.Printf("%v\n", err)
 			return nil
 		}
-		err = cl.Store(defaultPathAndName)
-		if err != nil {
+		if err := cl.Store(defaultPathAndName); err != nil {
 			fmt.Printf("\nCould not write config. %v\n", err)
 			return nil
 		}
-
 		fmt.Println("\nAuthentication successful")
 	} else {
 		fmt.Println("\nMissing token")

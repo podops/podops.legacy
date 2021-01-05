@@ -12,16 +12,12 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/txsvc/commons/pkg/env"
-
 	a "github.com/podops/podops/apiv1"
 )
 
 const (
 	// DefaultNamespacePrefix is the API's namespace
 	DefaultNamespacePrefix = "/a/v1"
-	// DefaultAPIEndpoint is the podops services's default endpoint
-	DefaultAPIEndpoint = "https://api.podops.dev"
 )
 
 // Client is a client for interacting with the PodOps service.
@@ -36,15 +32,6 @@ type (
 		apiNamespace    string
 	}
 )
-
-var (
-	defaultAPIEndpoint string
-)
-
-func init() {
-	// DefaultAPIEndpoint points to the API
-	defaultAPIEndpoint = env.GetString("API_ENDPOINT", DefaultAPIEndpoint)
-}
 
 // NewClient creates a new podcast client.
 //
@@ -80,14 +67,14 @@ func NewClientFromFile(path string) (*Client, error) {
 		json.Unmarshal(byteValue, &client)
 
 		client.apiNamespace = DefaultNamespacePrefix
-		client.ServiceEndpoint = defaultAPIEndpoint
+		client.ServiceEndpoint = a.DefaultAPIEndpoint
 	}
 	return client, nil
 }
 
 func defaultClient(token string) *Client {
 	return &Client{
-		ServiceEndpoint: defaultAPIEndpoint,
+		ServiceEndpoint: a.DefaultAPIEndpoint,
 		Token:           token,
 		GUID:            "",
 		apiNamespace:    DefaultNamespacePrefix,
@@ -118,7 +105,7 @@ func DefaultConfigLocation() string {
 // Validate verifies the token against the backend service
 func (cl *Client) Validate() error {
 	if cl.Token == "" {
-		return fmt.Errorf("validation: missing token")
+		return a.ErrNoToken
 	}
 	status, err := cl.get(authenticationRoute, nil)
 	if err != nil {
@@ -126,7 +113,7 @@ func (cl *Client) Validate() error {
 	}
 	if status != http.StatusAccepted {
 		// the only valid positive response
-		return fmt.Errorf("validation: not authorized %d", status)
+		return a.ErrNotAuthorized
 	}
 	return nil
 }
@@ -134,7 +121,7 @@ func (cl *Client) Validate() error {
 // HasToken verifies that remote commands can be executed
 func (cl *Client) HasToken() error {
 	if cl.Token == "" {
-		return fmt.Errorf("Not authorized. Use 'po auth' first") // FIXME generic text, not CLI specific
+		return a.ErrNotAuthorized
 	}
 	return nil
 }
@@ -142,10 +129,10 @@ func (cl *Client) HasToken() error {
 // HasTokenAndGUID verifies the presence of a token and GUID
 func (cl *Client) HasTokenAndGUID() error {
 	if cl.Token == "" {
-		return fmt.Errorf("Not authorized. Use 'po auth' first") // FIXME generic text, not CLI specific
+		return a.ErrNotAuthorized
 	}
 	if cl.GUID == "" {
-		return fmt.Errorf("No show selected. Use 'po show' and/or 'po set NAME' first")
+		return a.ErrInvalidParameters
 	}
 	return nil
 }
@@ -243,7 +230,7 @@ func (cl *Client) invoke(req *http.Request, response interface{}) (int, error) {
 			status := &a.StatusObject{}
 			err = json.NewDecoder(resp.Body).Decode(&status)
 			if err != nil {
-				return resp.StatusCode, fmt.Errorf(fmt.Sprintf("status: %d", resp.StatusCode))
+				return resp.StatusCode, fmt.Errorf("status: %d", resp.StatusCode)
 			}
 			return status.Status, fmt.Errorf(status.Message)
 		}

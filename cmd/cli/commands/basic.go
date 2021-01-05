@@ -30,7 +30,7 @@ func NewProductionCommand(c *cli.Context) error {
 		return nil
 	}
 
-	show := a.DefaultShow(client.ServiceEndpoint, p.Name, title, summary, p.GUID)
+	show := a.DefaultShow(p.Name, title, summary, p.GUID, a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
 	err = dump(fmt.Sprintf("show-%s.yaml", p.GUID), show)
 	if err != nil {
 		printError(c, err)
@@ -168,7 +168,7 @@ func ListResourcesCommand(c *cli.Context) error {
 func DeleteResourcesCommand(c *cli.Context) error {
 
 	if c.NArg() != 2 {
-		return fmt.Errorf("Wrong number of arguments. Expected 2, got %d", c.NArg())
+		return fmt.Errorf("wrong number of arguments: expected 2, got %d", c.NArg())
 	}
 
 	kind := strings.ToLower(c.Args().First())
@@ -176,7 +176,7 @@ func DeleteResourcesCommand(c *cli.Context) error {
 
 	status, err := client.DeleteResource(client.GUID, kind, guid)
 	if status > http.StatusAccepted && err == nil {
-		fmt.Println(fmt.Sprintf("Could not delete resource '%s/%s-%s'", client.GUID, kind, guid))
+		fmt.Println(fmt.Sprintf("could not delete resource '%s/%s-%s'", client.GUID, kind, guid))
 		return nil
 	}
 	if err != nil {
@@ -184,6 +184,6 @@ func DeleteResourcesCommand(c *cli.Context) error {
 		return err
 	}
 
-	fmt.Println(fmt.Sprintf("Successfully delete resource '%s/%s-%s'", client.GUID, kind, guid))
+	fmt.Println(fmt.Sprintf("successfully delete resource '%s/%s-%s'", client.GUID, kind, guid))
 	return nil
 }

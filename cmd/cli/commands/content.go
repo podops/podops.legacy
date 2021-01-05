@@ -38,7 +38,7 @@ func TemplateCommand(c *cli.Context) error {
 	// create the yamls
 	if template == "show" {
 
-		show := a.DefaultShow(client.ServiceEndpoint, name, "TITLE", "SUMMARY", guid)
+		show := a.DefaultShow(name, "TITLE", "SUMMARY", guid, a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
 		err := dump(fmt.Sprintf("show-%s.yaml", guid), show)
 		if err != nil {
 			printError(c, err)
@@ -46,7 +46,7 @@ func TemplateCommand(c *cli.Context) error {
 		}
 	} else {
 
-		episode := a.DefaultEpisode(client.ServiceEndpoint, name, parent, guid, parentGUID)
+		episode := a.DefaultEpisode(name, parent, guid, parentGUID, a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
 		err := dump(fmt.Sprintf("episode-%s.yaml", guid), episode)
 		if err != nil {
 			printError(c, err)
@@ -61,7 +61,7 @@ func TemplateCommand(c *cli.Context) error {
 func CreateCommand(c *cli.Context) error {
 
 	if c.NArg() != 1 {
-		return fmt.Errorf("Wrong number of arguments. Expected 1, got %d", c.NArg())
+		return fmt.Errorf("wrong number of arguments: expected 1, got %d", c.NArg())
 	}
 	path := c.Args().First()
 	force := c.Bool("force")
@@ -76,7 +76,7 @@ func CreateCommand(c *cli.Context) error {
 		return err
 	}
 
-	fmt.Println(fmt.Sprintf("Created resource %s-%s", kind, guid))
+	fmt.Println(fmt.Sprintf("created resource %s-%s", kind, guid))
 	return nil
 }
 
@@ -84,7 +84,7 @@ func CreateCommand(c *cli.Context) error {
 func UpdateCommand(c *cli.Context) error {
 
 	if c.NArg() != 1 {
-		return fmt.Errorf("Wrong number of arguments. Expected 1, got %d", c.NArg())
+		return fmt.Errorf("wrong number of arguments: expected 1, got %d", c.NArg())
 	}
 	path := c.Args().First()
 	force := c.Bool("force")
@@ -121,7 +121,7 @@ func BuildCommand(c *cli.Context) error {
 func UploadCommand(c *cli.Context) error {
 
 	if c.NArg() != 1 {
-		return fmt.Errorf("Wrong number of arguments. Expected 1, got %d", c.NArg())
+		return fmt.Errorf("wrong number of arguments: expected 1, got %d", c.NArg())
 	}
 	name := c.Args().First()
 	force := c.Bool("force")

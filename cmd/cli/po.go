@@ -8,12 +8,12 @@ import (
 
 	"github.com/urfave/cli/v2"
 
+	a "github.com/podops/podops/apiv1"
 	cmd "github.com/podops/podops/cmd/cli/commands"
 )
 
 const (
-	cmdLineName    = "po"
-	cmdLineVersion = "v0.1"
+	cmdLineName = "po"
 )
 
 func main() {
@@ -21,19 +21,17 @@ func main() {
 	// initialize CLI
 	app := &cli.App{
 		Name:    cmdLineName,
-		Version: cmdLineVersion,
+		Version: a.Version,
 		Usage:   "PodOps: Podcast Operations Client",
 		Action: func(c *cli.Context) error {
 			fmt.Println(globalHelpText)
 			return nil
 		},
-		//Flags:    globalFlags(),
 		Commands: setupCommands(),
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 
-	// runthe CLI
 	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
@@ -76,7 +74,7 @@ func setupCommands() []*cli.Command {
 		// Settings
 		{
 			Name:      "auth",
-			Usage:     "Login to the PodOps service",
+			Usage:     "Login to the service",
 			UsageText: "auth TOKEN",
 			Category:  cmd.SettingsCmdGroup,
 			Action:    cmd.AuthCommand,

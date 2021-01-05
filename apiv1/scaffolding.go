@@ -51,7 +51,7 @@ func DefaultEpisodeMetadata(guid, parent string) map[string]string {
 }
 
 // DefaultShow creates a default show struc
-func DefaultShow(baseURL, name, title, summary, guid string) *Show {
+func DefaultShow(name, title, summary, guid, portal, cdn string) *Show {
 	return &Show{
 		APIVersion: Version,
 		Kind:       ResourceShow,
@@ -63,7 +63,7 @@ func DefaultShow(baseURL, name, title, summary, guid string) *Show {
 			Title:   title,
 			Summary: summary,
 			Link: Asset{
-				URI: fmt.Sprintf("%s/s/%s", baseURL, name),
+				URI: fmt.Sprintf("%s/s/%s", portal, name),
 			},
 			Category: Category{
 				Name: "Technology",
@@ -79,14 +79,14 @@ func DefaultShow(baseURL, name, title, summary, guid string) *Show {
 			Copyright: fmt.Sprintf("%s copyright", name),
 		},
 		Image: Asset{
-			URI: "https://cdn.podops.dev/default/cover.png",
+			URI: fmt.Sprintf("%s/default/cover.png", cdn),
 			Rel: "external",
 		},
 	}
 }
 
 // DefaultEpisode creates a default episode struc
-func DefaultEpisode(baseURL, name, parentName, guid, parent string) *Episode {
+func DefaultEpisode(name, parentName, guid, parent, portal, cdn string) *Episode {
 
 	return &Episode{
 		APIVersion: Version,
@@ -100,12 +100,12 @@ func DefaultEpisode(baseURL, name, parentName, guid, parent string) *Episode {
 			Summary:     fmt.Sprintf("%s - Episode Subtitle or short summary", name),
 			EpisodeText: "A long-form description of the episode with notes etc.",
 			Link: Asset{
-				URI: fmt.Sprintf("%s/s/%s/%s", baseURL, parentName, name),
+				URI: fmt.Sprintf("%s/s/%s/%s", portal, parentName, name),
 			},
 			Duration: 1, // Seconds. Must not be 0, otherwise a validation error occurs.
 		},
 		Image: Asset{
-			URI: "https://cdn.podops.dev/default/episode.png",
+			URI: fmt.Sprintf("%s/default/episode.png", cdn),
 			Rel: "external",
 		},
 		Enclosure: Asset{
