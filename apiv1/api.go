@@ -2,7 +2,6 @@ package apiv1
 
 import (
 	"errors"
-	"fmt"
 )
 
 const (
@@ -62,27 +61,15 @@ type (
 		Resources []*Resource `json:"resources" `
 	}
 
-	// BuildRequest initiates the build of the feed
-	BuildRequest struct {
-		GUID string `json:"guid" binding:"required"`
+	// Build initiates the build of the feed
+	Build struct {
+		GUID         string `json:"guid" binding:"required"`
+		FeedURL      string `json:"feed"`
+		FeedAliasURL string `json:"alias"`
 	}
 
-	// BuildResponse returns the resulting URL
-	BuildResponse struct {
-		GUID string `json:"guid" binding:"required"`
-		URL  string `json:"url" binding:"required"`
-	}
-
-	// StatusObject is used to report status and errors in an API request.
-	// The struct can be used as a response object or be treated as an error object
-	StatusObject struct {
-		Status    int    `json:"status" binding:"required"`
-		Message   string `json:"message" binding:"required"`
-		RootError error  `json:"-"`
-	}
-
-	// ImportRequest is used by the import task
-	ImportRequest struct {
+	// Import is used by the import task
+	Import struct {
 		Source string `json:"src" binding:"required"`
 		Dest   string `json:"dest" binding:"required"`
 	}
@@ -107,7 +94,3 @@ type (
 		Token    string `json:"token" binding:"required"`
 	}
 )
-
-func (so *StatusObject) Error() string {
-	return fmt.Sprintf("%s: %d", so.Message, so.Status)
-}

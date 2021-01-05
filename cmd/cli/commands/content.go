@@ -108,12 +108,12 @@ func BuildCommand(c *cli.Context) error {
 
 	// FIXME support the 'NAME' option
 
-	url, err := client.Build(client.GUID)
+	build, err := client.Build(client.GUID)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(fmt.Sprintf("Build production '%s' successful.\nAccess the feed at %s", client.GUID, url))
+	fmt.Println(fmt.Sprintf("Build production '%s' successful.\nAccess the feed at %s", client.GUID, build.FeedURL))
 	return nil
 }
 

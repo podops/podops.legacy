@@ -183,22 +183,22 @@ func (cl *Client) Delete(prod, kind, guid string) (int, error) {
 }
 
 // Build invokes the BuildEndpoint
-func (cl *Client) Build(guid string) (string, error) {
+func (cl *Client) Build(guid string) (*a.Build, error) {
 	if err := cl.HasTokenAndGUID(); err != nil {
-		return "", err
+		return nil, err
 	}
 
-	req := a.BuildRequest{
+	req := a.Build{
 		GUID: guid,
 	}
-	resp := a.BuildResponse{}
+	resp := a.Build{}
 
 	_, err := cl.post(cl.apiNamespace+buildRoute, &req, &resp)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return resp.URL, nil
+	return &resp, nil
 }
 
 // Upload invokes the UploadEndpoint

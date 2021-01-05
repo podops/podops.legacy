@@ -1,5 +1,11 @@
 package apiv1
 
+import "regexp"
+
+var (
+	nameRegex = regexp.MustCompile(`^[a-z]+[a-z0-9_-]`)
+)
+
 // Validate verifies the integrity of struct Show
 //
 //	APIVersion  string          `json:"apiVersion" yaml:"apiVersion" binding:"required"`   // REQUIRED default: v1.0
@@ -136,4 +142,16 @@ func (d *EpisodeDescription) Validate(v *Validator) *Validator {
 	v.AssertNotZero(d.Duration, "Duration")
 
 	return v
+}
+
+// ValidResourceName verifies that a name is valid for a resource. The following rules apply:
+//
+// 'name' must contain only lowercase letters, numbers, dashes (-), underscores (_).
+// 'name' must contain 8-64 characters.
+// Spaces and dots (.) are not allowed.
+func ValidResourceName(name string) bool {
+	if len(name) < 8 || len(name) > 65 {
+		return false
+	}
+	return nameRegex.MatchString(name)
 }
