@@ -144,7 +144,7 @@ func ListResourcesCommand(c *cli.Context) error {
 		guid := c.Args().Get(1)
 
 		var rsrc interface{}
-		err := client.Resource(client.GUID, kind, guid, &rsrc)
+		err := client.GetResource(client.GUID, kind, guid, &rsrc)
 		if err != nil {
 			printError(c, err)
 			return nil
@@ -174,7 +174,7 @@ func DeleteResourcesCommand(c *cli.Context) error {
 	kind := strings.ToLower(c.Args().First())
 	guid := c.Args().Get(1)
 
-	status, err := client.Delete(client.GUID, kind, guid)
+	status, err := client.DeleteResource(client.GUID, kind, guid)
 	if status > http.StatusAccepted && err == nil {
 		fmt.Println(fmt.Sprintf("Could not delete resource '%s/%s-%s'", client.GUID, kind, guid))
 		return nil

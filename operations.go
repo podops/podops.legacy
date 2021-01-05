@@ -120,8 +120,8 @@ func (cl *Client) CreateResource(kind, rsrcGUID string, force bool, rsrc interfa
 	return status, nil
 }
 
-// Resource returns a resource file
-func (cl *Client) Resource(prod, kind, guid string, rsrc interface{}) error {
+// GetResource returns a resource file
+func (cl *Client) GetResource(prod, kind, guid string, rsrc interface{}) error {
 	if err := cl.HasToken(); err != nil {
 		return err
 	}
@@ -135,6 +135,21 @@ func (cl *Client) Resource(prod, kind, guid string, rsrc interface{}) error {
 	}
 
 	return nil
+}
+
+// UpdateResource invokes the ResourceEndpoint
+func (cl *Client) UpdateResource(kind, rsrcGUID string, force bool, rsrc interface{}) (int, error) {
+	if err := cl.HasTokenAndGUID(); err != nil {
+		return http.StatusBadRequest, err
+	}
+
+	resp := a.StatusObject{}
+	status, err := cl.put(cl.apiNamespace+fmt.Sprintf(updateResourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
+
+	if err != nil {
+		return status, err
+	}
+	return status, nil
 }
 
 // Resources retrieves a list of resources
@@ -154,23 +169,8 @@ func (cl *Client) Resources(prod, kind string) (*a.ResourceList, error) {
 	return &resp, nil
 }
 
-// UpdateResource invokes the ResourceEndpoint
-func (cl *Client) UpdateResource(kind, rsrcGUID string, force bool, rsrc interface{}) (int, error) {
-	if err := cl.HasTokenAndGUID(); err != nil {
-		return http.StatusBadRequest, err
-	}
-
-	resp := a.StatusObject{}
-	status, err := cl.put(cl.apiNamespace+fmt.Sprintf(updateResourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
-
-	if err != nil {
-		return status, err
-	}
-	return status, nil
-}
-
-// Delete deletes a resources
-func (cl *Client) Delete(prod, kind, guid string) (int, error) {
+// DeleteResource deletes a resources
+func (cl *Client) DeleteResource(prod, kind, guid string) (int, error) {
 	if err := cl.HasToken(); err != nil {
 		return http.StatusBadRequest, err
 	}

@@ -15,13 +15,14 @@ func AuthCommand(c *cli.Context) error {
 	if token != "" {
 		// remove old config if it exists
 		if err := removeConfig(); err != nil {
-			return err
+			// return err FIXME nothing to do ...
 		}
 
 		// create a new client and force token verification
 		cl, err := podops.NewClient(token)
 		if err != nil {
 			fmt.Println("\nNot authorized")
+			fmt.Printf("%v\n", err)
 			return nil
 		}
 		err = cl.Store(defaultPathAndName)

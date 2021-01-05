@@ -82,7 +82,6 @@ func NewClientFromFile(path string) (*Client, error) {
 		client.apiNamespace = DefaultNamespacePrefix
 		client.ServiceEndpoint = defaultAPIEndpoint
 	}
-
 	return client, nil
 }
 
@@ -107,7 +106,6 @@ func (cl *Client) Store(path string) error {
 			return err
 		}
 	}
-
 	return ioutil.WriteFile(path, config, 0644)
 }
 
