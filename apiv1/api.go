@@ -1,25 +1,8 @@
 package apiv1
 
-import (
-	"errors"
-)
-
 const (
 	// Version specifies the verion of the API and its structs
 	Version = "v1"
-)
-
-var (
-	// ErrNoSuchProduction indicates that the production does not exist
-	ErrNoSuchProduction = errors.New("api: production doesn't exist")
-	// ErrNoSuchResource indicates that the resource does not exist
-	ErrNoSuchResource = errors.New("api: resource doesn't exist")
-	// ErrNoSuchAsset indicates that the asset does not exist
-	ErrNoSuchAsset = errors.New("api: asset doesn't exist")
-	// ErrBuildFailed indicates that the feed build failed
-	ErrBuildFailed = errors.New("api: build failed")
-	// ErrValidationFailed indicates that a resource validation failed
-	ErrValidationFailed = errors.New("api: validation failed")
 )
 
 type (
