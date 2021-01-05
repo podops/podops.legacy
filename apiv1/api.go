@@ -1,79 +1,86 @@
 package apiv1
 
+import (
+	"errors"
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
 const (
 	// Version specifies the verion of the API and its structs
 	Version = "v1"
 )
 
 type (
-	// Production is the parent struct of all other resources.
-	Production struct {
-		Name      string `json:"name" binding:"required"`
-		GUID      string `json:"guid,omitempty"`
-		Owner     string `json:"owner"`
-		Title     string `json:"title"`
-		Summary   string `json:"summary"`
-		BuildDate int64  `json:"build_date"`
-		// internal
-		Created int64 `json:"-"`
-		Updated int64 `json:"-"`
-	}
-
-	// ProductionList returns a list of productions
-	ProductionList struct {
-		Productions []*Production `json:"productions" `
-	}
-
-	// Resource is used to maintain a repository of all existing resources across all shows
-	Resource struct {
-		Name       string `json:"name"`
-		GUID       string `json:"guid"`
-		Kind       string `json:"kind"`
-		ParentGUID string `json:"parent_guid"`
-		Location   string `json:"location"` // path to the .yaml
-		// only used in assets e.g. .mp3/.png
-		ContentType string `json:"content_type"`
-		Size        int64  `json:"size"`
-		// internal
-		Created int64 `json:"-"`
-		Updated int64 `json:"-"`
-	}
-
-	// ResourceList returns a list of resources
-	ResourceList struct {
-		Resources []*Resource `json:"resources" `
-	}
-
-	// Build initiates the build of the feed
-	Build struct {
-		GUID         string `json:"guid" binding:"required"`
-		FeedURL      string `json:"feed"`
-		FeedAliasURL string `json:"alias"`
-	}
-
-	// Import is used by the import task
-	Import struct {
-		Source string `json:"src" binding:"required"`
-		Dest   string `json:"dest" binding:"required"`
-	}
-
-	// AuthorizationRequest struct is used to request a token
-	// Imported from https://github.com/txsvc/service/blob/main/pkg/auth/types.go
-	AuthorizationRequest struct {
-		Secret     string `json:"secret" binding:"required"`
-		Realm      string `json:"realm" binding:"required"`
-		ClientID   string `json:"client_id" binding:"required"`
-		ClientType string `json:"client_type" binding:"required"` // user,app,bot
-		UserID     string `json:"user_id" binding:"required"`
-		Scope      string `json:"scope" binding:"required"`
-		Duration   int64  `json:"duration" binding:"required"`
-	}
-
-	// AuthorizationResponse provides a valid token
-	// Imported from https://github.com/txsvc/service/blob/main/pkg/auth/types.go
-	AuthorizationResponse struct {
-		Realm    string `json:"realm" binding:"required"`
-		ClientID string `json:"client_id" binding:"required"`
-		Token    string `json:"token" binding:"required"`
+	// StatusObject is used to report operation status and errors in an API request.
+	// The struct can be used as a response object or be treated as an error object
+	StatusObject struct {
+		Status    int    `json:"status" binding:"required"`
+		Message   string `json:"message" binding:"required"`
+		RootError error  `json:"-"`
 	}
 )
+
+var (
+	// ErrNotAuthorized indicates that the API call is not authorized
+	ErrNotAuthorized = errors.New("api: not authorized")
+	// ErrNoToken indicates that no bearer token was provided
+	ErrNoToken = errors.New("api: no token provided")
+
+	// ErrInvalidParameters indicates that parameters used in an API call are not valid
+	ErrInvalidParameters = errors.New("api: invalid parameters")
+	// ErrValidationFailed indicates that a resource validation failed
+	ErrValidationFailed = errors.New("api: validation failed")
+
+	// ErrNoSuchProduction indicates that the production does not exist
+	ErrNoSuchProduction = errors.New("api: production doesn't exist")
+	// ErrNoSuchResource indicates that the resource does not exist
+	ErrNoSuchResource = errors.New("api: resource doesn't exist")
+	// ErrNoSuchAsset indicates that the asset does not exist
+	ErrNoSuchAsset = errors.New("api: asset doesn't exist")
+	// ErrBuildFailed indicates that the feed build failed
+	ErrBuildFailed = errors.New("api: build failed")
+
+	// ErrInternalError indicates that an unspecified internal error happened
+	ErrInternalError = errors.New("api: internal error")
+)
+
+// NewStatus initializes a new StatusObject
+func NewStatus(s int, m string) StatusObject {
+	return StatusObject{Status: s, Message: m}
+}
+
+// NewErrorStatus initializes a new StatusObject from an error
+func NewErrorStatus(s int, e error) StatusObject {
+	return StatusObject{Status: s, Message: e.Error(), RootError: e}
+}
+
+func (so *StatusObject) Error() string {
+	return fmt.Sprintf("%s: %d", so.Message, so.Status)
+}
+
+// StandardResponse is the default way to respond to API requests
+func StandardResponse(c *gin.Context, status int, res interface{}) {
+	if res == nil {
+		resp := StatusObject{
+			Status:  status,
+			Message: fmt.Sprintf("status: %d", status),
+		}
+		c.JSON(status, &resp)
+	} else {
+		c.JSON(status, res)
+	}
+}
+
+// ErrorResponse responds with an ErrorObject
+func ErrorResponse(c *gin.Context, status int, err error) {
+	var resp StatusObject
+	if err == nil {
+		resp = NewStatus(http.StatusInternalServerError, fmt.Sprintf("status: %d", status))
+	} else {
+		resp = NewErrorStatus(status, err)
+	}
+	c.JSON(status, &resp)
+}
