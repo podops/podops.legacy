@@ -26,7 +26,13 @@ type (
 		Kind       string `json:"kind"`
 		ParentGUID string `json:"parent_guid"`
 		Location   string `json:"location"` // path to the .yaml
-		// only used in assets e.g. .mp3/.png
+		// Metadata used in e.g. the web UI
+		Title   string `json:"title"`
+		Summary string `json:"summary"`
+		Image   string `json:"image"`  // Full URL to the show/episode image
+		Extra1  string `json:"extra1"` // These two attributes are just placeholders for any kind of resource type specific data.
+		Extra2  string `json:"extra2"` // One possible use is to e.g. store the URL of an episodes media file here.
+		// used for assets e.g. .mp3/.png
 		ContentType string `json:"content_type"`
 		Size        int64  `json:"size"`
 		// internal

@@ -17,11 +17,11 @@ func TemplateCommand(c *cli.Context) error {
 		return nil
 	}
 
-	// extract flags or set defaults
-	name := c.String("name")
-	if name == "" {
-		name = "NAME"
+	name := "NAME"
+	if c.NArg() == 2 {
+		name = c.Args().Get(1)
 	}
+	// extract flags or set defaults
 	guid := c.String("id")
 	if guid == "" {
 		guid, _ = util.ShortUUID()

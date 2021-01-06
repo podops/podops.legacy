@@ -65,7 +65,7 @@ func setupCommands() []*cli.Command {
 		{
 			Name:      "template",
 			Usage:     "Create a resource template with default values",
-			UsageText: "template [show|episode]",
+			UsageText: "template [show|episode] NAME",
 			Category:  cmd.BasicCmdGroup,
 			Action:    cmd.TemplateCommand,
 			Flags:     templateFlags(),
@@ -176,11 +176,13 @@ func createFlags() []cli.Flag {
 
 func templateFlags() []cli.Flag {
 	f := []cli.Flag{
-		&cli.StringFlag{
-			Name:    "name",
-			Usage:   "Resource name",
-			Aliases: []string{"n"},
-		},
+		/*
+			&cli.StringFlag{
+				Name:    "name",
+				Usage:   "Resource name",
+				Aliases: []string{"n"},
+			},
+		*/
 		&cli.StringFlag{
 			Name:    "parent",
 			Usage:   "Parent resource name",

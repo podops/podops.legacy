@@ -19,7 +19,7 @@ func TestISO(t *testing.T) {
 
 }
 func TestTemplateShow(t *testing.T) {
-	s := DefaultShow("BASE_URL", "NAME", "TITLE", "SUMMARY", "GUID")
+	s := DefaultShow("NAME", "TITLE", "SUMMARY", "GUID", "BASE_URL", "PORTAL_URL")
 	v := s.Validate(NewValidator(ResourceShow))
 	if !v.IsClean() {
 		t.Errorf(v.AsError().Error())
@@ -27,7 +27,7 @@ func TestTemplateShow(t *testing.T) {
 }
 
 func TestTemplateEpisode(t *testing.T) {
-	e := DefaultEpisode("BASE_URL", "NAME", "PARENT_NAME", "GUID", "PARENT_GUID")
+	e := DefaultEpisode("NAME", "PARENT_NAME", "GUID", "PARENT_GUID", "BASE_URL", "PORTAL_URL")
 	v := e.Validate(NewValidator(ResourceEpisode))
 	if !v.IsClean() {
 		t.Errorf(v.AsError().Error())
