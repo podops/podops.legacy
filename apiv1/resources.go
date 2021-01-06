@@ -203,13 +203,13 @@ func (s *Show) GUID() string {
 }
 
 // ResolveURI re-writes the URI
-func (r *Asset) ResolveURI(cdn, guid string) string {
+func (r *Asset) ResolveURI(cdn, parent string) string {
 
 	if r.Rel == ResourceTypeLocal {
-		return fmt.Sprintf("%s/%s/%s", cdn, guid, r.URI)
+		return fmt.Sprintf("%s/%s/%s", cdn, parent, r.URI)
 	}
 	if r.Rel == ResourceTypeImport {
-		id := r.FingerprintURI(guid)
+		id := r.FingerprintURI(parent)
 		return fmt.Sprintf("%s/%s", cdn, id)
 	}
 	if r.Rel == "" || r.Rel == ResourceTypeExternal {
@@ -221,11 +221,11 @@ func (r *Asset) ResolveURI(cdn, guid string) string {
 }
 
 // FingerprintURI is used in rewriting the URI when Rel == IMPORT
-func (r *Asset) FingerprintURI(guid string) string {
+func (r *Asset) FingerprintURI(parent string) string {
 	id := util.Fingerprint(r.URI)
 	parts := strings.Split(r.URI, ".")
 	if len(parts) == 0 {
 		return fmt.Sprintf("%s", id)
 	}
-	return fmt.Sprintf("%s/%s.%s", guid, id, parts[len(parts)-1])
+	return fmt.Sprintf("%s/%s.%s", parent, id, parts[len(parts)-1])
 }
