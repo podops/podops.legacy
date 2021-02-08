@@ -206,11 +206,11 @@ func (s *Show) GUID() string {
 func (r *Asset) ResolveURI(cdn, parent string) string {
 
 	if r.Rel == ResourceTypeLocal {
-		return fmt.Sprintf("%s/%s/%s", cdn, parent, r.URI)
+		return fmt.Sprintf("%s/c/%s/%s", cdn, parent, r.URI)
 	}
 	if r.Rel == ResourceTypeImport {
 		id := r.FingerprintURI(parent)
-		return fmt.Sprintf("%s/%s", cdn, id)
+		return fmt.Sprintf("%s/c/%s", cdn, id)
 	}
 	if r.Rel == "" || r.Rel == ResourceTypeExternal {
 		return r.URI
