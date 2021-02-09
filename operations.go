@@ -58,7 +58,7 @@ func (cl *Client) CreateToken(secret, realm, clientID, userID, scope string, dur
 	if err != nil {
 		return "", fmt.Errorf("create token exception: %v", err)
 	}
-	if status != http.StatusOK {
+	if status != http.StatusCreated {
 		return "", fmt.Errorf("create token exception: %d", status)
 	}
 
