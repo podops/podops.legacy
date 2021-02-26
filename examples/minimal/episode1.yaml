@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: episode
+metadata:
+    name: drums
+    labels:
+        block: "no"
+        date: Sun, 03 Jan 2021 11:30:16 +0000
+        episode: "1"
+        explicit: "no"
+        guid: c7b5414c9c01
+        parent_guid: f02b4620baf2
+        season: "1"
+        type: Full
+description:
+    title: Drums - A soundcheck
+    summary: Only a first episode to test the feed
+    episodeText: This is not really an episode but just a link to a short default/placeholder mp3 to test the feed.
+    link:
+        uri: https://podops.dev/s/minimal/drums
+    duration: 21
+image:
+    uri: https://cdn.podops.dev/c/default/episode.png
+    rel: external
+enclosure:
+    uri: https://cdn.podops.dev/c/default/sample.mp3
+    rel: import
+    type: audio/mpeg
+    size: 503140
