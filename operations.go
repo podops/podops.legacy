@@ -36,7 +36,7 @@ func (cl *Client) SetProduction(guid string) {
 	// FIXME make sure we own the GUID
 }
 
-// CreateToken creates an access token on the service
+// CreateToken creates an access token on the server
 // FIXME this is not tested
 func (cl *Client) CreateToken(secret, realm, clientID, userID, scope string, duration int64) (string, error) {
 	req := a.AuthorizationRequest{

@@ -34,7 +34,6 @@ func TransformToPodcast(s *Show) (*rss.Channel, error) {
 		pf.IAuthor = s.Description.Author
 	}
 	pf.AddCategory(s.Description.Category.Name, s.Description.Category.SubCategory)
-	// FIXME: pf.AddImage(s.Image.ResolveURI(DefaultCDNEndpoint, s.GUID()))
 	pf.AddImage(s.Image.ResolveURI(StorageEndpoint, s.GUID()))
 	pf.IOwner = &rss.Author{
 		Name:  s.Description.Owner.Name,
@@ -81,8 +80,6 @@ func TransformToItem(e *Episode) (*rss.Item, error) {
 		Description: e.Description.Summary,
 	}
 
-	// FIXME: ef.AddEnclosure(e.Enclosure.ResolveURI(DefaultCDNEndpoint, e.ParentGUID()), mediaTypeMap[e.Enclosure.Type], (int64)(e.Enclosure.Size))
-	// FIXME: ef.AddImage(e.Image.ResolveURI(DefaultCDNEndpoint, e.ParentGUID()))
 	ef.AddEnclosure(e.Enclosure.ResolveURI(DefaultCDNEndpoint+"/c", e.ParentGUID()), mediaTypeMap[e.Enclosure.Type], (int64)(e.Enclosure.Size))
 	ef.AddImage(e.Image.ResolveURI(StorageEndpoint, e.ParentGUID()))
 	ef.AddPubDate(&pubDate)
