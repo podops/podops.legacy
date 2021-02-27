@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/fupas/observer/pkg/observer"
 	"github.com/gin-gonic/gin"
 )
 
@@ -74,9 +75,13 @@ func StandardResponse(c *gin.Context, status int, res interface{}) {
 	}
 }
 
-// ErrorResponse responds with an ErrorObject
+// ErrorResponse reports the error and responds with an ErrorObject
 func ErrorResponse(c *gin.Context, status int, err error) {
 	var resp StatusObject
+
+	// send the error to Google Error Reporting
+	observer.ReportError(err)
+
 	if err == nil {
 		resp = NewStatus(http.StatusInternalServerError, fmt.Sprintf("status: %d", status))
 	} else {
