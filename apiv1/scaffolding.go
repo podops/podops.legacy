@@ -79,7 +79,7 @@ func DefaultShow(name, title, summary, guid, portal, cdn string) *Show {
 			Copyright: fmt.Sprintf("%s copyright", name),
 		},
 		Image: Asset{
-			URI: fmt.Sprintf("%s/default/cover.png", cdn),
+			URI: fmt.Sprintf("%s/c/default/cover.png", cdn),
 			Rel: "external",
 		},
 	}
@@ -105,7 +105,7 @@ func DefaultEpisode(name, parentName, guid, parent, portal, cdn string) *Episode
 			Duration: 1, // Seconds. Must not be 0, otherwise a validation error occurs.
 		},
 		Image: Asset{
-			URI: fmt.Sprintf("%s/default/episode.png", cdn),
+			URI: fmt.Sprintf("%s/c/default/episode.png", cdn),
 			Rel: "external",
 		},
 		Enclosure: Asset{

@@ -12,8 +12,8 @@ import (
 
 const (
 	podcastName    string = "simple-podcast"
-	podcastTitle   string = "Simple Podcast Example"
-	podcastSummary string = "A podcast created using the PodOps API"
+	podcastTitle   string = "PodOps Simple Example"
+	podcastSummary string = "A simple podcast for testing and experimentation. Created with the PodOps API."
 )
 
 // In order to test against a running local service,
@@ -44,7 +44,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("\n[%d ms] Registered a podcast.\n", delta(start))
+	fmt.Printf("\n[%d ms] Registered a podcast.GUID='%s'\n", delta(start), p.GUID)
 
 	// Set the context of the next operations to this show
 	client.SetProduction(p.GUID)
@@ -55,10 +55,10 @@ func main() {
 	// We can add or change values if needed.
 	show := a.DefaultShow(p.Name, podcastTitle, podcastSummary, p.GUID, a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
 	show.Metadata.Labels[a.LabelLanguage] = "de_DE"
-	show.Description.Author = "podops sample code"
-	show.Description.Copyright = "Copyright 2021 podops.dev"
-	show.Description.Owner.Name = "podops"
-	show.Description.Owner.Email = "hello@podops.dev"
+	show.Description.Author = "PodOps sample code"
+	show.Description.Copyright = "Copyright 2021 - Transformative Services"
+	show.Description.Owner.Name = "Transformative Services"
+	show.Description.Owner.Email = "hello@txs.vc"
 
 	if _, err := client.UpdateResource(show.Kind, show.GUID(), true, &show); err != nil {
 		log.Fatal(err)
@@ -77,7 +77,7 @@ func main() {
 
 	// Set the media data. This is a sample mp3 ...
 	episode.Description.Duration = 21 // the duration of the episode, in seconds
-	episode.Enclosure.URI = fmt.Sprintf("%s/default/sample.mp3", a.DefaultCDNEndpoint)
+	episode.Enclosure.URI = fmt.Sprintf("%s/c/default/sample.mp3", a.DefaultCDNEndpoint)
 	episode.Enclosure.Size = 503140 // bytes
 	episode.Enclosure.Rel = "external"
 

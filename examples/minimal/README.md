@@ -53,7 +53,7 @@ enclosure:
     size: 1
 
 enclosure:
-    uri: https://cdn.podops.dev/default/sample.mp3
+    uri: https://cdn.podops.dev/c/default/sample.mp3
     rel: import
     type: audio/mpeg
     size: 1

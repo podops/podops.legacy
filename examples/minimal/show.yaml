@@ -11,7 +11,7 @@ metadata:
         type: Episodic
 description:
     title: PodOps Minimal Podcast
-    summary: A minimal podcast for testing and experimentation. Not for consumption.
+    summary: A minimal podcast for testing and experimentation. Created with the PodOps CLI.
     link:
         uri: https://podops.dev/s/minimal
     category:
