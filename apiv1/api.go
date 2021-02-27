@@ -12,6 +12,13 @@ import (
 const (
 	// Version specifies the verion of the API and its structs
 	Version = "v1"
+
+	// MajorVersion of the API
+	MajorVersion = 1
+	// MinorVersion of the API
+	MinorVersion = 1
+	// FixVersion of the API
+	FixVersion = 2
 )
 
 type (
@@ -88,4 +95,9 @@ func ErrorResponse(c *gin.Context, status int, err error) {
 		resp = NewErrorStatus(status, err)
 	}
 	c.JSON(status, &resp)
+}
+
+// VersionEndpoint returns the current API version
+func VersionEndpoint(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": fmt.Sprintf("%s.%s.%s", MajorVersion, MinorVersion, FixVersion), "major": MajorVersion, "minor": MinorVersion, "fix": FixVersion})
 }
