@@ -147,10 +147,10 @@ func (d *EpisodeDescription) Validate(v *Validator) *Validator {
 // ValidResourceName verifies that a name is valid for a resource. The following rules apply:
 //
 // 'name' must contain only lowercase letters, numbers, dashes (-), underscores (_).
-// 'name' must contain 8-64 characters.
+// 'name' must contain 8-44 characters.
 // Spaces and dots (.) are not allowed.
 func ValidResourceName(name string) bool {
-	if len(name) < 8 || len(name) > 65 {
+	if len(name) < 8 || len(name) > 45 {
 		return false
 	}
 	return nameRegex.MatchString(name)
