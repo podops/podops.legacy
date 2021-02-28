@@ -222,7 +222,8 @@ func (r *Asset) ResolveURI(cdn, parent string) string {
 
 // FingerprintURI is used in rewriting the URI when Rel == IMPORT
 func (r *Asset) FingerprintURI(parent string) string {
-	id := util.Fingerprint(r.URI)
+	// REMOVE id := util.Fingerprint(r.URI)
+	id := util.Checksum(r.URI)
 	parts := strings.Split(r.URI, ".")
 	if len(parts) == 0 {
 		return fmt.Sprintf("%s", id)

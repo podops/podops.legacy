@@ -54,7 +54,8 @@ var (
 	// ErrInternalError indicates that an unspecified internal error happened
 	ErrInternalError = errors.New("api: internal error")
 
-	versionString string = fmt.Sprintf("%s.%s.%s", MajorVersion, MinorVersion, FixVersion)
+	// VersionString is the canonical API description
+	VersionString string = fmt.Sprintf("%s.%s.%s", MajorVersion, MinorVersion, FixVersion)
 )
 
 // NewStatus initializes a new StatusObject
@@ -101,5 +102,5 @@ func ErrorResponse(c *gin.Context, status int, err error) {
 
 // VersionEndpoint returns the current API version
 func VersionEndpoint(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"version": versionString, "major": MajorVersion, "minor": MinorVersion, "fix": FixVersion, "namespace": Version})
+	c.JSON(http.StatusOK, gin.H{"version": VersionString, "major": MajorVersion, "minor": MinorVersion, "fix": FixVersion, "namespace": Version})
 }
