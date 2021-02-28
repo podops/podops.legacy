@@ -18,7 +18,7 @@ const (
 	// MinorVersion of the API
 	MinorVersion = 1
 	// FixVersion of the API
-	FixVersion = 2
+	FixVersion = 4
 )
 
 type (
@@ -56,6 +56,8 @@ var (
 
 	// VersionString is the canonical API description
 	VersionString string = fmt.Sprintf("%s.%s.%s", MajorVersion, MinorVersion, FixVersion)
+	// UserAgentString identifies any http request podops makes
+	UserAgentString string = fmt.Sprintf("PodOps %s.%s.%s", MajorVersion, MinorVersion, FixVersion)
 )
 
 // NewStatus initializes a new StatusObject

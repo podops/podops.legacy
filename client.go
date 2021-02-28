@@ -210,6 +210,7 @@ func (cl *Client) invoke(req *http.Request, response interface{}) (int, error) {
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("Authorization", "Bearer "+cl.Token)
+	req.Header.Set("User-Agent", a.UserAgentString)
 
 	// perform the request
 	client := &http.Client{}
