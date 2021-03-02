@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/txsvc/commons/pkg/util"
+	"github.com/fupas/commons/pkg/util"
 )
 
 const (

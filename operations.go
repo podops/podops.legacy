@@ -211,6 +211,7 @@ func (cl *Client) Upload(path string, force bool) error {
 	if err != nil {
 		log.Fatal(err)
 	}
+	req.Header.Set("User-Agent", a.UserAgentString)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

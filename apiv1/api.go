@@ -3,10 +3,6 @@ package apiv1
 import (
 	"errors"
 	"fmt"
-	"net/http"
-
-	"github.com/fupas/observer/pkg/observer"
-	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -55,9 +51,9 @@ var (
 	ErrInternalError = errors.New("api: internal error")
 
 	// VersionString is the canonical API description
-	VersionString string = fmt.Sprintf("%s.%s.%s", MajorVersion, MinorVersion, FixVersion)
+	VersionString string = fmt.Sprintf("%d.%d.%d", MajorVersion, MinorVersion, FixVersion)
 	// UserAgentString identifies any http request podops makes
-	UserAgentString string = fmt.Sprintf("PodOps %s.%s.%s", MajorVersion, MinorVersion, FixVersion)
+	UserAgentString string = fmt.Sprintf("PodOps %d.%d.%d", MajorVersion, MinorVersion, FixVersion)
 )
 
 // NewStatus initializes a new StatusObject
@@ -72,37 +68,4 @@ func NewErrorStatus(s int, e error) StatusObject {
 
 func (so *StatusObject) Error() string {
 	return fmt.Sprintf("%s: %d", so.Message, so.Status)
-}
-
-// StandardResponse is the default way to respond to API requests
-func StandardResponse(c *gin.Context, status int, res interface{}) {
-	if res == nil {
-		resp := StatusObject{
-			Status:  status,
-			Message: fmt.Sprintf("status: %d", status),
-		}
-		c.JSON(status, &resp)
-	} else {
-		c.JSON(status, res)
-	}
-}
-
-// ErrorResponse reports the error and responds with an ErrorObject
-func ErrorResponse(c *gin.Context, status int, err error) {
-	var resp StatusObject
-
-	// send the error to Google Error Reporting
-	observer.ReportError(err)
-
-	if err == nil {
-		resp = NewStatus(http.StatusInternalServerError, fmt.Sprintf("status: %d", status))
-	} else {
-		resp = NewErrorStatus(status, err)
-	}
-	c.JSON(status, &resp)
-}
-
-// VersionEndpoint returns the current API version
-func VersionEndpoint(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"version": VersionString, "major": MajorVersion, "minor": MinorVersion, "fix": FixVersion, "namespace": Version})
 }
