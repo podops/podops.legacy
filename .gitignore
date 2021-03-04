@@ -11,7 +11,11 @@ stuff.md
 show-*.yaml
 episode-*.yaml
 
+# website
+cmd/podops-cdn/public
+
 # Binaries
+cmd/podops-cdn/main
 
 # Binaries for programs and plugins
 *.exe

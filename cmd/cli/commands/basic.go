@@ -5,10 +5,9 @@ import (
 	"net/http"
 	"strings"
 
+	a "github.com/podops/podops/apiv1"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"
-
-	a "github.com/podops/podops/apiv1"
 )
 
 // NewProductionCommand requests a new show

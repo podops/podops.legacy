@@ -4,9 +4,8 @@ import (
 	"fmt"
 
 	"github.com/fupas/commons/pkg/util"
-	"github.com/urfave/cli/v2"
-
 	a "github.com/podops/podops/apiv1"
+	"github.com/urfave/cli/v2"
 )
 
 // TemplateCommand creates a resource template with all default values

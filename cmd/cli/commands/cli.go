@@ -9,13 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/urfave/cli/v2"
-	"gopkg.in/yaml.v3"
-
 	"github.com/fupas/commons/pkg/env"
-
 	"github.com/podops/podops"
 	a "github.com/podops/podops/apiv1"
+	"github.com/urfave/cli/v2"
+	"gopkg.in/yaml.v3"
 )
 
 const (

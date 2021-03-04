@@ -6,10 +6,9 @@ import (
 	"os"
 	"sort"
 
-	"github.com/urfave/cli/v2"
-
 	a "github.com/podops/podops/apiv1"
-	cmd "github.com/podops/podops/cli/commands"
+	cmd "github.com/podops/podops/cmd/cli/commands"
+	"github.com/urfave/cli/v2"
 )
 
 const (
