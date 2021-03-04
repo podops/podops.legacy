@@ -8,7 +8,7 @@ import (
 
 	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/commons/pkg/util"
-	"github.com/podops/podops/pkg/observer"
+	"github.com/podops/podops/internal/observer"
 )
 
 const (

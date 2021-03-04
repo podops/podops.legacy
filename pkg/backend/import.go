@@ -13,7 +13,7 @@ import (
 	"github.com/fupas/platform/pkg/platform"
 	"github.com/gin-gonic/gin"
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/pkg/observer"
+	"github.com/podops/podops/internal/observer"
 	"google.golang.org/appengine"
 )
 

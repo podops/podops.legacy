@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/pkg/observer"
+	"github.com/podops/podops/internal/observer"
 )
 
 // ErrorResponse reports the error and responds with an ErrorObject
