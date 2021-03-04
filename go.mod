@@ -6,6 +6,8 @@ require (
 	cloud.google.com/go v0.75.0
 	cloud.google.com/go/datastore v1.3.0
 	cloud.google.com/go/storage v1.12.0
+	github.com/99designs/gqlgen v0.13.0
+	github.com/OrlovEvgeny/go-mcache v0.0.0-20200121124330-1a8195b34f3a
 	github.com/franela/goblin v0.0.0-20210113153425-413781f5e6c8 // indirect
 	github.com/fupas/commons v1.0.0
 	github.com/fupas/platform v1.1.2
@@ -27,6 +29,7 @@ require (
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/ugorji/go v1.2.3 // indirect
 	github.com/urfave/cli/v2 v2.3.0
+	github.com/vektah/gqlparser/v2 v2.1.0
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
 	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect
 	golang.org/x/text v0.3.5 // indirect
