@@ -1,0 +1,82 @@
+type show {
+    guid: ID!
+    name: String!
+    created: Timestamp!
+    build: Timestamp!
+    labels: labels!
+    description: showDescription!
+    image: String!
+    episodes: [episode!]!
+}
+
+type production {
+    guid: ID!
+    name: String!
+    title: String!
+}
+
+type episode {
+    guid: ID!
+    name: String!
+    created: Timestamp!
+    published: Timestamp!
+    labels: labels!
+    description: episodeDescription!
+    image: String!
+    enclosure: enclosure!
+    production: production!
+}
+
+type showDescription {
+    title: String!
+    summary: String!
+    link: String!
+    category: [category!]!
+    author: String!
+    copyright: String!
+    owner: owner!
+}
+
+type episodeDescription {
+    title: String!
+    summary: String!
+    description: String
+    link: String!
+    duration: Int!,
+}
+
+type enclosure {
+    link: String!,
+    type: String!,
+    size: Int!
+}
+
+type owner {
+    name: String!
+    email: String!
+}
+
+type category {
+    name: String!
+    subcategory: String
+}
+
+type labels {
+    block: String!
+    explicit: String!
+    type: String!
+    complete: String!
+    language: String!
+    episode: Int!
+    season: Int!
+}
+
+type Query {
+    show(name: String): show
+    episode(guid: String): episode
+
+    recent(max: Int!) : [show]!
+    popular(max: Int!) : [show]!
+}
+
+scalar Timestamp
