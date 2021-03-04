@@ -12,7 +12,6 @@ show-*.yaml
 episode-*.yaml
 
 # Binaries
-cmd/token/token
 
 # Binaries for programs and plugins
 *.exe

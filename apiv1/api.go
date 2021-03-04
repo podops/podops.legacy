@@ -12,9 +12,9 @@ const (
 	// MajorVersion of the API
 	MajorVersion = 1
 	// MinorVersion of the API
-	MinorVersion = 1
+	MinorVersion = 2
 	// FixVersion of the API
-	FixVersion = 4
+	FixVersion = 1
 )
 
 type (
