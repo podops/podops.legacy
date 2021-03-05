@@ -32,12 +32,36 @@ const (
 
 var (
 	staticFileLocation string
+	showPagePath       string
+	episodePagePath    string
 	bkt                *storage.BucketHandle
 )
 
 func init() {
 	staticFileLocation = env.GetString("STATIC_FILE_LOCATION", "./public")
 	bkt = platform.Storage().Bucket(a.BucketCDN)
+}
+
+// RewriteShowHandler rewrites requests from /s/:name to /s/_id.html
+func RewriteShowHandler(c echo.Context) error {
+	if err := c.File(showPagePath); err != nil {
+		c.Logger().Error(err)
+	}
+	// track the event
+	analytics.TrackEvent(c.Request(), "podcast", "show", c.Param("name"), 1)
+
+	return nil
+}
+
+// RewriteEpisodeHandler rewrites requests from /e/:guid to /e/_id.html
+func RewriteEpisodeHandler(c echo.Context) error {
+	if err := c.File(episodePagePath); err != nil {
+		c.Logger().Error(err)
+	}
+	// track the event
+	analytics.TrackEvent(c.Request(), "podcast", "episode", c.Param("guid"), 1)
+
+	return nil
 }
 
 // FeedEndpoint handles request for feed.xml by redirecting to the public storage bucket

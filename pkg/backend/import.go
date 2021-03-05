@@ -11,7 +11,7 @@ import (
 
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/observer"
 	"google.golang.org/appengine"
@@ -37,20 +37,19 @@ type (
 )
 
 // ImportTaskEndpoint implements async file import
-func ImportTaskEndpoint(c *gin.Context) {
-	var req a.Import
+func ImportTaskEndpoint(c echo.Context) error {
+	var req *a.Import = new(a.Import)
 
-	err := c.BindJSON(&req)
+	err := c.Bind(req)
 	if err != nil {
 		// just report and return, resending will not change anything
 		observer.ReportError(err)
-		c.Status(http.StatusOK)
-		return
+		return c.NoContent(http.StatusOK)
 	}
 
 	// FIXME does it make sense to retry? If not, send StatusOK
-	status := importResource(appengine.NewContext(c.Request), req.Source, req.Dest)
-	c.Status(status)
+	status := importResource(appengine.NewContext(c.Request()), req.Source, req.Dest)
+	return c.NoContent(status)
 }
 
 func importResource(ctx context.Context, src, dest string) int {
