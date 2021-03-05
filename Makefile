@@ -5,7 +5,7 @@ all: cli web cdn
 build_test:
 	go mod verify && go mod tidy
 	cd cmd/cli && go build po.go && rm po
-	cd cmd/podops-cdn && go build main.go && rm main
+	cd cmd/cdn && go build main.go && rm main
 	cd examples/simple && go build main.go && rm main
 
 .PHONY: web

@@ -41,6 +41,11 @@ func setup() *echo.Echo {
 	e.GET(api.EpisodeRoute, RewriteEpisodeHandler)
 	e.GET(api.FeedRoute, cdn.FeedEndpoint)
 
+	// cdn enpoints
+	content := e.Group(api.ContentNamespace)
+	content.GET(api.DefaultCDNRoute, cdn.RedirectCDNContentEndpoint)
+	content.HEAD(api.DefaultCDNRoute, cdn.RedirectCDNContentEndpoint)
+
 	// grapghql
 	gql := e.Group(api.GraphqlNamespacePrefix)
 	gql.POST(api.GraphqlRoute, api.GetGraphqlEndpoint())
