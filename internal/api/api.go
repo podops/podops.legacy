@@ -58,7 +58,7 @@ const (
 	ShowRoute = "/s/:name"
 
 	// EpisodeRoute route to show.json
-	EpisodeRoute = "/s/:name/:guid"
+	EpisodeRoute = "/e/:guid"
 
 	// FeedRoute route to feed.xml
 	FeedRoute = "/s/:name/feed.xml"

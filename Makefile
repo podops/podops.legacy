@@ -1,5 +1,5 @@
 .PHONY: all
-all: web cli
+all: cli web cdn
 
 .PHONY: build_test
 build_test:
@@ -11,9 +11,13 @@ build_test:
 .PHONY: web
 web:
 	cd ../podops.dev && gridsome build
-	rm -rf cmd/podops-cdn/public
-	cp -R ../podops.dev/dist cmd/podops-cdn/public
+	rm -rf cmd/cdn/public
+	cp -R ../podops.dev/dist cmd/cdn/public
 
 .PHONY: cli
 cli:
 	cd cmd/cli && go mod verify && go mod tidy && go install po.go
+
+.PHONY: cdn
+cdn:
+	cd cmd/cdn && gcloud app deploy . --quiet

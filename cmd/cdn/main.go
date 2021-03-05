@@ -31,6 +31,7 @@ func setup() *echo.Echo {
 	// add and configure the middlewares
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
+	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 
 	// TODO: add/configure e.Use(middleware.Logger())
 	// TODO: e.Logger.SetLevel(log.INFO)
@@ -62,7 +63,7 @@ func RewriteShowHandler(c echo.Context) error {
 	return nil
 }
 
-// RewriteEpisodeHandler rewrites requests from /s/:name/:guid to /e/_id.html
+// RewriteEpisodeHandler rewrites requests from /e/:guid to /e/_id.html
 func RewriteEpisodeHandler(c echo.Context) error {
 	if err := c.File(episodePagePath); err != nil {
 		c.Logger().Error(err)
@@ -99,21 +100,3 @@ func main() {
 	service := svc.NewServer(setup, shutdown, nil)
 	service.StartBlocking()
 }
-
-/*
-
-
-"/a/v1"
-
-"/_a"
-"/_t"
-"/c"
-
-"/q"
-
-"/s/:name"
-"/s/:name/feed.xml"
-
-"/e/:guid"
-
-*/
