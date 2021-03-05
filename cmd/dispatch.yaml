@@ -1,0 +1,18 @@
+dispatch:
+  - url: "*/a/v1/*"
+    service: api
+
+  - url: "*/_a/*"
+    service: api
+
+  - url: "*/_t/*"
+    service: api
+
+  - url: "api.podops.dev/q/*"
+    service: default
+
+  - url: "cdn.podops.dev/*"
+    service: default
+
+  - url: "podops.dev/"
+    service: default

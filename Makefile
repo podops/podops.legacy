@@ -1,5 +1,5 @@
 .PHONY: all
-all: cli web cdn api
+all: build_test cli web cdn api
 
 .PHONY: build_test
 build_test:
@@ -17,12 +17,12 @@ web:
 
 .PHONY: api
 api:
-	cd cmd/api && go mod verify && go mod tidy && go install po.go
-
-.PHONY: cli
-cli:
-	cd cmd/cli && go mod verify && go mod tidy && go install po.go
+	cd cmd/api && gcloud app deploy . --quiet
 
 .PHONY: cdn
 cdn:
 	cd cmd/cdn && gcloud app deploy . --quiet
+
+.PHONY: cli
+cli:
+	cd cmd/cli && go mod verify && go mod tidy && go install po.go

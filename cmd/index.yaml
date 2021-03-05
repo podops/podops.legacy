@@ -1,0 +1,27 @@
+indexes:
+  - kind: RESOURCES
+    properties:
+      - name: Kind
+      - name: ParentGUID
+      - name: Index
+        direction: desc
+
+  - kind: RESOURCES
+    properties:
+      - name: Kind
+      - name: ParentGUID
+      - name: Created
+        direction: desc
+
+  - kind: RESOURCES
+    properties:
+      - name: ParentGUID
+      - name: Created
+        direction: desc
+
+  - kind: RESOURCES
+    properties:
+      - name: Kind
+      - name: ParentGUID
+      - name: Published
+        direction: desc
