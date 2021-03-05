@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/podops/podops/internal/api"
+	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
 )
 
@@ -35,9 +36,9 @@ func setup() *echo.Echo {
 	tasks.POST(backend.ImportTask, backend.ImportTaskEndpoint)
 
 	// admin endpoints
-	// admin := svc.Group(api.AdminNamespacePrefix)
-	//admin.POST(api.AuthenticationRoute, acl.CreateAuthorizationEndpoint)
-	//admin.GET(api.AuthenticationRoute, acl.ValidateAuthorizationEndpoint)
+	admin := e.Group(api.AdminNamespacePrefix)
+	admin.POST(api.AuthenticationRoute, auth.CreateAuthorizationEndpoint)
+	admin.GET(api.AuthenticationRoute, auth.ValidateAuthorizationEndpoint)
 
 	// the api endpoints
 	apiEndpoints := e.Group(api.NamespacePrefix)

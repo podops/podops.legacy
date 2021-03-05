@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/analytics"
+	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
 	"google.golang.org/appengine"
@@ -18,32 +19,32 @@ func BuildEndpoint(c echo.Context) error {
 	var req *a.Build = new(a.Build)
 
 	if status, err := auth.Authorized(c, "ROLES"); err != nil {
-		return ErrorResponse(c, status, err)
+		return api.ErrorResponse(c, status, err)
 	}
 
 	if err := c.Bind(req); err != nil {
-		return ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	ctx := appengine.NewContext(c.Request())
 
 	p, err := backend.GetProduction(ctx, req.GUID)
 	if err != nil {
-		return ErrorResponse(c, http.StatusNotFound, err)
+		return api.ErrorResponse(c, http.StatusNotFound, err)
 	}
 	if p == nil {
-		return ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid guid '%s'", req.GUID))
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid guid '%s'", req.GUID))
 	}
 
 	// FIXME make this async, make validateOnly a flag
 	if err := backend.Build(ctx, req.GUID, false); err != nil {
-		return ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("error building feed '%s': %v", req.GUID, err))
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("error building feed '%s': %v", req.GUID, err))
 	}
 
 	// update the PRODUCTION record
 	p.BuildDate = util.Timestamp()
 	if err := backend.UpdateProduction(ctx, p); err != nil {
-		return ErrorResponse(c, http.StatusBadRequest, err)
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	resp := a.Build{
@@ -55,5 +56,5 @@ func BuildEndpoint(c echo.Context) error {
 	// track api access for billing etc
 	analytics.TrackEvent(c.Request(), "api", "build", p.GUID, 1)
 
-	return StandardResponse(c, http.StatusCreated, &resp)
+	return api.StandardResponse(c, http.StatusCreated, &resp)
 }

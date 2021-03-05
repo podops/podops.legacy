@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/analytics"
+	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
 	"google.golang.org/appengine"
@@ -18,17 +19,17 @@ import (
 // UploadEndpoint implements content upload
 func UploadEndpoint(c echo.Context) error {
 	if status, err := auth.Authorized(c, "ROLES"); err != nil {
-		return ErrorResponse(c, status, err)
+		return api.ErrorResponse(c, status, err)
 	}
 
 	mr, err := c.Request().MultipartReader()
 	if err != nil {
-		return ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	prod := c.Param("prod")
 	if prod == "" {
-		return ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':prod'"))
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':prod'"))
 	}
 
 	ctx := appengine.NewContext(c.Request())
@@ -38,7 +39,7 @@ func UploadEndpoint(c echo.Context) error {
 			break
 		}
 		if err != nil {
-			return ErrorResponse(c, http.StatusInternalServerError, err)
+			return api.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 
 		if p.FormName() == "asset" {
@@ -50,14 +51,14 @@ func UploadEndpoint(c echo.Context) error {
 			defer writer.Close() // just to be sure we really close the writer
 
 			if _, err := io.Copy(writer, p); err != nil {
-				return ErrorResponse(c, http.StatusInternalServerError, err)
+				return api.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
 			writer.Close() // force close to have attributes like size etc correct
 
 			// get the attributes back
 			attr, err := obj.Attrs(ctx)
 			if err != nil {
-				return ErrorResponse(c, http.StatusInternalServerError, err)
+				return api.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
 
 			duration := int64(0) // FIXME implement it

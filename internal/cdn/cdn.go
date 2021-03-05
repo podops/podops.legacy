@@ -21,7 +21,7 @@ import (
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/analytics"
-	"github.com/podops/podops/internal/api"
+	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/backend"
 	"google.golang.org/appengine"
 )
