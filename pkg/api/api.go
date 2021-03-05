@@ -86,11 +86,6 @@ func StandardResponse(c echo.Context, status int, res interface{}) error {
 	}
 }
 
-// VersionEndpoint returns the current API version
-func VersionEndpoint(c echo.Context) error {
-	return c.JSON(http.StatusOK, gin.H{"version": a.VersionString, "major": a.MajorVersion, "minor": a.MinorVersion, "fix": a.FixVersion, "namespace": a.Version})
-}
-
 // ErrorResponse reports the error and responds with an ErrorObject
 func ErrorResponse(c echo.Context, status int, err error) error {
 	var resp a.StatusObject
@@ -104,4 +99,9 @@ func ErrorResponse(c echo.Context, status int, err error) error {
 		resp = a.NewErrorStatus(status, err)
 	}
 	return c.JSON(status, &resp)
+}
+
+// VersionEndpoint returns the current API version
+func VersionEndpoint(c echo.Context) error {
+	return c.JSON(http.StatusOK, gin.H{"version": a.VersionString, "major": a.MajorVersion, "minor": a.MinorVersion, "fix": a.FixVersion, "namespace": a.Version})
 }

@@ -1,10 +1,11 @@
 .PHONY: all
-all: cli web cdn
+all: cli web cdn api
 
 .PHONY: build_test
 build_test:
 	go mod verify && go mod tidy
 	cd cmd/cli && go build po.go && rm po
+	cd cmd/api && go build main.go && rm main
 	cd cmd/cdn && go build main.go && rm main
 	cd examples/simple && go build main.go && rm main
 
@@ -13,6 +14,10 @@ web:
 	cd ../podops.dev && gridsome build
 	rm -rf cmd/cdn/public
 	cp -R ../podops.dev/dist cmd/cdn/public
+
+.PHONY: api
+api:
+	cd cmd/api && go mod verify && go mod tidy && go install po.go
 
 .PHONY: cli
 cli:
