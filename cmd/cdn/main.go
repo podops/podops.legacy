@@ -35,9 +35,15 @@ func setup() *echo.Echo {
 	// TODO: add/configure e.Use(middleware.Logger())
 	// TODO: e.Logger.SetLevel(log.INFO)
 
+	// frontend routes for feed, show & episode
 	e.GET(api.ShowRoute, RewriteShowHandler)
 	e.GET(api.EpisodeRoute, RewriteEpisodeHandler)
 	e.GET(api.FeedRoute, cdn.FeedEndpoint)
+
+	// grapghql
+	gql := e.Group(api.GraphqlNamespacePrefix)
+	gql.POST(api.GraphqlRoute, api.GetGraphqlEndpoint())
+	gql.GET(api.GraphqlPlaygroundRoute, api.GetGraphqlPlaygroundEndpoint())
 
 	// add the routes last
 	e.Static("/", staticFileLocation) // serve static files from e.g. ./public

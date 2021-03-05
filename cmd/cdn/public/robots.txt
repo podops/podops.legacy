@@ -1,0 +1,14 @@
+User-agent: *
+Disallow: /a/
+
+User-agent: *
+Disallow: /_a/
+
+User-agent: *
+Disallow: /_t/
+
+User-agent: *
+Disallow: /q/
+
+User-agent: *
+Allow: /
