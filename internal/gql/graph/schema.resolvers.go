@@ -5,26 +5,111 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"log"
 
+	"cloud.google.com/go/datastore"
+	"github.com/fupas/commons/pkg/util"
+	"github.com/fupas/platform/pkg/platform"
+	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/gql/graph/generated"
 	"github.com/podops/podops/internal/gql/graph/model"
+	"github.com/podops/podops/internal/observer"
+	"github.com/podops/podops/pkg/backend"
 )
 
 func (r *queryResolver) Show(ctx context.Context, name *string) (*model.Show, error) {
-	panic(fmt.Errorf("not implemented"))
+	if r.ShowLoader == nil {
+		log.Fatal("panic: missing show loader")
+	}
+
+	data, err := r.ShowLoader.Load(ctx, *name)
+	if err != nil {
+		observer.ReportError(err)
+		return nil, err
+	}
+	show := data.(*model.Show)
+
+	// list all episodes, excluding future (i.e. unpublished) ones, descending order
+	var er []*a.Resource
+	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", show.GUID).Filter("Kind =", a.ResourceEpisode).Filter("Published <", util.Timestamp()).Order("-Published"), &er); err != nil {
+		observer.ReportError(err)
+		return nil, err
+	}
+
+	if er != nil {
+		episodes := make([]*model.Episode, len(er))
+		for i := range er {
+			e, err := r.Episode(ctx, &er[i].GUID)
+			if err != nil {
+				// no need to log, already done in r.Episode
+				return nil, err
+			}
+			episodes[i] = e
+		}
+		show.Episodes = episodes
+	}
+
+	return show, nil
 }
 
 func (r *queryResolver) Episode(ctx context.Context, guid *string) (*model.Episode, error) {
-	panic(fmt.Errorf("not implemented"))
+	if r.EpisodeLoader == nil {
+		log.Fatal("panic: missing episode loader")
+	}
+
+	data, err := r.EpisodeLoader.Load(ctx, *guid)
+	if err != nil {
+		observer.ReportError(err)
+		return nil, err
+	}
+	return data.(*model.Episode), nil
 }
 
 func (r *queryResolver) Recent(ctx context.Context, max int) ([]*model.Show, error) {
-	panic(fmt.Errorf("not implemented"))
+	var sh []*a.Production
+	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreProductions).Filter("BuildDate >", 0).Order("-BuildDate").Limit(max), &sh); err != nil {
+		observer.ReportError(err)
+		return nil, err
+	}
+
+	var shows []*model.Show
+	if sh != nil {
+		shows = make([]*model.Show, len(sh))
+		for i := range sh {
+			show, err := r.ShowLoader.Load(ctx, sh[i].Name)
+			if err != nil {
+				observer.ReportError(err)
+				return nil, err
+			}
+			shows[i] = show.(*model.Show)
+		}
+	}
+
+	return shows, nil
 }
 
 func (r *queryResolver) Popular(ctx context.Context, max int) ([]*model.Show, error) {
-	panic(fmt.Errorf("not implemented"))
+	var sh []*a.Production
+	// FIXME change this once we have metrics on show subscriptions
+	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreProductions).Filter("BuildDate >", 0).Order("-BuildDate").Limit(max), &sh); err != nil {
+		observer.ReportError(err)
+		return nil, err
+	}
+
+	var shows []*model.Show
+	if sh != nil {
+		shows = make([]*model.Show, len(sh))
+		for i := range sh {
+			show, err := r.ShowLoader.Load(ctx, sh[i].Name)
+			if err != nil {
+				observer.ReportError(err)
+				return nil, err
+			}
+			shows[i] = show.(*model.Show)
+		}
+	}
+
+	return shows, nil
 }
 
 // Query returns generated.QueryResolver implementation.
