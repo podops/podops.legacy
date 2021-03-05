@@ -565,7 +565,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "schema.graphql", Input: `type show {
+	{Name: "graph/schema.graphqls", Input: `type show {
     guid: ID!
     name: String!
     created: Timestamp!
@@ -804,7 +804,7 @@ func (ec *executionContext) _Query_show(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(*model.Show)
 	fc.Result = res
-	return ec.marshalOshow2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx, field.Selections, res)
+	return ec.marshalOshow2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_episode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -843,7 +843,7 @@ func (ec *executionContext) _Query_episode(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*model.Episode)
 	fc.Result = res
-	return ec.marshalOepisode2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisode(ctx, field.Selections, res)
+	return ec.marshalOepisode2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_recent(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -885,7 +885,7 @@ func (ec *executionContext) _Query_recent(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.([]*model.Show)
 	fc.Result = res
-	return ec.marshalNshow2ᚕᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx, field.Selections, res)
+	return ec.marshalNshow2ᚕᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_popular(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -927,7 +927,7 @@ func (ec *executionContext) _Query_popular(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.Show)
 	fc.Result = res
-	return ec.marshalNshow2ᚕᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx, field.Selections, res)
+	return ec.marshalNshow2ᚕᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2428,7 +2428,7 @@ func (ec *executionContext) _episode_labels(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*model.Labels)
 	fc.Result = res
-	return ec.marshalNlabels2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐLabels(ctx, field.Selections, res)
+	return ec.marshalNlabels2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐLabels(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _episode_description(ctx context.Context, field graphql.CollectedField, obj *model.Episode) (ret graphql.Marshaler) {
@@ -2463,7 +2463,7 @@ func (ec *executionContext) _episode_description(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.EpisodeDescription)
 	fc.Result = res
-	return ec.marshalNepisodeDescription2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisodeDescription(ctx, field.Selections, res)
+	return ec.marshalNepisodeDescription2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisodeDescription(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _episode_image(ctx context.Context, field graphql.CollectedField, obj *model.Episode) (ret graphql.Marshaler) {
@@ -2533,7 +2533,7 @@ func (ec *executionContext) _episode_enclosure(ctx context.Context, field graphq
 	}
 	res := resTmp.(*model.Enclosure)
 	fc.Result = res
-	return ec.marshalNenclosure2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐEnclosure(ctx, field.Selections, res)
+	return ec.marshalNenclosure2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐEnclosure(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _episode_production(ctx context.Context, field graphql.CollectedField, obj *model.Episode) (ret graphql.Marshaler) {
@@ -2568,7 +2568,7 @@ func (ec *executionContext) _episode_production(ctx context.Context, field graph
 	}
 	res := resTmp.(*model.Production)
 	fc.Result = res
-	return ec.marshalNproduction2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐProduction(ctx, field.Selections, res)
+	return ec.marshalNproduction2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐProduction(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _episodeDescription_title(ctx context.Context, field graphql.CollectedField, obj *model.EpisodeDescription) (ret graphql.Marshaler) {
@@ -3335,7 +3335,7 @@ func (ec *executionContext) _show_labels(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(*model.Labels)
 	fc.Result = res
-	return ec.marshalNlabels2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐLabels(ctx, field.Selections, res)
+	return ec.marshalNlabels2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐLabels(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _show_description(ctx context.Context, field graphql.CollectedField, obj *model.Show) (ret graphql.Marshaler) {
@@ -3370,7 +3370,7 @@ func (ec *executionContext) _show_description(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.ShowDescription)
 	fc.Result = res
-	return ec.marshalNshowDescription2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐShowDescription(ctx, field.Selections, res)
+	return ec.marshalNshowDescription2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐShowDescription(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _show_image(ctx context.Context, field graphql.CollectedField, obj *model.Show) (ret graphql.Marshaler) {
@@ -3440,7 +3440,7 @@ func (ec *executionContext) _show_episodes(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.Episode)
 	fc.Result = res
-	return ec.marshalNepisode2ᚕᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisodeᚄ(ctx, field.Selections, res)
+	return ec.marshalNepisode2ᚕᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisodeᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _showDescription_title(ctx context.Context, field graphql.CollectedField, obj *model.ShowDescription) (ret graphql.Marshaler) {
@@ -3580,7 +3580,7 @@ func (ec *executionContext) _showDescription_category(ctx context.Context, field
 	}
 	res := resTmp.([]*model.Category)
 	fc.Result = res
-	return ec.marshalNcategory2ᚕᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐCategoryᚄ(ctx, field.Selections, res)
+	return ec.marshalNcategory2ᚕᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐCategoryᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _showDescription_author(ctx context.Context, field graphql.CollectedField, obj *model.ShowDescription) (ret graphql.Marshaler) {
@@ -3685,7 +3685,7 @@ func (ec *executionContext) _showDescription_owner(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.Owner)
 	fc.Result = res
-	return ec.marshalNowner2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐOwner(ctx, field.Selections, res)
+	return ec.marshalNowner2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐOwner(ctx, field.Selections, res)
 }
 
 // endregion **************************** field.gotpl *****************************
@@ -4751,7 +4751,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalNcategory2ᚕᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Category) graphql.Marshaler {
+func (ec *executionContext) marshalNcategory2ᚕᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Category) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4775,7 +4775,7 @@ func (ec *executionContext) marshalNcategory2ᚕᚖgithubᚗcomᚋpodopsᚋbacke
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNcategory2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐCategory(ctx, sel, v[i])
+			ret[i] = ec.marshalNcategory2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐCategory(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4788,7 +4788,7 @@ func (ec *executionContext) marshalNcategory2ᚕᚖgithubᚗcomᚋpodopsᚋbacke
 	return ret
 }
 
-func (ec *executionContext) marshalNcategory2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v *model.Category) graphql.Marshaler {
+func (ec *executionContext) marshalNcategory2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐCategory(ctx context.Context, sel ast.SelectionSet, v *model.Category) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4798,7 +4798,7 @@ func (ec *executionContext) marshalNcategory2ᚖgithubᚗcomᚋpodopsᚋbackend�
 	return ec._category(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNenclosure2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐEnclosure(ctx context.Context, sel ast.SelectionSet, v *model.Enclosure) graphql.Marshaler {
+func (ec *executionContext) marshalNenclosure2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐEnclosure(ctx context.Context, sel ast.SelectionSet, v *model.Enclosure) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4808,7 +4808,7 @@ func (ec *executionContext) marshalNenclosure2ᚖgithubᚗcomᚋpodopsᚋbackend
 	return ec._enclosure(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNepisode2ᚕᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisodeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Episode) graphql.Marshaler {
+func (ec *executionContext) marshalNepisode2ᚕᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisodeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Episode) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4832,7 +4832,7 @@ func (ec *executionContext) marshalNepisode2ᚕᚖgithubᚗcomᚋpodopsᚋbacken
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNepisode2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisode(ctx, sel, v[i])
+			ret[i] = ec.marshalNepisode2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisode(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4845,7 +4845,7 @@ func (ec *executionContext) marshalNepisode2ᚕᚖgithubᚗcomᚋpodopsᚋbacken
 	return ret
 }
 
-func (ec *executionContext) marshalNepisode2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisode(ctx context.Context, sel ast.SelectionSet, v *model.Episode) graphql.Marshaler {
+func (ec *executionContext) marshalNepisode2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisode(ctx context.Context, sel ast.SelectionSet, v *model.Episode) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4855,7 +4855,7 @@ func (ec *executionContext) marshalNepisode2ᚖgithubᚗcomᚋpodopsᚋbackend�
 	return ec._episode(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNepisodeDescription2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisodeDescription(ctx context.Context, sel ast.SelectionSet, v *model.EpisodeDescription) graphql.Marshaler {
+func (ec *executionContext) marshalNepisodeDescription2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisodeDescription(ctx context.Context, sel ast.SelectionSet, v *model.EpisodeDescription) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4865,7 +4865,7 @@ func (ec *executionContext) marshalNepisodeDescription2ᚖgithubᚗcomᚋpodops�
 	return ec._episodeDescription(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNlabels2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐLabels(ctx context.Context, sel ast.SelectionSet, v *model.Labels) graphql.Marshaler {
+func (ec *executionContext) marshalNlabels2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐLabels(ctx context.Context, sel ast.SelectionSet, v *model.Labels) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4875,7 +4875,7 @@ func (ec *executionContext) marshalNlabels2ᚖgithubᚗcomᚋpodopsᚋbackendᚋ
 	return ec._labels(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNowner2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐOwner(ctx context.Context, sel ast.SelectionSet, v *model.Owner) graphql.Marshaler {
+func (ec *executionContext) marshalNowner2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐOwner(ctx context.Context, sel ast.SelectionSet, v *model.Owner) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4885,7 +4885,7 @@ func (ec *executionContext) marshalNowner2ᚖgithubᚗcomᚋpodopsᚋbackendᚋi
 	return ec._owner(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNproduction2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐProduction(ctx context.Context, sel ast.SelectionSet, v *model.Production) graphql.Marshaler {
+func (ec *executionContext) marshalNproduction2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐProduction(ctx context.Context, sel ast.SelectionSet, v *model.Production) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4895,7 +4895,7 @@ func (ec *executionContext) marshalNproduction2ᚖgithubᚗcomᚋpodopsᚋbacken
 	return ec._production(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNshow2ᚕᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx context.Context, sel ast.SelectionSet, v []*model.Show) graphql.Marshaler {
+func (ec *executionContext) marshalNshow2ᚕᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx context.Context, sel ast.SelectionSet, v []*model.Show) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4919,7 +4919,7 @@ func (ec *executionContext) marshalNshow2ᚕᚖgithubᚗcomᚋpodopsᚋbackend�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOshow2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx, sel, v[i])
+			ret[i] = ec.marshalOshow2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4932,7 +4932,7 @@ func (ec *executionContext) marshalNshow2ᚕᚖgithubᚗcomᚋpodopsᚋbackend�
 	return ret
 }
 
-func (ec *executionContext) marshalNshowDescription2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐShowDescription(ctx context.Context, sel ast.SelectionSet, v *model.ShowDescription) graphql.Marshaler {
+func (ec *executionContext) marshalNshowDescription2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐShowDescription(ctx context.Context, sel ast.SelectionSet, v *model.ShowDescription) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5164,14 +5164,14 @@ func (ec *executionContext) marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 	return ec.___Type(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOepisode2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisode(ctx context.Context, sel ast.SelectionSet, v *model.Episode) graphql.Marshaler {
+func (ec *executionContext) marshalOepisode2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐEpisode(ctx context.Context, sel ast.SelectionSet, v *model.Episode) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._episode(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOshow2ᚖgithubᚗcomᚋpodopsᚋbackendᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx context.Context, sel ast.SelectionSet, v *model.Show) graphql.Marshaler {
+func (ec *executionContext) marshalOshow2ᚖgithubᚗcomᚋpodopsᚋpodopsᚋinternalᚋgqlᚋgraphᚋmodelᚐShow(ctx context.Context, sel ast.SelectionSet, v *model.Show) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

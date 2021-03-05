@@ -1,6 +1,7 @@
 # Configuration files with potentially keys in it
 app.yaml
 credentials.json
+google-credentials.json
 master.key
 .po
 
