@@ -7,7 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/internal/analytics"
+	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
@@ -46,7 +46,7 @@ func ProductionEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	analytics.TrackEvent(c.Request(), "api", "prod_create", p.GUID, 1)
+	platform.TrackEvent(c.Request(), "api", "prod_create", p.GUID, 1)
 
 	return api.StandardResponse(c, http.StatusCreated, p)
 }
@@ -66,7 +66,7 @@ func ListProductionsEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	analytics.TrackEvent(c.Request(), "api", "prod_list", clientID, 1)
+	platform.TrackEvent(c.Request(), "api", "prod_list", clientID, 1)
 
 	return api.StandardResponse(c, http.StatusOK, &a.ProductionList{Productions: productions})
 }

@@ -20,7 +20,7 @@ import (
 	"github.com/fupas/platform/pkg/platform"
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/internal/analytics"
+	p "github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/backend"
 	"google.golang.org/appengine"
@@ -48,7 +48,7 @@ func RewriteShowHandler(c echo.Context) error {
 		c.Logger().Error(err)
 	}
 	// track the event
-	analytics.TrackEvent(c.Request(), "podcast", "show", c.Param("name"), 1)
+	p.TrackEvent(c.Request(), "podcast", "show", c.Param("name"), 1)
 
 	return nil
 }
@@ -59,7 +59,7 @@ func RewriteEpisodeHandler(c echo.Context) error {
 		c.Logger().Error(err)
 	}
 	// track the event
-	analytics.TrackEvent(c.Request(), "podcast", "episode", c.Param("guid"), 1)
+	p.TrackEvent(c.Request(), "podcast", "episode", c.Param("guid"), 1)
 
 	return nil
 }
@@ -83,7 +83,7 @@ func FeedEndpoint(c echo.Context) error {
 	redirectTo := fmt.Sprintf("%s/%s/feed.xml", a.StorageEndpoint, prod.GUID)
 
 	// track the event
-	analytics.TrackEvent(c.Request(), "cdn", "feed", prod.GUID, 1)
+	p.TrackEvent(c.Request(), "cdn", "feed", prod.GUID, 1)
 
 	return c.Redirect(http.StatusTemporaryRedirect, redirectTo)
 }
@@ -125,13 +125,13 @@ func RedirectCDNContentEndpoint(c echo.Context) error {
 		c.Response().Header().Set("content-length", fmt.Sprintf("%d", attr.Size))
 
 		// track the event
-		analytics.TrackEvent(c.Request(), "cdn", "asset", rsrc, 1)
+		p.TrackEvent(c.Request(), "cdn", "asset", rsrc, 1)
 
 		return c.NoContent(http.StatusOK)
 	}
 
 	// track the event
-	analytics.TrackEvent(c.Request(), "cdn", "asset", rsrc, 1)
+	p.TrackEvent(c.Request(), "cdn", "asset", rsrc, 1)
 
 	// let the storage cdn handle the request
 	redirectTo := fmt.Sprintf("%s/%s", a.StorageEndpoint, rsrc)

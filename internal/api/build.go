@@ -7,7 +7,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/internal/analytics"
+	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
@@ -54,7 +54,7 @@ func BuildEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	analytics.TrackEvent(c.Request(), "api", "build", p.GUID, 1)
+	platform.TrackEvent(c.Request(), "api", "build", p.GUID, 1)
 
 	return api.StandardResponse(c, http.StatusCreated, &resp)
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/fupas/platform/pkg/platform"
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/internal/analytics"
+	p "github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
@@ -69,7 +69,7 @@ func UploadEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	analytics.TrackEvent(c.Request(), "api", "upload", prod, 1)
+	p.TrackEvent(c.Request(), "api", "upload", prod, 1)
 
 	return c.NoContent(http.StatusCreated)
 }

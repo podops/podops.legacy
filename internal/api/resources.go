@@ -7,7 +7,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/internal/analytics"
+	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
@@ -41,7 +41,7 @@ func GetResourceEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	analytics.TrackEvent(c.Request(), "api", "rsrc_get", fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
+	platform.TrackEvent(c.Request(), "api", "rsrc_get", fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
 
 	if resource == nil {
 		return api.StandardResponse(c, http.StatusNotFound, nil)
@@ -71,7 +71,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	analytics.TrackEvent(c.Request(), "api", "rsrc_list", fmt.Sprintf("%s/%s", prod, kind), 1)
+	platform.TrackEvent(c.Request(), "api", "rsrc_list", fmt.Sprintf("%s/%s", prod, kind), 1)
 
 	return api.StandardResponse(c, http.StatusOK, &a.ResourceList{Resources: l})
 }
@@ -179,7 +179,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	analytics.TrackEvent(c.Request(), "api", action, fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
+	platform.TrackEvent(c.Request(), "api", action, fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
 
 	return api.StandardResponse(c, http.StatusCreated, nil)
 }
@@ -210,7 +210,7 @@ func DeleteResourceEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	analytics.TrackEvent(c.Request(), "api", "rsrc_delete", fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
+	platform.TrackEvent(c.Request(), "api", "rsrc_delete", fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
 
 	return c.NoContent(http.StatusNoContent)
 }
