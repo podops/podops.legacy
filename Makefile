@@ -3,7 +3,6 @@ all: build_test cli web cdn api
 
 .PHONY: build_test
 build_test:
-	go mod verify && go mod tidy
 	cd cmd/cli && go build po.go && rm po
 	cd cmd/api && go build main.go && rm main
 	cd cmd/cdn && go build main.go && rm main

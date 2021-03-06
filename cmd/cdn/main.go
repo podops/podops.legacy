@@ -35,7 +35,7 @@ func setup() *echo.Echo {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
-	e.Use(middleware.CSRFWithConfig(middleware.DefaultCSRFConfig))
+	//e.Use(middleware.CSRFWithConfig(middleware.DefaultCSRFConfig))
 
 	// TODO: add/configure e.Use(middleware.Logger())
 	// TODO: e.Logger.SetLevel(log.INFO)

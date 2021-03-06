@@ -5,7 +5,6 @@ import (
 )
 
 const (
-	//defaultBucketUpload     = "upload.podops.dev"
 	defaultBucketProduction = "production.podops.dev"
 	defaultBucketCDN        = "cdn.podops.dev"
 

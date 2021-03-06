@@ -12,6 +12,7 @@ import (
 	"github.com/fupas/commons/pkg/env"
 	"github.com/podops/podops"
 	a "github.com/podops/podops/apiv1"
+	cl "github.com/podops/podops/client"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"
 )
@@ -32,7 +33,7 @@ const (
 )
 
 var (
-	client             *podops.Client
+	client             *cl.Client
 	defaultPath        string
 	defaultPathAndName string
 )

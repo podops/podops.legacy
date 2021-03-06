@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	// NamespacePrefix namespace for the CLI. Should not be used directly.
+	// NamespacePrefix namespace for the client and CLI
 	NamespacePrefix = "/a/v1"
 	// GraphqlNamespacePrefix namespace for the GraphQL endpoints
 	GraphqlNamespacePrefix = "/q"

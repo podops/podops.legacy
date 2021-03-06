@@ -1,4 +1,4 @@
-package podops
+package client
 
 import (
 	"bytes"
@@ -51,7 +51,7 @@ func (cl *Client) CreateToken(secret, realm, clientID, userID, scope string, dur
 	resp := a.AuthorizationResponse{}
 
 	// create temporary client because we have to swap an existing token with secret
-	tempClient, _ := NewClient("")
+	tempClient := DefaultClient("")
 	tempClient.Token = secret
 	status, err := tempClient.post(authenticationRoute, &req, &resp)
 
@@ -82,7 +82,7 @@ func (cl *Client) CreateProduction(name, title, summary string) (*a.Production, 
 	}
 
 	resp := a.Production{}
-	_, err := cl.post(cl.apiNamespace+productionRoute, &req, &resp)
+	_, err := cl.post(cl.Namespace+productionRoute, &req, &resp)
 
 	if err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func (cl *Client) Productions() (*a.ProductionList, error) {
 	}
 
 	var resp a.ProductionList
-	_, err := cl.get(cl.apiNamespace+listProductionsRoute, &resp)
+	_, err := cl.get(cl.Namespace+listProductionsRoute, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (cl *Client) CreateResource(kind, rsrcGUID string, force bool, rsrc interfa
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.post(cl.apiNamespace+fmt.Sprintf(updateResourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
+	status, err := cl.post(cl.Namespace+fmt.Sprintf(updateResourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -126,7 +126,7 @@ func (cl *Client) GetResource(prod, kind, guid string, rsrc interface{}) error {
 		return err
 	}
 
-	status, err := cl.get(cl.apiNamespace+fmt.Sprintf(getResourceRoute, prod, kind, guid), rsrc)
+	status, err := cl.get(cl.Namespace+fmt.Sprintf(getResourceRoute, prod, kind, guid), rsrc)
 	if status == http.StatusBadRequest {
 		return fmt.Errorf("not found: '%s/%s-%s'", prod, kind, guid)
 	}
@@ -144,7 +144,7 @@ func (cl *Client) UpdateResource(kind, rsrcGUID string, force bool, rsrc interfa
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.put(cl.apiNamespace+fmt.Sprintf(updateResourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
+	status, err := cl.put(cl.Namespace+fmt.Sprintf(updateResourceRoute, cl.GUID, kind, rsrcGUID, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -162,7 +162,7 @@ func (cl *Client) Resources(prod, kind string) (*a.ResourceList, error) {
 	}
 
 	var resp a.ResourceList
-	_, err := cl.get(cl.apiNamespace+fmt.Sprintf(listResourcesRoute, prod, kind), &resp)
+	_, err := cl.get(cl.Namespace+fmt.Sprintf(listResourcesRoute, prod, kind), &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (cl *Client) DeleteResource(prod, kind, guid string) (int, error) {
 		return http.StatusBadRequest, err
 	}
 
-	status, err := cl.delete(cl.apiNamespace+fmt.Sprintf(deleteResourceRoute, prod, kind, guid), nil)
+	status, err := cl.delete(cl.Namespace+fmt.Sprintf(deleteResourceRoute, prod, kind, guid), nil)
 	if err != nil {
 		return status, err
 	}
@@ -193,7 +193,7 @@ func (cl *Client) Build(guid string) (*a.Build, error) {
 	}
 	resp := a.Build{}
 
-	_, err := cl.post(cl.apiNamespace+buildRoute, &req, &resp)
+	_, err := cl.post(cl.Namespace+buildRoute, &req, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +207,7 @@ func (cl *Client) Upload(path string, force bool) error {
 		return err
 	}
 
-	req, err := cl.fileUploadRequest(cl.ServiceEndpoint+cl.apiNamespace+uploadRoute, cl.GUID, path)
+	req, err := cl.fileUploadRequest(cl.ServiceEndpoint+cl.Namespace+uploadRoute, cl.GUID, path)
 	if err != nil {
 		log.Fatal(err)
 	}
