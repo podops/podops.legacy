@@ -12,7 +12,7 @@ import (
 
 const (
 	podcastName    string = "simple-podcast"
-	podcastTitle   string = "PodOps Simple Example"
+	podcastTitle   string = "PodOps Simple SDK Example"
 	podcastSummary string = "A simple podcast for testing and experimentation. Created with the PodOps API."
 )
 
