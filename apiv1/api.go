@@ -5,18 +5,6 @@ import (
 	"fmt"
 )
 
-const (
-	// Version specifies the verion of the API and its structs
-	Version = "v1"
-
-	// MajorVersion of the API
-	MajorVersion = 1
-	// MinorVersion of the API
-	MinorVersion = 2
-	// FixVersion of the API
-	FixVersion = 1
-)
-
 type (
 	// StatusObject is used to report operation status and errors in an API request.
 	// The struct can be used as a response object or be treated as an error object
@@ -49,11 +37,6 @@ var (
 
 	// ErrInternalError indicates that an unspecified internal error happened
 	ErrInternalError = errors.New("api: internal error")
-
-	// VersionString is the canonical API description
-	VersionString string = fmt.Sprintf("%d.%d.%d", MajorVersion, MinorVersion, FixVersion)
-	// UserAgentString identifies any http request podops makes
-	UserAgentString string = fmt.Sprintf("PodOps %d.%d.%d", MajorVersion, MinorVersion, FixVersion)
 )
 
 // NewStatus initializes a new StatusObject

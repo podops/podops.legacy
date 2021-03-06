@@ -20,8 +20,8 @@ func main() {
 	// initialize CLI
 	app := &cli.App{
 		Name:    cmdLineName,
-		Version: a.Version,
-		Usage:   "PodOps: Podcast Operations Client",
+		Version: a.VersionString,
+		Usage:   fmt.Sprintf("PodOps: Podcast Operations CLI (%s)", a.Version),
 		Action: func(c *cli.Context) error {
 			fmt.Println(globalHelpText)
 			return nil

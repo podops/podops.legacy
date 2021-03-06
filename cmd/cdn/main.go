@@ -25,10 +25,17 @@ func setup() *echo.Echo {
 	// Create a new router instance
 	e := echo.New()
 
+	// hack to get get rid of these 404 in the log
+	e.Pre(middleware.Rewrite(map[string]string{
+		"/7c054e6693dc/feed.xml": "/s/wizards-magic-sheep/feed.xml",
+	}))
+	// end hack
+
 	// add and configure the middlewares
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
+	e.Use(middleware.CSRFWithConfig(middleware.DefaultCSRFConfig))
 
 	// TODO: add/configure e.Use(middleware.Logger())
 	// TODO: e.Logger.SetLevel(log.INFO)
