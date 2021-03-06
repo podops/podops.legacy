@@ -3,14 +3,13 @@ module github.com/podops/podops
 go 1.15
 
 require (
-	cloud.google.com/go v0.75.0
 	cloud.google.com/go/datastore v1.3.0
 	cloud.google.com/go/storage v1.12.0
 	github.com/99designs/gqlgen v0.13.0
 	github.com/OrlovEvgeny/go-mcache v0.0.0-20200121124330-1a8195b34f3a
 	github.com/franela/goblin v0.0.0-20210113153425-413781f5e6c8 // indirect
 	github.com/fupas/commons v1.0.0
-	github.com/fupas/platform v1.1.2
+	github.com/fupas/platform v1.1.3
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect

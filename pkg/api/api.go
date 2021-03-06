@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/internal/observer"
+	"github.com/podops/podops/internal/platform"
 )
 
 const (
@@ -91,7 +91,7 @@ func ErrorResponse(c echo.Context, status int, err error) error {
 	var resp a.StatusObject
 
 	// send the error to Google Error Reporting
-	observer.ReportError(err)
+	platform.ReportError(err)
 
 	if err == nil {
 		resp = a.NewStatus(http.StatusInternalServerError, fmt.Sprintf("status: %d", status))

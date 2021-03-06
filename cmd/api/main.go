@@ -1,7 +1,13 @@
 package main
 
 import (
+	"context"
+	"log"
+
+	"github.com/fupas/commons/pkg/env"
+	"github.com/fupas/platform"
 	svc "github.com/fupas/platform/pkg/http"
+	gcp "github.com/fupas/platform/provider/google"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/podops/podops/internal/api"
@@ -60,7 +66,18 @@ func shutdown(*echo.Echo) {
 }
 
 func init() {
-	// TODO implement all the global stuff here
+	// initialize the platform first
+	projectID := env.GetString("PROJECT_ID", "")
+	if projectID == "" {
+		log.Fatal("Missing variable 'PROJECT_ID'")
+	}
+	serviceName := env.GetString("SERVICE_NAME", "default")
+
+	client, err := platform.NewClient(context.Background(), gcp.NewErrorReporting(context.TODO(), projectID, serviceName))
+	if err != nil {
+		log.Fatal("error initializing the platform services")
+	}
+	platform.RegisterGlobally(client)
 }
 
 func main() {

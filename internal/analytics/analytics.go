@@ -8,7 +8,7 @@ import (
 
 	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/commons/pkg/util"
-	"github.com/podops/podops/internal/observer"
+	"github.com/podops/podops/internal/platform"
 )
 
 const (
@@ -49,7 +49,7 @@ func TrackEvent(request *http.Request, category, action, label string, value int
 	v["ev"] = strconv.FormatInt(int64(value), 10)
 
 	if err := PostToAnalytics(request, &v); err != nil {
-		observer.ReportError(err)
+		platform.ReportError(err)
 		return err
 	}
 	return nil

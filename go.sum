@@ -87,8 +87,8 @@ github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWo
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
 github.com/fupas/commons v1.0.0 h1:VWLBMMgJ53Wcc1DbgkFS2E5V0Ak3EFSbAYeNtj6MSoo=
 github.com/fupas/commons v1.0.0/go.mod h1:0pgRPgirIeWQvnAP5pQ5u55cAV6FV6zHa34MWV1/2/8=
-github.com/fupas/platform v1.1.2 h1:Y0F6RmHKa6JJfluDdnhJuAtg0TvyFLBYabTGJwOE8wE=
-github.com/fupas/platform v1.1.2/go.mod h1:kO2P15+lp/ETNIkVOv29auebQKB/nUEsFgmbb46nyfY=
+github.com/fupas/platform v1.1.3 h1:roZOXz1aWd6e9UWhSTmARfsjnVWFqrqTy+co9sCKZ1I=
+github.com/fupas/platform v1.1.3/go.mod h1:kO2P15+lp/ETNIkVOv29auebQKB/nUEsFgmbb46nyfY=
 github.com/gin-contrib/sse v0.1.0 h1:Y/yl/+YNO8GZSjAhjMsSuLt29uWRFHdHYUb5lYOV9qE=
 github.com/gin-contrib/sse v0.1.0/go.mod h1:RHrZQHXnP2xjPF+u1gW/2HnVO7nvIa9PG3Gm+fLHvGI=
 github.com/gin-gonic/gin v1.6.3 h1:ahKqKTFpO5KTPHxWZjEdPScmYaGtLo8Y4DMHoEsnp14=

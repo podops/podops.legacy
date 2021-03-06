@@ -1,16 +1,14 @@
-package observer
+package platform
 
 import (
-	"context"
-	"fmt"
-	"log"
-
-	"cloud.google.com/go/errorreporting"
-
-	"github.com/fupas/commons/pkg/env"
-	o "github.com/fupas/platform/pkg/observer"
+	p "github.com/fupas/platform"
 )
 
+func ReportError(e error) {
+	p.ReportError(e)
+}
+
+/*
 var (
 	// a central error client instance used in the service
 	errorClient *o.Client
@@ -36,3 +34,4 @@ func ReportError(err error) {
 	}
 	errorClient.ErrorClient.Report(errorreporting.Entry{Error: err})
 }
+*/

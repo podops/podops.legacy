@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/fupas/commons/pkg/util"
-	"github.com/fupas/platform/pkg/platform"
+	ds "github.com/fupas/platform/pkg/platform"
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/internal/observer"
+	"github.com/podops/podops/internal/platform"
 	"google.golang.org/appengine"
 )
 
@@ -43,7 +43,7 @@ func ImportTaskEndpoint(c echo.Context) error {
 	err := c.Bind(req)
 	if err != nil {
 		// just report and return, resending will not change anything
-		observer.ReportError(err)
+		platform.ReportError(err)
 		return c.NoContent(http.StatusOK)
 	}
 
@@ -60,12 +60,12 @@ func importResource(ctx context.Context, src, dest string) int {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		observer.ReportError(fmt.Errorf("can not retrieve '%s': %s", src, resp.Status))
+		platform.ReportError(fmt.Errorf("can not retrieve '%s': %s", src, resp.Status))
 		return http.StatusBadRequest
 	}
 
 	meta := extractMetadataFromResponse(resp)
-	obj := platform.Storage().Bucket(a.BucketCDN).Object(dest)
+	obj := ds.Storage().Bucket(a.BucketCDN).Object(dest)
 	writer := obj.NewWriter(ctx)
 	writer.ContentType = meta.ContentType
 	defer writer.Close()
@@ -76,11 +76,11 @@ func importResource(ctx context.Context, src, dest string) int {
 
 	// error handling & verification
 	if err != nil {
-		observer.ReportError(fmt.Errorf("can not transfer '%s': %v", dest, err))
+		platform.ReportError(fmt.Errorf("can not transfer '%s': %v", dest, err))
 		return http.StatusBadRequest
 	}
 	if l != meta.Size {
-		observer.ReportError(fmt.Errorf("error transfering '%s': expected %d, reveived %d", src, meta.Size, l))
+		platform.ReportError(fmt.Errorf("error transfering '%s': expected %d, reveived %d", src, meta.Size, l))
 		return http.StatusBadRequest
 	}
 
@@ -96,7 +96,7 @@ func importResource(ctx context.Context, src, dest string) int {
 	duration := int64(0) // FIXME implement it
 
 	if err := UpdateAssetResource(ctx, name, util.Checksum(src), a.ResourceAsset, parent, dest, meta.ContentType, meta.Size, duration); err != nil {
-		observer.ReportError(fmt.Errorf("error updating inventory: %v", err))
+		platform.ReportError(fmt.Errorf("error updating inventory: %v", err))
 		return http.StatusBadRequest
 	}
 
