@@ -77,7 +77,7 @@ func dump(path string, doc interface{}) error {
 	}
 
 	ioutil.WriteFile(path, data, 0644)
-	fmt.Printf("--- # %s:\n\n%s\n", path, string(data))
+	fmt.Printf("-- %s:\n\n%s\n", path, string(data))
 
 	return nil
 }

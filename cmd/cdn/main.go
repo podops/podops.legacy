@@ -14,6 +14,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/podops/podops/internal/api"
 	"github.com/podops/podops/internal/cdn"
+	p "github.com/podops/podops/internal/platform"
 )
 
 // ShutdownDelay is the delay before exiting the process
@@ -40,6 +41,7 @@ func setup() *echo.Echo {
 	e.Use(middleware.Gzip())
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 	//e.Use(middleware.CSRFWithConfig(middleware.DefaultCSRFConfig))
+	e.Use(p.PageViewMiddleware)
 
 	// TODO: add/configure e.Use(middleware.Logger())
 	// TODO: e.Logger.SetLevel(log.INFO)
