@@ -9,6 +9,7 @@ master.key
 .DS_Store
 stuff.md
 /hack
+/build
 show-*.yaml
 episode-*.yaml
 

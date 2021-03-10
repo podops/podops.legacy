@@ -3,6 +3,7 @@ module github.com/podops/podops
 go 1.15
 
 require (
+	cloud.google.com/go v0.75.0
 	cloud.google.com/go/datastore v1.3.0
 	cloud.google.com/go/storage v1.12.0
 	github.com/99designs/gqlgen v0.13.0
@@ -34,6 +35,7 @@ require (
 	golang.org/x/text v0.3.5 // indirect
 	google.golang.org/api v0.40.0
 	google.golang.org/appengine v1.6.7
+	google.golang.org/genproto v0.0.0-20210222152913-aa3ee6e6a81c
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b

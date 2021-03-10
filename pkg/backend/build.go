@@ -10,8 +10,8 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
-	"github.com/fupas/platform/pkg/services"
 	a "github.com/podops/podops/apiv1"
+	p "github.com/podops/podops/internal/platform"
 	"google.golang.org/api/iterator"
 )
 
@@ -147,7 +147,7 @@ func EnsureAsset(ctx context.Context, parent string, rsrc *a.Asset) error {
 		}
 
 		// dispatch a request for background import
-		_, err = services.CreateTask(ctx, importTaskWithPrefix, &a.Import{Source: rsrc.URI, Dest: path})
+		_, err = p.CreateTask(ctx, importTaskWithPrefix, &a.Import{Source: rsrc.URI, Dest: path})
 		if err != nil {
 			return err
 		}
