@@ -1,5 +1,5 @@
 .PHONY: all
-all: build_test local web cdn api
+all: build_test local cli web cdn api
 
 VERSION_TAG = 0.9.6
 PLATFORM_LINUX = GOARCH=amd64 GOOS=linux
