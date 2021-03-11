@@ -27,9 +27,10 @@ jobs:
 
     - name: Build CLI
       run: |
-        cd cmd/cli && GOOS=linux GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../build/po-linux-$VERSION
-        cd cmd/cli && GOOS=darwin GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../build/po-mac-$VERSION
-        cd cmd/cli && GOOS=windows GOARCH=amd64 go build po.go && chmod +x po && gzip -S zip po && mv po.zip ../../build/po-win-$VERSION
+        cd cmd/cli
+        GOOS=linux GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../build/po-linux-$VERSION
+        GOOS=darwin GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../build/po-mac-$VERSION
+        GOOS=windows GOARCH=amd64 go build po.go && chmod +x po && gzip -S zip po && mv po.zip ../../build/po-win-$VERSION
 
     # Setup gcloud CLI
     #- uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
