@@ -28,8 +28,7 @@ jobs:
     - name: Build CLI
       run: |
         cd cmd/cli
-        GOOS=linux GOARCH=amd64 go build po.go
-        pwd
+        GOOS=linux GOARCH=amd64 go build po.go && gzip po && mv po.gz ../../build/po-linux-$VERSION
         ls -la
         
 #        GOOS=linux GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../build/po-linux-$VERSION
