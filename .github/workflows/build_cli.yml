@@ -47,5 +47,5 @@ jobs:
     - name: upload archives
       uses: google-github-actions/upload-cloud-storage@main
       with:
-        path: "$BUILDDIR"
+        path: cli-0.9.6
         destination: ${{ secrets.CLI_DOWNLOAD_BUCKET }} 
