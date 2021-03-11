@@ -2,11 +2,11 @@ name: build_cli
 
 on:
   push:
-    branches: [ main ]
+    branches: [ release ]
 
 env:
-  VERSION: 0.9.6
-  BUILDDIR: cli-0.9.6
+  VERSION: 0.9.7
+  BUILDDIR: cli-0.9.7
   GITHUB_SHA: ${{ github.sha }}
 
 jobs:
@@ -47,5 +47,5 @@ jobs:
     - name: upload archives
       uses: google-github-actions/upload-cloud-storage@main
       with:
-        path: cli-0.9.6
+        path: cli-0.9.7
         destination: ${{ secrets.CLI_DOWNLOAD_BUCKET }} 

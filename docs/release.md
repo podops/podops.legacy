@@ -37,7 +37,7 @@ const (
 
 ### Pre-deploy checks
 
-Run a local `smoke-test`before commiting & deploying:
+Run a local `build_test`before commiting & pushing code.
 
 ```shell
 $ make build_test
@@ -45,8 +45,8 @@ $ make build_test
 
 ### Commit code
 
-* All all code files to Git and commit them on the `main`branch.
+* All all files to Git and commit the `main`branch.
+* Push the `main` branch to Git.
 * Merge the `main` branch with the `release` branch.
 * Push the `release` branch to Git.
 * Create a version tag on e.g. GitHub, based on the `release` branch.
-
