@@ -8,8 +8,6 @@ on:
 env:
   GITHUB_SHA: ${{ github.sha }}
   VERSION: 0.9.6
-  GOARCH: amd64
-  GOOS: linux
   
 jobs:
   build:
@@ -29,9 +27,9 @@ jobs:
 
     - name: Build CLI
       run: |
-        cd cmd/cli && GOARCH=amd64 GOOS=linux go build po.go && gzip po && mv po.gz ../../build/po-linux-$GITHUB_SHA
-        cd cmd/cli && GOARCH=amd64 GOOS=darwin go build po.go && gzip po && mv po.gz ../../build/po-mac-$GITHUB_SHA
-        cd cmd/cli && GOARCH=amd64 GOOS=windows go build po.go && gzip -S zip po && mv po.zip ../../build/po-win-$GITHUB_SHA
+        cd cmd/cli && GOOS=linux GOARCH=amd64 go build po.go && chmod+x po && gzip po && mv po.gz ../../build/po-linux-$VERSION
+        cd cmd/cli && GOOS=darwin GOARCH=amd64 go build po.go && chmod+x po && gzip po && mv po.gz ../../build/po-mac-$VERSION
+        cd cmd/cli && GOOS=windows GOARCH=amd64 go build po.go && chmod+x po && gzip -S zip po && mv po.zip ../../build/po-win-$VERSION
 
     # Setup gcloud CLI
     #- uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
