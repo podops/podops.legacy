@@ -29,7 +29,8 @@ jobs:
         cd cmd/cli
         GOOS=linux GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../build/po-linux-$VERSION
         GOOS=darwin GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../build/po-mac-$VERSION
-        GOOS=windows GOARCH=amd64 go build po.go gzip po.exe && mv po.exe.gz ../../build/po-win-$VERSION
+        GOOS=windows GOARCH=amd64 go build po.go && gzip po.exe && mv po.exe.gz ../../build/po-win-$VERSION
+        echo "$VERSION-$GITHUB_SHA" > ../../build/version.txt
         
     - name: setup gcloud
       uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
