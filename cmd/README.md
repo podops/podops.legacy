@@ -1,10 +1,10 @@
-# Build from source
+## Build CLI and services
 
-## Requirements
+### Requirements
 
 * [Go 1.15](https://golang.org/dl) or newer
 
-## Clone the repository
+### Clone the repository
 
 ```shell
 $ git clone https://github.com/podops/podops.git
@@ -13,19 +13,19 @@ $ git clone https://github.com/podops/podops.git
 If you don't have git, you can download the source code as a file [archive from GitHub](https://github.com/podops/podops).
 Each [release](https://github.com/podops/podops/releases) has a source snapshot.
 
-## Command-line-interface (CLI)
+### Command-line-interface (CLI)
 
-### Build
+#### Build
 
 ```shell
 $ cd podops/cmd/cli
 $ go build po.go
 ```
 
-## API service
+### API service
 
 TBD
 
-## CDN service
+### CDN service
 
 TBD

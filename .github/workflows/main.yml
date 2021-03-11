@@ -1,0 +1,47 @@
+# This is a basic workflow to help you get started with Actions
+name: BuildAndSyncCLI
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  GITHUB_SHA: ${{ github.sha }}
+  VERSION: 0.9.6
+  GOARCH: amd64
+  GOOS: linux
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.15
+      id: go
+
+    - uses: actions/checkout@v2
+
+    - name: Get dependencies
+      run: cd cmd/cli && go get -v -t -d ./...
+
+    - name: Build CLI
+      run: |
+        cd cmd/cli && GOARCH=amd64 GOOS=linux go build po.go && gzip po && mv po.gz ../../build/po-linux-$GITHUB_SHA
+        cd cmd/cli && GOARCH=amd64 GOOS=darwin go build po.go && gzip po && mv po.gz ../../build/po-mac-$GITHUB_SHA
+        cd cmd/cli && GOARCH=amd64 GOOS=windows go build po.go && gzip -S zip po && mv po.zip ../../build/po-win-$GITHUB_SHA
+
+    # Setup gcloud CLI
+    #- uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+    #  with:
+    #    service_account_email: ${{ secrets.GCP_EMAIL }}
+    #    service_account_key: ${{ secrets.GCP_KEY }}
+    #    export_default_credentials: true
+
+    - name: Upload archives
+      run: |
+        ls -la build
+
+    
