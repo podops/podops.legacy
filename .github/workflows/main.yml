@@ -36,6 +36,9 @@ jobs:
     - name: prepare release
       run: |
         echo "$VERSION-$GITHUB_SHA" > $TARGET/version.txt
+        pwd
+        ls -la
+        ls -la $TARGET
 
     - name: setup gcloud
       uses: google-github-actions/setup-gcloud@master
