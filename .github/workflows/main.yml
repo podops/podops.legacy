@@ -1,5 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-name: BuildAndSyncCLI
+name: build_cli
 
 on:
   push:
@@ -30,20 +29,19 @@ jobs:
         cd cmd/cli
         GOOS=linux GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../build/po-linux-$VERSION
         GOOS=darwin GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../build/po-mac-$VERSION
-        GOOS=windows GOARCH=amd64 go build po.go && gzip po.exe && mv po.gz ../../build/po-win-$VERSION
+        ls -la
+        GOOS=windows GOARCH=amd64 go build po.go 
+        ls -la
+        gzip po.exe && mv po.gz ../../build/po-win-$VERSION
         
-    # Setup gcloud CLI
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+    - id: setup gcloud
+      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         service_account_email: ${{ secrets.GCP_EMAIL }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
-    - name: check archives
-      run: |
-        ls -la build
-
-    - id: upload-archives
+    - id: upload archives
       uses: google-github-actions/upload-cloud-storage@main
       with:
         path: /build
