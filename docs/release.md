@@ -35,7 +35,13 @@ const (
 )
 ```
 
-### Pre-deploy checks
+### Release
+
+#### Prepare the code base
+
+* All all files to Git and commit the `main`branch.
+
+#### Pre-deploy checks
 
 Run a local `build_test`before commiting & pushing code.
 
@@ -43,10 +49,9 @@ Run a local `build_test`before commiting & pushing code.
 $ make build_test
 ```
 
-### Commit code
+#### Commit code
 
-* All all files to Git and commit the `main`branch.
 * Push the `main` branch to Git.
-* Merge the `main` branch with the `release` branch.
+* Merge the `main` branch into the `release` branch.
 * Push the `release` branch to Git.
 * Create a version tag on e.g. GitHub, based on the `release` branch.
