@@ -34,14 +34,14 @@ jobs:
         ls -la
         gzip po.exe && mv po.gz ../../build/po-win-$VERSION
         
-    - id: setup gcloud
+    - name: setup gcloud
       uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         service_account_email: ${{ secrets.GCP_EMAIL }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
-    - id: upload archives
+    - name: upload archives
       uses: google-github-actions/upload-cloud-storage@main
       with:
         path: /build
