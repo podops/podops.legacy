@@ -6,7 +6,7 @@ on:
 
 env:
   VERSION: 0.9.6
-  TARGET: cli-0.9.6
+  BUILDDIR: cli-0.9.6
   GITHUB_SHA: ${{ github.sha }}
 
 jobs:
@@ -27,18 +27,18 @@ jobs:
 
     - name: build cli
       run: |
-        mkdir $TARGET
+        mkdir $BUILDDIR
         cd cmd/cli
-        GOOS=linux GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../$TARGET/po-linux-$VERSION
-        GOOS=darwin GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../$TARGET/po-mac-$VERSION
-        GOOS=windows GOARCH=amd64 go build po.go && gzip po.exe && mv po.exe.gz ../../$TARGET/po-win-$VERSION
+        GOOS=linux GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../$BUILDDIR/po-linux-$VERSION
+        GOOS=darwin GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../$BUILDDIR/po-mac-$VERSION
+        GOOS=windows GOARCH=amd64 go build po.go && gzip po.exe && mv po.exe.gz ../../$BUILDDIR/po-win-$VERSION
         
     - name: prepare release
       run: |
-        echo "$VERSION-$GITHUB_SHA" > $TARGET/version.txt
+        echo "$VERSION-$GITHUB_SHA" > $BUILDDIR/version.txt
         pwd
         ls -la
-        ls -la $TARGET
+        ls -la $BUILDDIR
 
     - name: setup gcloud
       uses: google-github-actions/setup-gcloud@master
@@ -50,5 +50,5 @@ jobs:
     - name: upload archives
       uses: google-github-actions/upload-cloud-storage@main
       with:
-        path: $TARGET
+        path: ${{ BUILDDIR }}
         destination: ${{ secrets.CLI_DOWNLOAD_BUCKET }} 
