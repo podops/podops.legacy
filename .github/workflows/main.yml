@@ -21,35 +21,23 @@ jobs:
       id: go
 
     - uses: actions/checkout@v2
-
-    - name: get dependencies
-      run: cd cmd/cli && go get -v -t -d ./...
-
-    - name: build cli
-      run: |
-        cd cmd/cli
-        GOOS=linux GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../build/po-linux-$VERSION
-        GOOS=darwin GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../build/po-mac-$VERSION
-        GOOS=windows GOARCH=amd64 go build po.go && gzip po.exe && mv po.exe.gz ../../build/po-win-$VERSION
         
     - name: release info
+      env:
+        BKT: foo
       run: |
         pwd
         echo "$VERSION-$GITHUB_SHA" > build/version.txt
+        cat build/version.txt
         echo "A"
-        echo $BUCKET
+        echo ${BUCKET}
         echo "B"
+        echo $BKT
+        echo "C"
+        echo "$BKT"
+        echo "D"
+        echo ${BKT}
+        echo "E"
         ls -la build
 
-    - name: setup gcloud
-      uses: google-github-actions/setup-gcloud@master
-      with:
-        service_account_email: ${{ secrets.GCP_EMAIL }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
-
-    - name: upload archives
-      uses: google-github-actions/upload-cloud-storage@main
-      with:
-        path: build
-        destination: $BUCKET
+    
