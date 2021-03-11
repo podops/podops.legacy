@@ -30,7 +30,7 @@ jobs:
         echo "$VERSION-$GITHUB_SHA" > build/version.txt
         cat build/version.txt
         echo "A"
-        echo ${BUCKET}
+        echo "${BUCKET}"
         echo "B"
         echo $BKT
         echo "C"
