@@ -6,7 +6,7 @@ on:
 
 env:
   VERSION: 0.9.6
-  TARGET: cli-$VERSION
+  TARGET: cli-0.9.6
   GITHUB_SHA: ${{ github.sha }}
 
 jobs:
