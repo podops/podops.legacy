@@ -1,5 +1,7 @@
 # PodOps - Programmable Podcasts
 
+[![Join the chat at https://gitter.im/podops/help](https://badges.gitter.im/podops/help.svg)](https://gitter.im/podops/help?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 ## Credits
 
