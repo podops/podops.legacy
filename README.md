@@ -32,12 +32,19 @@ Download the latest binary for your system:
 * [MacOS/amd64](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-mac-0.9.7.gz)
 * [Windows](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-windows-0.9.7.zip)
 
-Unpack the archive and place the `po` binary in a directory that is on your `$PATH`. Verify that the command line tool is accessible.
+Unpack the archive and place the `po` binary in a directory that is on your `$PATH`. Verify that the command line tool is accessible:
 
 ```shell
-po help
+$ po help
 ```
 
+### Create a user
+
+TBD
+
+### Get the API access key
+
+TBD 
 ## Documentation
 The documentation repository is [here](/docs)
 
