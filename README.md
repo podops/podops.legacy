@@ -30,11 +30,11 @@ Unpack the archive and place the `po` binary in a directory that is on your `$PA
 $ po help
 ```
 
-#### Create a user
+### Create a user
 
 TBD
 
-#### Get the API access key
+### Get the API access key
 
 TBD 
 ## Documentation
