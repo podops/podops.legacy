@@ -13,6 +13,11 @@ PodOps is an all-in-one platform to host and distribute your podcast feed and al
 #### A Podcast Website
 Use the GraphQL API to build a custom, static website or just use the default pages created by PodOps.
 
-## Documentation
+## Examples
+[Examples](/examples)
 
+## Documentation
 [Documentation](/docs)
+
+## Contributing
+[Contributing](/docs/contributing.md) to PodOps
