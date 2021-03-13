@@ -24,6 +24,20 @@ To use Pooops, you need an API access key from `https://api.podops.dev`. For thi
 
 **Note:** While all the Podops code is [here on GitHub](https://github.com/podops), there is no step-by-step guide how install it on your own infrastructure at the moment. This will come later. If you want to deploy Podops on your own infrastructure *TODAY*, join the [community on Gitter](https://gitter.im/podops/) and send me a DM at `@mickuehl` and we will sort it out.
 
+### Downloads the binary
+
+Download the latest binary for your system:
+
+* [Linux/amd64](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-linux-0.9.7.gz)
+* [MacOS/amd64](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-mac-0.9.7.gz)
+* [Windows](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-windows-0.9.7.zip)
+
+Unpack the archive and place the `po` binary in a directory that is on your `$PATH`. Verify that the command line tool is accessible.
+
+```shell
+po help
+```
+
 ## Documentation
 The documentation repository is [here](/docs)
 

@@ -1,6 +1,6 @@
 # Installation
 
-With the PodOps command-line interface (CLI), the `po` command, you can create podcasts and manage them from a terminal. This page describes various methods for installing the PoOps command-line interface on your system. 
+With the Podops command-line interface (CLI), the `po` command, you can create podcasts and manage them from a terminal. This page describes various methods for installing the PoOps command-line interface on your system. 
 
 ## Downloads the binary
 
