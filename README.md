@@ -22,4 +22,4 @@ Should you wish to contribute, please have a look at the [contribution guideline
 The documentation repository is [here](/docs)
 
 ## Examples
-Examples on how to use the Command Line Interface or Go Client SDK to create and publish your podcast are [here](/docs/examples.md).
+Examples on how to use the Command Line Interface or Go Client SDK to create and publish your podcast are [here](/docs/tutorial).
