@@ -4,20 +4,11 @@
 
 Automate your podcast creation workflow. API, CLI and backend service implementation.
 
-#### CLI, GraphQL & REST API
-Automate your podcast workflow by creating your own scripts and integrating PodOps with 3rd party tools.
-
-#### Content Delivery
-PodOps is an all-in-one platform to host and distribute your podcast feed and all its assets.
-
-#### A Podcast Website
-Use the GraphQL API to build a custom, static website or just use the default pages created by PodOps.
+## Documentation
+The PodOps documentation is [here](/docs)
 
 ## Examples
-[Examples](/examples)
-
-## Documentation
-[Documentation](/docs)
+Examples on how to use the Command Line Interface or Go Client SDK to create and publish your podcast are [here](/examples).
 
 ## Contributing
 [Contributing](/docs/contributing.md) to PodOps
