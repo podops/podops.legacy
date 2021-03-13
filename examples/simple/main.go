@@ -53,7 +53,7 @@ func main() {
 
 	// Return a fully populated show struct with all defaults.
 	// We can add or change values if needed.
-	show := a.DefaultShow(p.Name, podcastTitle, podcastSummary, p.GUID, a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
+	show := a.DefaultShow(p.Name, podcastTitle, podcastSummary, p.GUID, "", "")
 	show.Metadata.Labels[a.LabelLanguage] = "de_DE"
 	show.Description.Author = "PodOps sample code"
 	show.Description.Copyright = "Copyright 2021 - Transformative Services"
@@ -68,14 +68,14 @@ func main() {
 
 	// Each podcast needs at least one episode to be valid. Let's add one ...
 	guid, _ := util.ShortUUID()
-	episode := a.DefaultEpisode("first", show.Metadata.Name, guid, show.GUID(), a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
+	episode := a.DefaultEpisode("first", show.Metadata.Name, guid, show.GUID(), "", "")
 	episode.Description.Title = "Drums !"
 	episode.Description.Summary = "A short sample generated from one of Garage Band's default settings"
 	episode.Description.EpisodeText = `This is the real description of the episode's content. Knock yourself out! 
 	
 	Withing 4000 characters that is ..`
 
-	// Set the media data. This is a sample mp3 ...
+	// Add the media data. This links to a sample mp3 ...
 	episode.Description.Duration = 21 // the duration of the episode, in seconds
 	episode.Enclosure.URI = fmt.Sprintf("%s/c/default/sample.mp3", a.DefaultCDNEndpoint)
 	episode.Enclosure.Size = 503140 // bytes
@@ -93,7 +93,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// The path to the feed
+	// The URL to the feed
 	fmt.Printf("\n[%d ms] Access the podcast feed at %s\n", delta(start), feed.FeedURL)
 }
 
