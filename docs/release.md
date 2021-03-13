@@ -1,4 +1,4 @@
-## Release checklist
+# Release Checklist
 
 ### Version numbers
 
