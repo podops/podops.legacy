@@ -4,7 +4,7 @@
 
 Podops is podcast infrastructure platform that provides functionallity to automate your podcast creation workflow. It allows you to create the podcast feed and delivers media assets like mp3s or images to podcast clients. 
 
-The platform follows an API-first approach and is very *light* on user-facing frontends. Almost all interactions with Podops happens either using `po` the command line interface or by directly integrating the Rest API.
+The platform follows an API-first approach and is very light on user-facing frontends. Almost all interactions with Podops happens either using `po` the command line interface or by directly integrating the Rest API.
 
 If you need support or have ideas for improving Podops, please join the [Podops Gitter community](https://gitter.im/podops/) or visit the [GitHub Issues section](https://github.com/podops/podops/issues) of this repo. Please visit the Podops document repository for installation instructions and documentation.
 
