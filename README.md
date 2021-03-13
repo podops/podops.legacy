@@ -10,14 +10,6 @@ If you need support or have ideas for improving Podops, please join the [Podops 
 
 If you find this project interesting, please consider starring the project on GitHub.
 
-## Open-source but not open-contribution?
-
-I am grateful for community involvement, bug reports, & feature requests but I do not expect code contributions. I will gladly review [pull requests](https://github.com/podops/podops/pulls) however.
-
-There is another way to help the project: many of the most valuable contributions are in the forms of [testing, feedback, and documentation](https://github.com/podops/podops/issues). This helps to harden the software and streamlines its usage for other users.
-
-Should you wish to contribute, please review the [contribution guidelines](/docs/contributing.md) first.
-
 ## Getting started
 
 To use Pooops, you need an API access key from `https://api.podops.dev`. For this, you have to install `po`, the command line tool first. After installing it, you can register your account and get your API key.
@@ -53,3 +45,11 @@ Examples on how to use the Command Line Interface or Go Client SDK to create and
 
 ## Development
 A description how to build the codebase and how to test locally is [here](/docs/development.md).
+
+## Open-source but not open-contribution?
+
+I am grateful for community involvement, bug reports, & feature requests but I do not expect code contributions. I will gladly review [pull requests](https://github.com/podops/podops/pulls) however.
+
+There is another way to help the project: many of the most valuable contributions are in the forms of [testing, feedback, and documentation](https://github.com/podops/podops/issues). This helps to harden the software and streamlines its usage for other users.
+
+Should you wish to contribute, please review the [contribution guidelines](/docs/contributing.md) first.
