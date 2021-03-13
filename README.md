@@ -28,6 +28,13 @@ Unpack the archive and place the `po` binary in a directory that is on your `$PA
 
 ```shell
 $ po help
+
+PodOps: Podcast Operations Client
+
+This client tool helps you to create and produce podcasts.
+It also includes administrative commands for managing your live podcasts.
+
+To see the full list of supported commands, run 'po help'
 ```
 
 ### Create a user
