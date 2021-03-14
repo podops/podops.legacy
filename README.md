@@ -12,7 +12,7 @@ If you find this project interesting, please consider starring the project on Gi
 
 ## Getting started
 
-To use Pooops, you need an API access key from `https://api.podops.dev`. For this, you have to install `po`, the command line tool first. After installing it, you can register your account and get your API key.
+To use Podops, you need an API access key from `https://api.podops.dev`. For this, you have to install `po`, the command line tool first. After installing it, you can register your account and get your API key.
 
 **Note:** While all the Podops code is [here on GitHub](https://github.com/podops), there is no step-by-step guide how install it on your own infrastructure at the moment. This will come later. If you want to deploy Podops on your own infrastructure *TODAY*, join the [community on Gitter](https://gitter.im/podops/) and send me a DM at `@mickuehl` and we will sort it out.
 
@@ -32,11 +32,26 @@ $ po help
 
 ### Create a user
 
-TBD
+```shell
+$ po login your_email_address
+```
+
+If you login for the first time, Podops will send you an email to verify your Email-Address. Confirm by following the link in the Email. The link is valid for 15min.
 
 ### Get the API access key
 
-TBD 
+Next, Podops will send you another email with a confirmation code. Use this confirmation code and exchange it for your API access key.
+
+```shell
+$ po auth access_code
+```
+
+This will retrieve your current API access code and place it in its default location `$HOME/.po/config`. You can verify that everything is setup correctly by issuing a command that requires authentication e.g.
+
+```shell
+$ po list
+```
+
 ## Documentation
 The documentation repository is [here](/docs)
 
