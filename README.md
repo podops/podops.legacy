@@ -6,9 +6,9 @@ Podops is podcast infrastructure platform that provides functionallity to automa
 
 The platform follows an API-first approach and is very light on user-facing frontends. Almost all interactions with Podops happens either using `po` the command line interface or by directly integrating the Rest API.
 
-If you need support or have ideas for improving Podops, please join the [Podops Gitter community](https://gitter.im/podops/) or visit the [GitHub Issues section](https://github.com/podops/podops/issues) of this repo. Please visit the Podops document repository for installation instructions and documentation.
+If you need support or have ideas for improving Podops, please join the [Podops Gitter community](https://gitter.im/podops/) or visit the [GitHub Issues section](https://github.com/podops/podops/issues) of this repo. Please visit the Podops [document repository](/docs) for installation instructions and documentation.
 
-If you find this project interesting, please consider starring the project on GitHub.
+If you find this project interesting, please consider starring it here on GitHub!
 
 ## Getting started
 
@@ -30,17 +30,15 @@ Unpack the archive and place the `po` binary in a directory that is on your `$PA
 $ po help
 ```
 
-### Create a user
+### Register and get the API key
 
 ```shell
 $ po login your_email_address
 ```
 
-If you login for the first time, Podops will send you an email to verify your Email-Address. Confirm by following the link in the Email. The link is valid for 15min.
+Podops will send you an email with a confirmation code. Use this confirmation code and exchange it for your API access key. The access code is `valid for 15min` and can only be used once. In case you missed this time-window, start over with the login command.
 
-### Get the API access key
-
-Next, Podops will send you another email with a confirmation code. Use this confirmation code and exchange it for your API access key.
+**Note:** If you login for the first time, Podops will send you an email to verify your Email-Address first. Confirm by following the link in the Email. The link is `valid for 15min`.
 
 ```shell
 $ po auth access_code
@@ -52,11 +50,11 @@ This will retrieve your current API access code and place it in its default loca
 $ po list
 ```
 
-## Documentation
-The documentation repository is [here](/docs)
-
 ## Examples
 Examples on how to use the Command Line Interface or Go Client SDK to create and publish your podcast are [here](/docs/tutorial).
+
+## Documentation
+The documentation repository is [here](/docs)
 
 ## Development
 A description how to build the codebase and how to test locally is [here](/docs/development.md).
