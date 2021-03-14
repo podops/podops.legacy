@@ -38,8 +38,6 @@ $ po login your_email_address
 
 Podops will send you an email with a confirmation code. Use this confirmation code and exchange it for your API access key. The access code is `valid for 15min` and can only be used once. In case you missed this time-window, start over with the login command.
 
-**Note:** If you login for the first time, Podops will send you an email to verify your Email-Address first. Confirm by following the link in the Email. The link is `valid for 15min`.
-
 ```shell
 $ po auth access_code
 ```
@@ -49,6 +47,8 @@ This will retrieve your current API access code and place it in its default loca
 ```shell
 $ po list
 ```
+
+**Note:** If you login for the first time, Podops will send you an email to verify your Email-Address first. Confirm by following the link in the Email. The link is `valid for 15min`.
 
 ## Examples
 Examples on how to use the Command Line Interface or Go Client SDK to create and publish your podcast are [here](/docs/tutorial).
