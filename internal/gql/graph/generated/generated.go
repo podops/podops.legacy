@@ -44,9 +44,9 @@ type DirectiveRoot struct {
 type ComplexityRoot struct {
 	Query struct {
 		Episode func(childComplexity int, guid *string) int
-		Popular func(childComplexity int, max int) int
-		Recent  func(childComplexity int, max int) int
-		Show    func(childComplexity int, name *string) int
+		Popular func(childComplexity int, limit int) int
+		Recent  func(childComplexity int, limit int) int
+		Show    func(childComplexity int, name *string, limit int) int
 	}
 
 	Category struct {
@@ -124,10 +124,10 @@ type ComplexityRoot struct {
 }
 
 type QueryResolver interface {
-	Show(ctx context.Context, name *string) (*model.Show, error)
+	Show(ctx context.Context, name *string, limit int) (*model.Show, error)
 	Episode(ctx context.Context, guid *string) (*model.Episode, error)
-	Recent(ctx context.Context, max int) ([]*model.Show, error)
-	Popular(ctx context.Context, max int) ([]*model.Show, error)
+	Recent(ctx context.Context, limit int) ([]*model.Show, error)
+	Popular(ctx context.Context, limit int) ([]*model.Show, error)
 }
 
 type executableSchema struct {
@@ -167,7 +167,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Popular(childComplexity, args["max"].(int)), true
+		return e.complexity.Query.Popular(childComplexity, args["limit"].(int)), true
 
 	case "Query.recent":
 		if e.complexity.Query.Recent == nil {
@@ -179,7 +179,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Recent(childComplexity, args["max"].(int)), true
+		return e.complexity.Query.Recent(childComplexity, args["limit"].(int)), true
 
 	case "Query.show":
 		if e.complexity.Query.Show == nil {
@@ -191,7 +191,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Show(childComplexity, args["name"].(*string)), true
+		return e.complexity.Query.Show(childComplexity, args["name"].(*string), args["limit"].(int)), true
 
 	case "category.name":
 		if e.complexity.Category.Name == nil {
@@ -639,11 +639,11 @@ type labels {
 }
 
 type Query {
-    show(name: String): show
+    show(name: String, limit: Int!): show
     episode(guid: String): episode
 
-    recent(max: Int!) : [show]!
-    popular(max: Int!) : [show]!
+    recent(limit: Int!) : [show]!
+    popular(limit: Int!) : [show]!
 }
 
 scalar Timestamp
@@ -689,14 +689,14 @@ func (ec *executionContext) field_Query_popular_args(ctx context.Context, rawArg
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
-	if tmp, ok := rawArgs["max"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
 		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["max"] = arg0
+	args["limit"] = arg0
 	return args, nil
 }
 
@@ -704,14 +704,14 @@ func (ec *executionContext) field_Query_recent_args(ctx context.Context, rawArgs
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
-	if tmp, ok := rawArgs["max"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("max"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
 		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["max"] = arg0
+	args["limit"] = arg0
 	return args, nil
 }
 
@@ -727,6 +727,15 @@ func (ec *executionContext) field_Query_show_args(ctx context.Context, rawArgs m
 		}
 	}
 	args["name"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
 	return args, nil
 }
 
@@ -793,7 +802,7 @@ func (ec *executionContext) _Query_show(ctx context.Context, field graphql.Colle
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Show(rctx, args["name"].(*string))
+		return ec.resolvers.Query().Show(rctx, args["name"].(*string), args["limit"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -871,7 +880,7 @@ func (ec *executionContext) _Query_recent(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Recent(rctx, args["max"].(int))
+		return ec.resolvers.Query().Recent(rctx, args["limit"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -913,7 +922,7 @@ func (ec *executionContext) _Query_popular(ctx context.Context, field graphql.Co
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Popular(rctx, args["max"].(int))
+		return ec.resolvers.Query().Popular(rctx, args["limit"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

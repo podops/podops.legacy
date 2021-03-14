@@ -72,11 +72,11 @@ type labels {
 }
 
 type Query {
-    show(name: String): show
+    show(name: String, limit: Int!): show
     episode(guid: String): episode
 
-    recent(max: Int!) : [show]!
-    popular(max: Int!) : [show]!
+    recent(limit: Int!) : [show]!
+    popular(limit: Int!) : [show]!
 }
 
 scalar Timestamp

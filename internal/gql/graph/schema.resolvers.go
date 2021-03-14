@@ -17,7 +17,7 @@ import (
 	"github.com/podops/podops/pkg/backend"
 )
 
-func (r *queryResolver) Show(ctx context.Context, name *string) (*model.Show, error) {
+func (r *queryResolver) Show(ctx context.Context, name *string, limit int) (*model.Show, error) {
 	if r.ShowLoader == nil {
 		log.Fatal("panic: missing show loader")
 	}
@@ -31,7 +31,7 @@ func (r *queryResolver) Show(ctx context.Context, name *string) (*model.Show, er
 
 	// list all episodes, excluding future (i.e. unpublished) ones, descending order
 	var er []*a.Resource
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", show.GUID).Filter("Kind =", a.ResourceEpisode).Filter("Published <", util.Timestamp()).Order("-Published"), &er); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", show.GUID).Filter("Kind =", a.ResourceEpisode).Filter("Published <", util.Timestamp()).Order("-Published").Limit(limit), &er); err != nil {
 		platform.ReportError(err)
 		return nil, err
 	}
@@ -65,9 +65,9 @@ func (r *queryResolver) Episode(ctx context.Context, guid *string) (*model.Episo
 	return data.(*model.Episode), nil
 }
 
-func (r *queryResolver) Recent(ctx context.Context, max int) ([]*model.Show, error) {
+func (r *queryResolver) Recent(ctx context.Context, limit int) ([]*model.Show, error) {
 	var sh []*a.Production
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreProductions).Filter("BuildDate >", 0).Order("-BuildDate").Limit(max), &sh); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreProductions).Filter("BuildDate >", 0).Order("-BuildDate").Limit(limit), &sh); err != nil {
 		platform.ReportError(err)
 		return nil, err
 	}
@@ -88,10 +88,10 @@ func (r *queryResolver) Recent(ctx context.Context, max int) ([]*model.Show, err
 	return shows, nil
 }
 
-func (r *queryResolver) Popular(ctx context.Context, max int) ([]*model.Show, error) {
+func (r *queryResolver) Popular(ctx context.Context, limit int) ([]*model.Show, error) {
 	var sh []*a.Production
 	// FIXME change this once we have metrics on show subscriptions
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreProductions).Filter("BuildDate >", 0).Order("-BuildDate").Limit(max), &sh); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreProductions).Filter("BuildDate >", 0).Order("-BuildDate").Limit(limit), &sh); err != nil {
 		platform.ReportError(err)
 		return nil, err
 	}
