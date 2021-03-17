@@ -22,7 +22,7 @@ Download the latest binary for your system:
 
 * [Linux/amd64](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-linux-0.9.7.gz)
 * [MacOS/amd64](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-mac-0.9.7.gz)
-* [Windows](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-windows-0.9.7.zip)
+* [Windows](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-win-0.9.7.zip)
 
 Unpack the archive and place the `po` binary in a directory that is on your `$PATH`. Verify that the command line tool is accessible:
 
@@ -36,7 +36,7 @@ $ po help
 $ po login <your_email_address>
 ```
 
-Podops will send you an email with a confirmation code. Use this confirmation code and exchange it for your API access key. The access code is `valid for 15min` and can only be used once. In case you missed this time-window, start over with the login command.
+Podops will send you an email with a confirmation code. Use the confirmation code to exchange it for your API access key. The code is `valid for 15min` and can only be used once. In case you missed this time-window, start over with the login command.
 
 ```shell
 $ po auth <access_code>

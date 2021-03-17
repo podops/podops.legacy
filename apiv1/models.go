@@ -61,9 +61,9 @@ type (
 		Dest   string `json:"dest" binding:"required"`
 	}
 
-	// AuthorizationRequest struct is used to request a token
+	// OldAuthorizationRequest struct is used to request a token
 	// Imported from https://github.com/txsvc/service/blob/main/pkg/auth/types.go
-	AuthorizationRequest struct {
+	OldAuthorizationRequest struct {
 		Secret     string `json:"secret" binding:"required"`
 		Realm      string `json:"realm" binding:"required"`
 		ClientID   string `json:"client_id" binding:"required"`
@@ -73,9 +73,9 @@ type (
 		Duration   int64  `json:"duration" binding:"required"`
 	}
 
-	// AuthorizationResponse provides a valid token
+	// OldAuthorizationResponse provides a valid token
 	// Imported from https://github.com/txsvc/service/blob/main/pkg/auth/types.go
-	AuthorizationResponse struct {
+	OldAuthorizationResponse struct {
 		Realm    string `json:"realm" binding:"required"`
 		ClientID string `json:"client_id" binding:"required"`
 		Token    string `json:"token" binding:"required"`

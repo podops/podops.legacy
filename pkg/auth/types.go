@@ -1,50 +1,40 @@
 package auth
 
-import "github.com/fupas/commons/pkg/util"
-
-type (
-	// Authorization represents a user, app or bot and its permissions
-	Authorization struct {
-		ClientID  string `json:"client_id" binding:"required"` // UNIQUE
-		Name      string `json:"name"`                         // name of the domain, realm, tennant etc
-		Token     string `json:"token" binding:"required"`
-		TokenType string `json:"token_type" binding:"required"` // user,app,bot
-		UserID    string `json:"user_id"`                       // depends on TokenType. UserID could equal ClientID or BotUSerID in Slack
-		Scope     string `json:"scope"`                         // a comma separated list of scopes, see below
-		Expires   int64  `json:"expires"`                       // 0 = never
-		// internal
-		// FIXME: add revokation flag to the Authorization
-		AuthType string `json:"-"` // currently: jwt, slack
-		Created  int64  `json:"-"`
-		Updated  int64  `json:"-"`
-	}
-
-	// AuthorizationRequest struct is used to request a token
-	AuthorizationRequest struct {
-		Secret     string `json:"secret" binding:"required"`
-		Realm      string `json:"realm" binding:"required"`
-		ClientID   string `json:"client_id" binding:"required"`
-		ClientType string `json:"client_type" binding:"required"` // user,app,bot
-		UserID     string `json:"user_id" binding:"required"`
-		Scope      string `json:"scope" binding:"required"`
-		Duration   int64  `json:"duration" binding:"required"`
-	}
-
-	// AuthorizationResponse provides the token to the requestor
-	AuthorizationResponse struct {
-		Realm    string `json:"realm" binding:"required"`
-		ClientID string `json:"client_id" binding:"required"`
-		Token    string `json:"token" binding:"required"`
-	}
+const (
+	// AccountActive indicates a confirmed account with a valid login
+	AccountActive = 1
+	// AccountLoggedOut indicates a confirmed account without a valid login
+	AccountLoggedOut = 0
+	// AccountDeactivated indicates an account that has been deactivated due to
+	// e.g. account deletion or UserID swap
+	AccountDeactivated = -1
+	// AccountBlocked signals an issue with the account that needs intervention
+	AccountBlocked = -2
+	// AccountUnconfirmed well guess what?
+	AccountUnconfirmed = -3
 )
 
-// IsValid verifies that the Authorization is still valid, i.e. not expired and not revoked.
-func (a *Authorization) IsValid() bool {
-	if a.Expires == 0 {
-		return true
+type (
+	// AuthorizationRequest represents a login/authorization request from a user, app, or bot
+	AuthorizationRequest struct {
+		Realm    string `json:"realm" binding:"required"`
+		UserID   string `json:"user_id" binding:"required"`
+		ClientID string `json:"client_id"`
+		Token    string `json:"token"`
 	}
-	if a.Expires > util.Timestamp() {
-		return true
+
+	// Account represents an account for a user or client (e.g. API, bot)
+	Account struct {
+		Realm    string `json:"realm"`
+		ClientID string `json:"client_id"` // a unique id within [realm,user_id]
+		UserID   string `json:"user_id"`   // external id for the entity e.g. email for a user
+		// status and other metadata
+		Status int `json:"status"` // default == AccountUnconfirmed
+		// internal
+		TempToken string `json:"-"` // used to confirm the account and then to request the real token
+		Expires   int64  `json:"-"` // 0 == never
+		Confirmed int64  `json:"-"`
+		Created   int64  `json:"-"`
+		Updated   int64  `json:"-"`
 	}
-	return false
-}
+)

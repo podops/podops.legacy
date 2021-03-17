@@ -13,6 +13,11 @@ build_test:
 	cd cmd/cdn && go build main.go && rm main
 	cd examples/simple && go build main.go && rm main
 
+.PHONY: test
+test:
+	cd apiv1 && go test
+	cd pkg/auth && go test
+	
 .PHONY: web
 web:
 	cd ../podops.dev && gridsome build

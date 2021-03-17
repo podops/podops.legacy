@@ -39,7 +39,7 @@ func (cl *Client) SetProduction(guid string) {
 // CreateToken creates an access token on the server
 // FIXME this is not tested
 func (cl *Client) CreateToken(secret, realm, clientID, userID, scope string, duration int64) (string, error) {
-	req := a.AuthorizationRequest{
+	req := a.OldAuthorizationRequest{
 		Secret:     secret,
 		Realm:      realm,
 		ClientID:   clientID,
@@ -48,7 +48,7 @@ func (cl *Client) CreateToken(secret, realm, clientID, userID, scope string, dur
 		Scope:      scope,
 		Duration:   duration,
 	}
-	resp := a.AuthorizationResponse{}
+	resp := a.OldAuthorizationResponse{}
 
 	// create temporary client because we have to swap an existing token with secret
 	tempClient := DefaultClient("")

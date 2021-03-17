@@ -13,7 +13,6 @@ import (
 //	block:		Yes OPTIONAL 'channel.itunes.block' Anything else than 'Yes' has no effect
 //	complete:	Yes OPTIONAL 'channel.itunes.complete' Anything else than 'Yes' has no effect
 func DefaultShowMetadata(guid string) map[string]string {
-
 	l := make(map[string]string)
 
 	l[LabelLanguage] = "en_US"
@@ -35,7 +34,6 @@ func DefaultShowMetadata(guid string) map[string]string {
 //	type:		Full | Trailer | Bonus REQUIRED 'item.itunes.episodeType'
 //	block:		Yes OPTIONAL 'item.itunes.block' Anything else than 'Yes' has no effect
 func DefaultEpisodeMetadata(guid, parent string) map[string]string {
-
 	l := make(map[string]string)
 
 	l[LabelGUID] = guid
@@ -87,7 +85,6 @@ func DefaultShow(name, title, summary, guid, portal, cdn string) *Show {
 
 // DefaultEpisode creates a default episode struc
 func DefaultEpisode(name, parentName, guid, parent, portal, cdn string) *Episode {
-
 	return &Episode{
 		APIVersion: Version,
 		Kind:       ResourceEpisode,

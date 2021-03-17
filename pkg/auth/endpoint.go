@@ -1,76 +1,160 @@
 package auth
 
 import (
+	"fmt"
 	"net/http"
 
-	"github.com/fupas/commons/pkg/env"
-	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
-	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/pkg/api"
 	"google.golang.org/appengine"
+
+	"github.com/podops/podops/pkg/api"
 )
 
-// CreateAuthorizationEndpoint creates an authorization and JWT token
-func CreateAuthorizationEndpoint(c echo.Context) error {
-	var req *a.AuthorizationRequest = new(a.AuthorizationRequest)
-
-	// this endpoint is secured by a master token i.e. a shared secret between
-	// the service and the client, NOT a JWT token !!
-	bearer := GetBearerToken(c)
-	if bearer != env.GetString("MASTER_KEY", "") {
-		return c.NoContent(http.StatusUnauthorized)
-	}
+// LoginEndpoint initiates the login process.
+//
+// It creates a new account if the user does not exist and sends
+// confirmation request. Once the account is conformed, it will send the
+// confirmation token that can be swapped for a real login token.
+//
+// POST /login
+// status 201: new account, account confirmation sent
+// status 204: existing account, email with auth token sent
+// status 403: only logged-out and confirmed users can proceed
+func LoginEndpoint(c echo.Context) error {
+	var req *AuthorizationRequest = new(AuthorizationRequest)
+	ctx := appengine.NewContext(c.Request())
 
 	err := c.Bind(req)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
-	token, err := CreateJWTToken(req.Secret, req.Realm, req.ClientID, req.UserID, req.Scope, req.Duration)
+	if req.Realm == "" || req.UserID == "" {
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
+	}
+
+	account, err := LookupAccount(ctx, req.Realm, req.UserID)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
-	now := util.Timestamp()
-	authorization := Authorization{
-		ClientID:  req.ClientID,
-		Name:      req.Realm,
-		Token:     token,
-		TokenType: req.ClientType,
-		UserID:    req.UserID,
-		Scope:     req.Scope,
-		Expires:   now + (req.Duration * 86400), // Duration days from now
-		AuthType:  AuthTypeJWT,
-		Created:   now,
-		Updated:   now,
+	// new account
+	if account == nil {
+		// #1: create a new account
+		account, err = CreateAccount(ctx, req.Realm, req.UserID)
+		if err != nil {
+			return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		}
+		account, err = ResetAccountChallenge(ctx, account)
+		if err != nil {
+			return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		}
+		// #2: send the confirmation link
+		err = SendAccountChallenge(ctx, account)
+		if err != nil {
+			return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		}
+		// status 201: new account
+		return c.NoContent(http.StatusCreated)
 	}
-	err = CreateAuthorization(appengine.NewContext(c.Request()), &authorization)
+
+	// existing account but check some stuff first ...
+	if account.Confirmed == 0 {
+		// #1: update the expiration timestamp
+		account, err = ResetAccountChallenge(ctx, account)
+		if err != nil {
+			return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		}
+		// #2: send the account confirmation link
+		err = SendAccountChallenge(ctx, account)
+		if err != nil {
+			return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		}
+		// status 201: new account
+		return c.NoContent(http.StatusCreated)
+	}
+	if account.Status != 0 {
+		// status 403: only logged-out and confirmed users can proceed, do nothing otherwise
+		return api.ErrorResponse(c, http.StatusForbidden, err)
+	}
+
+	// create and send the auth token
+	account, err = ResetAuthToken(ctx, account)
+	if err != nil {
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+	}
+	err = SendAuthToken(ctx, account)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
-	resp := a.AuthorizationResponse{
-		Realm:    req.Realm,
-		ClientID: req.ClientID,
-		Token:    token,
-	}
-	return api.StandardResponse(c, http.StatusCreated, &resp)
+	// status 204: existing account, email with token sent
+	return c.NoContent(http.StatusNoContent)
 }
 
-// ValidateAuthorizationEndpoint verifies that the token is valid and exists in the authorization table
-func ValidateAuthorizationEndpoint(c echo.Context) error {
-	token := GetBearerToken(c)
+// LoginConfirmationEndpoint validates an email.
+//
+// GET /login/:token
+// status 204: account is confirmed, next step started
+// status 400: the request could not be understood by the server due to malformed syntax
+// status 401: token is wrong
+// status 403: token is expired or has already been used
+func LoginConfirmationEndpoint(c echo.Context) error {
+	token := c.Param("token")
 	if token == "" {
-		return c.NoContent(http.StatusUnauthorized)
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':token"))
 	}
 
-	auth, err := FindAuthorization(appengine.NewContext(c.Request()), token)
-	if auth == nil || err != nil {
-		return c.NoContent(http.StatusUnauthorized)
+	ctx := appengine.NewContext(c.Request())
+
+	account, status, err := ConfirmLoginChallenge(ctx, token)
+	if status != http.StatusNoContent {
+		return api.ErrorResponse(c, status, err)
 	}
-	if !auth.IsValid() {
-		return c.NoContent(http.StatusUnauthorized)
+
+	account, err = ResetAuthToken(ctx, account)
+	if err != nil {
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
-	return c.NoContent(http.StatusAccepted)
+	err = SendAuthToken(ctx, account)
+	if err != nil {
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+	}
+
+	// status 204: account is confirmed, email with auth token sent
+	return c.NoContent(http.StatusNoContent)
+}
+
+// GetAuthorizationEndpoint exchanges a temporary confirmation token for a 'real' token.
+//
+// POST /auth
+// status 200: success, the real token is in the response
+// status 401: token is expired or has already been used, token and user_id do not match
+func GetAuthorizationEndpoint(c echo.Context) error {
+	var req *AuthorizationRequest = new(AuthorizationRequest)
+	ctx := appengine.NewContext(c.Request())
+
+	err := c.Bind(req)
+	if err != nil {
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+	}
+
+	if req.Token == "" || req.Realm == "" || req.UserID == "" {
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
+	}
+
+	account, status, err := CreateAuthentication(ctx, req)
+	if status != http.StatusOK {
+		return api.ErrorResponse(c, status, err)
+	}
+
+	req.Token = account.TempToken
+	req.ClientID = account.ClientID
+
+	return api.StandardResponse(c, status, req)
+}
+
+// CreateAuthorizationEndpoint creates an authorization and JWT token
+func CreateAuthorizationEndpoint(c echo.Context) error {
+	return nil
 }
