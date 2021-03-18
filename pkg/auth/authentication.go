@@ -11,7 +11,17 @@ import (
 
 // ResetAccountChallenge creates a new confirmation token and resets the timer
 func ResetAccountChallenge(ctx context.Context, account *Account) (*Account, error) {
-	return nil, fmt.Errorf("ResetLoginChallenge: not implemented")
+	// FIXME add a mutex
+	// FIXME this is crude!
+	token, _ := util.ShortUUID()
+	account.Expires = util.IncT(util.Timestamp(), DefaultAuthenticationExpiration)
+	account.Ext1 = token
+	account.Status = AccountUnconfirmed
+
+	if err := UpdateAccount(ctx, account); err != nil {
+		return nil, err
+	}
+	return account, nil
 }
 
 // ResetAuthToken creates a new authorization token and resets the timer
@@ -21,6 +31,7 @@ func ResetAuthToken(ctx context.Context, account *Account) (*Account, error) {
 	token, _ := util.ShortUUID()
 	account.Expires = util.IncT(util.Timestamp(), DefaultAuthenticationExpiration)
 	account.Ext2 = token
+	account.Status = AccountLoggedOut
 
 	if err := UpdateAccount(ctx, account); err != nil {
 		return nil, err

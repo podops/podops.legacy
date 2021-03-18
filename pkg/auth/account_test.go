@@ -1,6 +1,5 @@
 package auth
 
-/*
 import (
 	"context"
 	"testing"
@@ -62,4 +61,3 @@ func TestUpdateAccount(t *testing.T) {
 		}
 	}
 }
-*/
