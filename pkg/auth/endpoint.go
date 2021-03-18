@@ -96,12 +96,12 @@ func LoginEndpoint(c echo.Context) error {
 // status 403: token is expired or has already been used
 // status 404: token was not found
 func LoginConfirmationEndpoint(c echo.Context) error {
+	ctx := appengine.NewContext(c.Request())
+
 	token := c.Param("token")
 	if token == "" {
 		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':token"))
 	}
-
-	ctx := appengine.NewContext(c.Request())
 
 	account, status, err := ConfirmLoginChallenge(ctx, token)
 	if status != http.StatusNoContent {
@@ -112,6 +112,7 @@ func LoginConfirmationEndpoint(c echo.Context) error {
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
+
 	err = SendAuthToken(ctx, account)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)

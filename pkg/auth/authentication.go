@@ -41,7 +41,7 @@ func ResetAuthToken(ctx context.Context, account *Account) (*Account, error) {
 
 func Logout(ctx context.Context, account *Account) error {
 	// FIXME add a mutex
-	auth, err := LookupAuthorization(ctx, account.ClientID, account.Realm)
+	auth, err := LookupAuthorization(ctx, account.Realm, account.ClientID)
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,6 @@ func ConfirmLoginChallenge(ctx context.Context, token string) (*Account, int, er
 	if account == nil {
 		return nil, http.StatusNotFound, nil
 	}
-
 	now := util.Timestamp()
 	if account.Expires < now {
 		return account, http.StatusForbidden, nil
@@ -98,6 +97,7 @@ func ConfirmLoginChallenge(ctx context.Context, token string) (*Account, int, er
 
 	account.Confirmed = now
 	account.Status = AccountLoggedOut
+	account.Ext1 = ""
 
 	err = UpdateAccount(ctx, account)
 	if err != nil {

@@ -73,19 +73,19 @@ func (a *Authorization) IsValid() bool {
 }
 
 // LookupAuthorization looks for an authorization
-func LookupAuthorization(ctx context.Context, clientID, realm string) (*Authorization, error) {
-	var auth *Authorization
+func LookupAuthorization(ctx context.Context, realm, clientID string) (*Authorization, error) {
+	var auth Authorization
 	k := authorizationKey(realm, clientID)
 
 	// FIXME add a cache ?
 
-	if err := platform.DataStore().Get(ctx, k, auth); err != nil {
+	if err := platform.DataStore().Get(ctx, k, &auth); err != nil {
 		if err == datastore.ErrNoSuchEntity {
 			return nil, nil // Not finding one is not an error!
 		}
 		return nil, err
 	}
-	return auth, nil
+	return &auth, nil
 }
 
 // FindAuthorizationByToken looks for an authorization by the token

@@ -48,6 +48,17 @@ func getAccount(t *testing.T) *Account {
 	return nil
 }
 
+func verifyAccountAndAuth(t *testing.T) bool {
+	account, err := LookupAccount(context.TODO(), realm, userID)
+	if err == nil && account != nil {
+		auth, err := LookupAuthorization(context.TODO(), account.Realm, account.ClientID)
+		if err == nil && auth != nil {
+			return true
+		}
+	}
+	return false
+}
+
 // Scenario 1:
 // - no account
 // - request login, create the account
@@ -55,16 +66,20 @@ func getAccount(t *testing.T) *Account {
 // - exchange auth token for permanent token
 // - delete account & authorization
 func TestLoginScenario1(t *testing.T) {
-	fmt.Println("Scenario 1")
+	fmt.Println("scenario 1")
 
 	apiv1.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
+	cleaner()
 
-	loginStep1(t) // new account, request login, create the account
-	loginStep2(t) // confirm the new account, send auth token
-	loginStep3(t) // exchange auth token for a permanent token
+	loginStep1(t, http.StatusCreated) // new account, request login, create the account
 
-	fmt.Println("Scenario 1. done")
+	account := getAccount(t)
+	loginStep2(t, account.Ext1, http.StatusNoContent) // confirm the new account, send auth token
+
+	loginStep3(t, http.StatusOK) // exchange auth token for a permanent token
+
+	assert.True(t, verifyAccountAndAuth(t))
 }
 
 // Scenario 2:
@@ -73,27 +88,54 @@ func TestLoginScenario1(t *testing.T) {
 // - request login again, expect to reuse existing account
 // - continue as Scenario 1
 func TestLoginScenario2(t *testing.T) {
-	fmt.Println("Scenario 2")
+	fmt.Println("scenario 2")
 
 	apiv1.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 
-	loginStep1(t) // new account, request login, create the account
+	loginStep1(t, http.StatusCreated) // new account, request login, create the account
 	account1 := getAccount(t)
 
-	loginStep1(t) // existing account, request login again, create the account
+	loginStep1(t, http.StatusCreated) // existing account, request login again, create the account
 	account2 := getAccount(t)
 
 	// requires a new token
 	assert.NotEqual(t, account1.Ext1, account2.Ext1)
 
-	loginStep2(t) // confirm the new account, send auth token
-	loginStep3(t) // exchange auth token for a permanent token
+	loginStep2(t, account2.Ext1, http.StatusNoContent) // confirm the new account, send auth token
+	loginStep3(t, http.StatusOK)                       // exchange auth token for a permanent token
 
-	fmt.Println("Scenario 2. done")
+	assert.True(t, verifyAccountAndAuth(t))
 }
 
-func loginStep1(t *testing.T) {
+// Scenario 3:
+// - no account
+// - request login, create the account
+// - confirm the account and send auth token
+// - confirm the account AGAIN, expect an error due to the token been used
+
+// - exchange auth token for permanent token
+// - delete account & authorization
+func TestLoginScenario3(t *testing.T) {
+	fmt.Println("scenario 3")
+
+	apiv1.DefaultAPIEndpoint = endpoint
+	t.Cleanup(cleaner)
+
+	loginStep1(t, http.StatusCreated) // new account, request login, create the account
+
+	account := getAccount(t)
+	token := account.Ext1
+
+	loginStep2(t, token, http.StatusNoContent) // confirm the new account, send auth token
+	loginStep2(t, token, http.StatusNotFound)  // confirm again
+
+	loginStep3(t, http.StatusOK) // exchange auth token for a permanent token
+
+	assert.True(t, verifyAccountAndAuth(t))
+}
+
+func loginStep1(t *testing.T, status int) {
 
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, api.LoginRequestRoute, strings.NewReader(createAuthRequestJSON(realm, userID, "", "")))
@@ -106,15 +148,15 @@ func loginStep1(t *testing.T) {
 	if assert.NoError(t, err) {
 		account := getAccount(t)
 		assert.NotEqual(t, int64(0), account.Ext1)
-		assert.Equal(t, http.StatusCreated, rec.Result().StatusCode)
+		assert.Equal(t, status, rec.Result().StatusCode)
 	}
 }
 
-func loginStep2(t *testing.T) {
+func loginStep2(t *testing.T, token string, status int) {
 
-	account := getAccount(t)
+	url := fmt.Sprintf("/login/%s", token)
+	fmt.Println("confirm: " + url)
 
-	url := fmt.Sprintf("/login/%s", account.Ext1)
 	req := httptest.NewRequest(http.MethodGet, url, nil)
 	rec := httptest.NewRecorder()
 
@@ -127,17 +169,17 @@ func loginStep2(t *testing.T) {
 
 	handler := c.Handler()
 	err := handler(c)
-
+	fmt.Println(err)
 	if assert.NoError(t, err) {
 		account := getAccount(t)
 		assert.NotEqual(t, int64(0), account.Confirmed)
 		assert.Equal(t, AccountLoggedOut, account.Status)
 		assert.NotEqual(t, int64(0), account.Ext2)
-		assert.Equal(t, http.StatusNoContent, rec.Result().StatusCode)
+		assert.Equal(t, status, rec.Result().StatusCode)
 	}
 }
 
-func loginStep3(t *testing.T) {
+func loginStep3(t *testing.T, status int) {
 
 	account := getAccount(t)
 
