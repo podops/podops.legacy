@@ -27,6 +27,11 @@ const (
 	// VersionRoute route to VersionEndpoint
 	VersionRoute = "/version"
 
+	// LoginRequestRoute route to LoginEndpoint
+	LoginRequestRoute = "/login"
+	// LoginConfirmationRoute route to LoginConfirmationEndpoint
+	LoginConfirmationRoute = "/login/:token"
+
 	// AuthenticationRoute is used to create and verify a token
 	AuthenticationRoute = "/token"
 

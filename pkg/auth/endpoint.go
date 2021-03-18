@@ -28,7 +28,6 @@ func LoginEndpoint(c echo.Context) error {
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
-
 	if req.Realm == "" || req.UserID == "" {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
@@ -42,10 +41,6 @@ func LoginEndpoint(c echo.Context) error {
 	if account == nil {
 		// #1: create a new account
 		account, err = CreateAccount(ctx, req.Realm, req.UserID)
-		if err != nil {
-			return api.ErrorResponse(c, http.StatusInternalServerError, err)
-		}
-		account, err = ResetAccountChallenge(ctx, account)
 		if err != nil {
 			return api.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
@@ -99,6 +94,7 @@ func LoginEndpoint(c echo.Context) error {
 // status 400: the request could not be understood by the server due to malformed syntax
 // status 401: token is wrong
 // status 403: token is expired or has already been used
+// status 404: token was not found
 func LoginConfirmationEndpoint(c echo.Context) error {
 	token := c.Param("token")
 	if token == "" {
@@ -130,6 +126,7 @@ func LoginConfirmationEndpoint(c echo.Context) error {
 // POST /auth
 // status 200: success, the real token is in the response
 // status 401: token is expired or has already been used, token and user_id do not match
+// status 404: token was not found
 func GetAuthorizationEndpoint(c echo.Context) error {
 	var req *AuthorizationRequest = new(AuthorizationRequest)
 	ctx := appengine.NewContext(c.Request())
@@ -143,13 +140,13 @@ func GetAuthorizationEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	account, status, err := CreateAuthentication(ctx, req)
+	auth, status, err := exchangeToken(ctx, req, c.Request().RemoteAddr)
 	if status != http.StatusOK {
 		return api.ErrorResponse(c, status, err)
 	}
 
-	req.Token = account.TempToken
-	req.ClientID = account.ClientID
+	req.Token = auth.Token
+	req.ClientID = auth.ClientID
 
 	return api.StandardResponse(c, status, req)
 }
