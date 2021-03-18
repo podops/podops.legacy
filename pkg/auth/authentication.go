@@ -60,7 +60,7 @@ func Logout(ctx context.Context, account *Account) error {
 // SendAccountChallenge sends a notification to the user promting to confirm the account
 func SendAccountChallenge(ctx context.Context, account *Account) error {
 	url := fmt.Sprintf("%s/login/%s", apiv1.DefaultAPIEndpoint, account.Ext1)
-	fmt.Println(url)
+	fmt.Println("account confirm: " + url)
 
 	// FIXME this is not done!
 	return nil

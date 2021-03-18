@@ -59,12 +59,7 @@ func verifyAccountAndAuth(t *testing.T) bool {
 	return false
 }
 
-// Scenario 1:
-// - no account
-// - request login, create the account
-// - confirm the account and send auth token
-// - exchange auth token for permanent token
-// - delete account & authorization
+// Scenario 1: new account, login, account confirmation, token swap
 func TestLoginScenario1(t *testing.T) {
 	fmt.Println("scenario 1")
 
@@ -77,16 +72,13 @@ func TestLoginScenario1(t *testing.T) {
 	account := getAccount(t)
 	loginStep2(t, account.Ext1, http.StatusNoContent) // confirm the new account, send auth token
 
-	loginStep3(t, http.StatusOK) // exchange auth token for a permanent token
+	account = getAccount(t)
+	loginStep3(t, account.Ext2, http.StatusOK) // exchange auth token for a permanent token
 
 	assert.True(t, verifyAccountAndAuth(t))
 }
 
-// Scenario 2:
-// - no account
-// - request login, create the account
-// - request login again, expect to reuse existing account
-// - continue as Scenario 1
+// Scenario 2: new account, login, duplicate login request
 func TestLoginScenario2(t *testing.T) {
 	fmt.Println("scenario 2")
 
@@ -103,19 +95,14 @@ func TestLoginScenario2(t *testing.T) {
 	assert.NotEqual(t, account1.Ext1, account2.Ext1)
 
 	loginStep2(t, account2.Ext1, http.StatusNoContent) // confirm the new account, send auth token
-	loginStep3(t, http.StatusOK)                       // exchange auth token for a permanent token
+
+	account3 := getAccount(t)
+	loginStep3(t, account3.Ext2, http.StatusOK) // exchange auth token for a permanent token
 
 	assert.True(t, verifyAccountAndAuth(t))
 }
 
-// Scenario 3:
-// - no account
-// - request login, create the account
-// - confirm the account and send auth token
-// - confirm the account AGAIN, expect an error due to the token been used
-
-// - exchange auth token for permanent token
-// - delete account & authorization
+// Scenario 3: new account, login, duplicate account confirmation
 func TestLoginScenario3(t *testing.T) {
 	fmt.Println("scenario 3")
 
@@ -130,7 +117,29 @@ func TestLoginScenario3(t *testing.T) {
 	loginStep2(t, token, http.StatusNoContent) // confirm the new account, send auth token
 	loginStep2(t, token, http.StatusNotFound)  // confirm again
 
-	loginStep3(t, http.StatusOK) // exchange auth token for a permanent token
+	account = getAccount(t)
+	loginStep3(t, account.Ext2, http.StatusOK) // exchange auth token for a permanent token
+
+	assert.True(t, verifyAccountAndAuth(t))
+}
+
+// Scenario 4: new account, login, account confirmation, duplicate token swap
+func TestLoginScenario4(t *testing.T) {
+	fmt.Println("scenario 4")
+
+	apiv1.DefaultAPIEndpoint = endpoint
+	//t.Cleanup(cleaner)
+
+	loginStep1(t, http.StatusCreated) // new account, request login, create the account
+
+	account := getAccount(t)
+	loginStep2(t, account.Ext1, http.StatusNoContent) // confirm the new account, send auth token
+
+	account = getAccount(t)
+	token := account.Ext2
+
+	loginStep3(t, token, http.StatusOK) // exchange auth token for a permanent token
+	loginStep3(t, token, http.StatusUnauthorized)
 
 	assert.True(t, verifyAccountAndAuth(t))
 }
@@ -169,7 +178,7 @@ func loginStep2(t *testing.T, token string, status int) {
 
 	handler := c.Handler()
 	err := handler(c)
-	fmt.Println(err)
+
 	if assert.NoError(t, err) {
 		account := getAccount(t)
 		assert.NotEqual(t, int64(0), account.Confirmed)
@@ -179,12 +188,12 @@ func loginStep2(t *testing.T, token string, status int) {
 	}
 }
 
-func loginStep3(t *testing.T, status int) {
+func loginStep3(t *testing.T, token string, status int) {
 
 	account := getAccount(t)
 
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader(createAuthRequestJSON(realm, userID, account.ClientID, account.Ext2)))
+	req := httptest.NewRequest(http.MethodPost, "/login", strings.NewReader(createAuthRequestJSON(realm, userID, account.ClientID, token)))
 	rec := httptest.NewRecorder()
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
@@ -194,6 +203,6 @@ func loginStep3(t *testing.T, status int) {
 	if assert.NoError(t, err) {
 		account := getAccount(t)
 		assert.Equal(t, AccountActive, account.Status)
-		assert.Equal(t, http.StatusOK, rec.Result().StatusCode)
+		assert.Equal(t, status, rec.Result().StatusCode)
 	}
 }
