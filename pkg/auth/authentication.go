@@ -39,8 +39,16 @@ func ResetAuthToken(ctx context.Context, account *Account) (*Account, error) {
 	return account, nil
 }
 
-func Logout(ctx context.Context, account *Account) error {
+func LogoutAccount(ctx context.Context, realm, userID string) error {
 	// FIXME add a mutex
+	account, err := LookupAccount(ctx, realm, userID)
+	if err != nil {
+		return err
+	}
+	if account == nil {
+		return fmt.Errorf("account %s.%s not found", realm, userID)
+	}
+
 	auth, err := LookupAuthorization(ctx, account.Realm, account.ClientID)
 	if err != nil {
 		return err
@@ -57,23 +65,49 @@ func Logout(ctx context.Context, account *Account) error {
 	return UpdateAccount(ctx, account)
 }
 
+func BlockAccount(ctx context.Context, realm, userID string) error {
+	// FIXME add a mutex
+	account, err := LookupAccount(ctx, realm, userID)
+	if err != nil {
+		return err
+	}
+	if account == nil {
+		return fmt.Errorf("account %s.%s not found", realm, userID)
+	}
+
+	auth, err := LookupAuthorization(ctx, account.Realm, account.ClientID)
+	if err != nil {
+		return err
+	}
+	if auth != nil {
+		auth.Revoked = true
+		err = UpdateAuthorization(ctx, auth)
+		if err != nil {
+			return err
+		}
+	}
+
+	account.Status = AccountBlocked
+	return UpdateAccount(ctx, account)
+}
+
 // SendAccountChallenge sends a notification to the user promting to confirm the account
 func SendAccountChallenge(ctx context.Context, account *Account) error {
+	// FIXME send a real notification
 	url := fmt.Sprintf("%s/login/%s", apiv1.DefaultAPIEndpoint, account.Ext1)
-	fmt.Println("account confirm: " + url)
-
-	// FIXME this is not done!
+	if url == "" {
+		return fmt.Errorf("SendLoginChallenge: not implemented")
+	}
 	return nil
-	//return fmt.Errorf("SendLoginChallenge: not implemented")
 }
 
 // SendAuthToken sends a notification to the user with the current authentication token
 func SendAuthToken(ctx context.Context, account *Account) error {
 	// FIXME this is not done, just a crude implementation
-	fmt.Println("auth token=" + account.Ext2)
+	if account.Ext2 == "" {
+		return fmt.Errorf("SendAuthToken: not implemented")
+	}
 	return nil
-
-	//return fmt.Errorf("SendAuthToken: not implemented")
 }
 
 // ConfirmLoginChallenge confirms the account
@@ -88,7 +122,7 @@ func ConfirmLoginChallenge(ctx context.Context, token string) (*Account, int, er
 		return nil, http.StatusInternalServerError, err
 	}
 	if account == nil {
-		return nil, http.StatusNotFound, nil
+		return nil, http.StatusUnauthorized, nil
 	}
 	now := util.Timestamp()
 	if account.Expires < now {
@@ -143,9 +177,8 @@ func exchangeToken(ctx context.Context, req *AuthorizationRequest, loginFrom str
 			Created:   now,
 		}
 	}
-	token, _ := util.UUID()
 
-	auth.Token = token
+	auth.Token = createSimpleToken(auth)
 	auth.Expires = now + (DefaultAuthorizationExpiration * 86400)
 	auth.Updated = now
 
@@ -169,4 +202,9 @@ func exchangeToken(ctx context.Context, req *AuthorizationRequest, loginFrom str
 	}
 
 	return auth, http.StatusOK, nil
+}
+
+func createSimpleToken(auth *Authorization) string {
+	token, _ := util.UUID()
+	return token
 }
