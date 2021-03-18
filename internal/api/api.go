@@ -10,6 +10,7 @@ import (
 	"github.com/podops/podops/internal/platform"
 )
 
+// FIXME REMOVE
 const (
 	// NamespacePrefix namespace for the CLI. Should not be used directly.
 	NamespacePrefix = "/a/v1"
@@ -26,6 +27,13 @@ const (
 
 	// VersionRoute route to VersionEndpoint
 	VersionRoute = "/version"
+
+	// LoginRequestRoute route to LoginEndpoint
+	LoginRequestRoute = "/login"
+	// LoginConfirmationRoute route to LoginConfirmationEndpoint
+	LoginConfirmationRoute = "/login/:token"
+	// GetAuthorizationRoute route to GetAuthorizationEndpoint
+	GetAuthorizationRoute = "/auth"
 
 	// AuthenticationRoute is used to create and verify a token
 	AuthenticationRoute = "/token"

@@ -159,14 +159,15 @@ func exchangeToken(ctx context.Context, req *AuthorizationRequest, loginFrom str
 	}
 
 	// all OK, create or update the authorization
-	auth, err = LookupAuthorization(ctx, req.Realm, req.ClientID)
+	auth, err = LookupAuthorization(ctx, account.Realm, account.ClientID)
 	if err != nil {
+		// FIXME maybe use a different code here
 		return nil, http.StatusInternalServerError, err
 	}
 	if auth == nil {
 		// FIXME this is hardcoded for podops, make it configurable
 		auth = &Authorization{
-			ClientID:  req.ClientID,
+			ClientID:  account.ClientID,
 			Realm:     req.Realm,
 			Name:      "DEPRECATED",
 			TokenType: DefaultTokenType,

@@ -10,7 +10,7 @@ import (
 	"github.com/podops/podops/pkg/api"
 )
 
-// LoginEndpoint initiates the login process.
+// LoginRequestEndpoint initiates the login process.
 //
 // It creates a new account if the user does not exist and sends
 // confirmation request. Once the account is conformed, it will send the
@@ -20,7 +20,7 @@ import (
 // status 201: new account, account confirmation sent
 // status 204: existing account, email with auth token sent
 // status 403: only logged-out and confirmed users can proceed
-func LoginEndpoint(c echo.Context) error {
+func LoginRequestEndpoint(c echo.Context) error {
 	var req *AuthorizationRequest = new(AuthorizationRequest)
 	ctx := appengine.NewContext(c.Request())
 

@@ -4,12 +4,14 @@ import (
 	"context"
 	"log"
 
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
 	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/platform"
 	svc "github.com/fupas/platform/pkg/http"
 	gcp "github.com/fupas/platform/provider/google"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+
 	"github.com/podops/podops/internal/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
@@ -43,8 +45,12 @@ func setup() *echo.Echo {
 
 	// admin endpoints
 	admin := e.Group(api.AdminNamespacePrefix)
-	admin.POST(api.AuthenticationRoute, auth.CreateAuthorizationEndpoint)
-	admin.GET(api.AuthenticationRoute, auth.ValidateAuthorizationEndpoint)
+	//admin.POST(api.AuthenticationRoute, auth.CreateAuthorizationEndpoint)  // FIXME REMOVE LEGACY
+	admin.GET(api.AuthenticationRoute, auth.ValidateAuthorizationEndpoint) // FIXME REMOVE LEGACY
+
+	admin.POST(api.LoginRequestRoute, auth.LoginRequestEndpoint)
+	admin.GET(api.LoginConfirmationRoute, auth.LoginConfirmationEndpoint)
+	admin.POST(api.GetAuthorizationRoute, auth.GetAuthorizationEndpoint)
 
 	// the api endpoints
 	apiEndpoints := e.Group(api.NamespacePrefix)
