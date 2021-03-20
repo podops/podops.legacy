@@ -11,7 +11,6 @@ import (
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
-	"google.golang.org/appengine"
 )
 
 // BuildEndpoint starts the build of the feed
@@ -26,7 +25,7 @@ func BuildEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
-	ctx := appengine.NewContext(c.Request())
+	ctx := api.NewHttpContext(c)
 
 	p, err := backend.GetProduction(ctx, req.GUID)
 	if err != nil {

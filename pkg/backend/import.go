@@ -14,7 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/platform"
-	"google.golang.org/appengine"
+	"github.com/podops/podops/pkg/api"
 )
 
 const (
@@ -48,7 +48,7 @@ func ImportTaskEndpoint(c echo.Context) error {
 	}
 
 	// FIXME does it make sense to retry? If not, send StatusOK
-	status := importResource(appengine.NewContext(c.Request()), req.Source, req.Dest)
+	status := importResource(api.NewHttpContext(c), req.Source, req.Dest)
 	return c.NoContent(status)
 }
 

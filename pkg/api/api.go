@@ -1,11 +1,13 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/labstack/echo/v4"
+	"google.golang.org/appengine"
+
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/platform"
 )
@@ -105,7 +107,8 @@ func ErrorResponse(c echo.Context, status int, err error) error {
 	return c.JSON(status, &resp)
 }
 
-// VersionEndpoint returns the current API version
-func VersionEndpoint(c echo.Context) error {
-	return c.JSON(http.StatusOK, gin.H{"version": a.VersionString, "major": a.MajorVersion, "minor": a.MinorVersion, "fix": a.FixVersion, "namespace": a.Version})
+// NewHttpContext creates a new context for appengine execution
+// FIXME make this more pluggable or change outright
+func NewHttpContext(c echo.Context) context.Context {
+	return appengine.NewContext(c.Request())
 }

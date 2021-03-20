@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"google.golang.org/appengine"
 
 	"github.com/podops/podops/pkg/api"
 )
@@ -22,7 +21,7 @@ import (
 // status 403: only logged-out and confirmed users can proceed
 func LoginRequestEndpoint(c echo.Context) error {
 	var req *AuthorizationRequest = new(AuthorizationRequest)
-	ctx := appengine.NewContext(c.Request())
+	ctx := api.NewHttpContext(c)
 
 	err := c.Bind(req)
 	if err != nil {
@@ -96,7 +95,7 @@ func LoginRequestEndpoint(c echo.Context) error {
 // status 403: token is expired or has already been used
 // status 404: token was not found
 func LoginConfirmationEndpoint(c echo.Context) error {
-	ctx := appengine.NewContext(c.Request())
+	ctx := api.NewHttpContext(c)
 
 	token := c.Param("token")
 	if token == "" {
@@ -130,7 +129,7 @@ func LoginConfirmationEndpoint(c echo.Context) error {
 // status 404: token was not found
 func GetAuthorizationEndpoint(c echo.Context) error {
 	var req *AuthorizationRequest = new(AuthorizationRequest)
-	ctx := appengine.NewContext(c.Request())
+	ctx := api.NewHttpContext(c)
 
 	err := c.Bind(req)
 	if err != nil {

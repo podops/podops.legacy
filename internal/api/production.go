@@ -11,7 +11,6 @@ import (
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
-	"google.golang.org/appengine"
 )
 
 // ProductionEndpoint creates an new show and does all the background setup
@@ -26,7 +25,7 @@ func ProductionEndpoint(c echo.Context) error {
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
-	ctx := appengine.NewContext(c.Request()) // FIXME replace this with a generic NewContext function
+	ctx := api.NewHttpContext(c)
 
 	// validate and normalize the name
 	showName := strings.ToLower(strings.TrimSpace(req.Name))
@@ -58,7 +57,7 @@ func ListProductionsEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, status, err)
 	}
 
-	ctx := appengine.NewContext(c.Request())
+	ctx := api.NewHttpContext(c)
 	clientID, _ := auth.GetClientID(ctx, c.Request())
 
 	productions, err := backend.FindProductionsByOwner(ctx, clientID)

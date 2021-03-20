@@ -13,7 +13,6 @@ import (
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
-	"google.golang.org/appengine"
 )
 
 // UploadEndpoint implements content upload
@@ -32,7 +31,7 @@ func UploadEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':prod'"))
 	}
 
-	ctx := appengine.NewContext(c.Request())
+	ctx := api.NewHttpContext(c)
 	for {
 		p, err := mr.NextPart()
 		if err == io.EOF {

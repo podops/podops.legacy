@@ -23,7 +23,6 @@ import (
 	p "github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/backend"
-	"google.golang.org/appengine"
 )
 
 const (
@@ -71,7 +70,8 @@ func FeedEndpoint(c echo.Context) error {
 	if name == "" {
 		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':name'"))
 	}
-	prod, err := backend.FindProductionByName(appengine.NewContext(c.Request()), name)
+
+	prod, err := backend.FindProductionByName(api.NewHttpContext(c), name)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
@@ -111,7 +111,7 @@ func RedirectCDNContentEndpoint(c echo.Context) error {
 	if m == "HEAD" {
 		// get object attributes, can be cached ...
 		obj := bkt.Object(rsrc)
-		attr, err := obj.Attrs(appengine.NewContext(c.Request()))
+		attr, err := obj.Attrs(api.NewHttpContext(c)) // FIXME replace this with a generic NewContext function
 
 		if err == storage.ErrObjectNotExist {
 			return api.ErrorResponse(c, http.StatusNotFound, fmt.Errorf("can not find '%s'", rsrc))

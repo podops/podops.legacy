@@ -11,7 +11,6 @@ import (
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
-	"google.golang.org/appengine"
 )
 
 // GetResourceEndpoint returns a resource
@@ -34,8 +33,7 @@ func GetResourceEndpoint(c echo.Context) error {
 	}
 
 	// FIXME prod, kind are ignored, assumption is that guid is globally unique ...
-
-	resource, err := backend.GetResourceContent(appengine.NewContext(c.Request()), guid)
+	resource, err := backend.GetResourceContent(api.NewHttpContext(c), guid)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
@@ -65,7 +63,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':kind"))
 	}
 
-	l, err := backend.ListResources(appengine.NewContext(c.Request()), prod, kind)
+	l, err := backend.ListResources(api.NewHttpContext(c), prod, kind)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
@@ -101,7 +99,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 	}
 
 	var payload interface{}
-	ctx := appengine.NewContext(c.Request())
+	ctx := api.NewHttpContext(c)
 	location := fmt.Sprintf("%s/%s-%s.yaml", prod, kind, guid)
 
 	if kind == a.ResourceShow {
@@ -204,8 +202,7 @@ func DeleteResourceEndpoint(c echo.Context) error {
 	}
 
 	// FIXME prod, kind are ignored, assumption is that guid is globally unique ...
-
-	if err := backend.DeleteResource(appengine.NewContext(c.Request()), guid); err != nil {
+	if err := backend.DeleteResource(api.NewHttpContext(c), guid); err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
