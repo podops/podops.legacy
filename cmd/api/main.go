@@ -36,9 +36,6 @@ func setup() *echo.Echo {
 	// TODO: add/configure e.Use(middleware.Logger())
 	// TODO: e.Logger.SetLevel(log.INFO)
 
-	// default public endpoints without authentication
-	e.GET(api.VersionRoute, api.VersionEndpoint)
-
 	// task endpoints
 	tasks := e.Group(api.TaskNamespacePrefix)
 	tasks.POST(backend.ImportTask, backend.ImportTaskEndpoint)

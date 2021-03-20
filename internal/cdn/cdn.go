@@ -16,9 +16,10 @@ import (
 	"net/http"
 
 	"cloud.google.com/go/storage"
+	"github.com/labstack/echo/v4"
+
 	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/platform/pkg/platform"
-	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
 	p "github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"

@@ -26,9 +26,6 @@ const (
 
 	// All the API & CLI endpoint routes
 
-	// VersionRoute route to VersionEndpoint
-	VersionRoute = "/version"
-
 	// LoginRequestRoute route to LoginEndpoint
 	LoginRequestRoute = "/login"
 	// LoginConfirmationRoute route to LoginConfirmationEndpoint

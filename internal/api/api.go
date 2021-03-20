@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/platform"
@@ -24,9 +23,6 @@ const (
 	ContentNamespace = "/c"
 
 	// All the API & CLI endpoint routes
-
-	// VersionRoute route to VersionEndpoint
-	VersionRoute = "/version"
 
 	// LoginRequestRoute route to LoginEndpoint
 	LoginRequestRoute = "/login"
@@ -89,11 +85,6 @@ func StandardResponse(c echo.Context, status int, res interface{}) error {
 	} else {
 		return c.JSON(status, res)
 	}
-}
-
-// VersionEndpoint returns the current API version
-func VersionEndpoint(c echo.Context) error {
-	return c.JSON(http.StatusOK, gin.H{"version": a.VersionString, "major": a.MajorVersion, "minor": a.MinorVersion, "fix": a.FixVersion, "namespace": a.Version})
 }
 
 // ErrorResponse reports the error and responds with an ErrorObject
