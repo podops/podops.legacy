@@ -72,17 +72,24 @@ func setupCommands() []*cli.Command {
 
 		// Settings
 		{
-			Name:      "auth",
+			Name:      "login",
 			Usage:     "Login to the service",
-			UsageText: "auth TOKEN",
+			UsageText: "login EMAIL",
 			Category:  cmd.SettingsCmdGroup,
-			Action:    cmd.AuthCommand,
+			Action:    cmd.LoginCommand,
 		},
 		{
 			Name:     "logout",
 			Usage:    "Logout and clear all session information",
 			Category: cmd.SettingsCmdGroup,
 			Action:   cmd.LogoutCommand,
+		},
+		{
+			Name:      "auth",
+			Usage:     "Exchange the token for the API access key",
+			UsageText: "auth TOKEN",
+			Category:  cmd.SettingsCmdGroup,
+			Action:    cmd.AuthCommand,
 		},
 		// Show/production commands
 		{

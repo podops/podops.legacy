@@ -9,7 +9,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"os/user"
 	"path/filepath"
 
 	a "github.com/podops/podops/apiv1"
@@ -52,12 +51,6 @@ func (cl *Client) Store(path string) error {
 		}
 	}
 	return ioutil.WriteFile(path, config, 0644)
-}
-
-// DefaultConfigLocation returns the suggested default location for the config file
-func DefaultConfigLocation() string {
-	usr, _ := user.Current()
-	return filepath.Join(usr.HomeDir, ".po/config")
 }
 
 // Validate verifies the token against the backend service
@@ -167,8 +160,10 @@ func (cl *Client) delete(cmd string, request interface{}) (int, error) {
 func (cl *Client) invoke(req *http.Request, response interface{}) (int, error) {
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	req.Header.Set("Authorization", "Bearer "+cl.Token)
 	req.Header.Set("User-Agent", a.UserAgentString)
+	if cl.Token != "" {
+		req.Header.Set("Authorization", "Bearer "+cl.Token)
+	}
 
 	// perform the request
 	client := &http.Client{}

@@ -7,6 +7,23 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// LoginCommand logs into the service
+func LoginCommand(c *cli.Context) error {
+	email := c.Args().First()
+
+	if email != "" {
+		// remove old config if it exists
+		if err := removeConfig(); err != nil {
+			// return err FIXME nothing to do ...
+		}
+
+	} else {
+		fmt.Println("\nMissing email")
+	}
+
+	return nil
+}
+
 // AuthCommand logs into the PodOps service and validates the token
 func AuthCommand(c *cli.Context) error {
 	token := c.Args().First()

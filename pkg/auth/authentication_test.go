@@ -125,6 +125,10 @@ func TestLoginScenario6(t *testing.T) {
 	loginStep3(t, realm, userID, account.ClientID, "wrong_auth_token", AccountLoggedOut, http.StatusUnauthorized, false)
 }
 
+// FIXME test account confirmation timeout
+
+// FIXME test auth swap timeout
+
 func loginStep1(t *testing.T, status int) {
 
 	e := echo.New()

@@ -36,35 +36,6 @@ func (cl *Client) SetProduction(guid string) {
 	// FIXME make sure we own the GUID
 }
 
-// CreateToken creates an access token on the server
-// FIXME this is not tested
-func (cl *Client) CreateToken(secret, realm, clientID, userID, scope string, duration int64) (string, error) {
-	req := a.OldAuthorizationRequest{
-		Secret:     secret,
-		Realm:      realm,
-		ClientID:   clientID,
-		ClientType: "user",
-		UserID:     userID,
-		Scope:      scope,
-		Duration:   duration,
-	}
-	resp := a.OldAuthorizationResponse{}
-
-	// create temporary client because we have to swap an existing token with secret
-	tempClient := DefaultClient("")
-	tempClient.Token = secret
-	status, err := tempClient.post(authenticationRoute, &req, &resp)
-
-	if err != nil {
-		return "", fmt.Errorf("create token exception: %v", err)
-	}
-	if status != http.StatusCreated {
-		return "", fmt.Errorf("create token exception: %d", status)
-	}
-
-	return resp.Token, nil
-}
-
 // CreateProduction invokes the CreateProductionEndpoint
 func (cl *Client) CreateProduction(name, title, summary string) (*a.Production, error) {
 	if err := cl.HasToken(); err != nil {
