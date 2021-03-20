@@ -11,7 +11,6 @@ require (
 	github.com/franela/goblin v0.0.0-20210113153425-413781f5e6c8 // indirect
 	github.com/fupas/commons v1.0.0
 	github.com/fupas/platform v1.1.3
-	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/johngb/langreg v0.0.0-20150123211413-5c6abc6d19d2
@@ -26,7 +25,7 @@ require (
 	github.com/onsi/gomega v1.10.4 // indirect
 	github.com/smartystreets/assertions v1.2.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
-	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/stretchr/testify v1.7.0
 	github.com/ugorji/go v1.2.3 // indirect
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/vektah/gqlparser/v2 v2.1.0
