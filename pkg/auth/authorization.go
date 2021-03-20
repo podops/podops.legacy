@@ -2,10 +2,14 @@ package auth
 
 import (
 	"context"
+	"net/http"
+	"strings"
 
 	"cloud.google.com/go/datastore"
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
+	"github.com/labstack/echo/v4"
+	a "github.com/podops/podops/apiv1"
 )
 
 const (
@@ -70,6 +74,51 @@ func (a *Authorization) IsValid() bool {
 		return false
 	}
 	return true
+}
+
+// Authorized verifies that clientID can access resource kind/GUID
+// FIXME not implemented yet
+func Authorized(c echo.Context, role string) (int, error) {
+	//return fmt.Errorf("Not allowed to access '%s/%s'", kind, guid)
+	return http.StatusOK, nil // FIXME this is just a placeholder
+}
+
+// GetBearerToken extracts the bearer token
+func GetBearerToken(r *http.Request) string {
+
+	auth := r.Header.Get("Authorization")
+	if len(auth) == 0 {
+		return ""
+	}
+
+	parts := strings.Split(auth, " ")
+	if len(parts) != 2 {
+		return ""
+	}
+
+	if parts[0] == "Bearer" {
+		return parts[1]
+	}
+
+	return ""
+}
+
+// GetClientID extracts the ClientID from the token
+func GetClientID(ctx context.Context, r *http.Request) (string, error) {
+	token := GetBearerToken(r)
+	if token == "" {
+		return "", a.ErrNoToken
+	}
+
+	auth, err := FindAuthorizationByToken(ctx, token)
+	if err != nil {
+		return "", err
+	}
+	if auth == nil {
+		return "", a.ErrNotAuthorized
+	}
+
+	return auth.ClientID, nil
 }
 
 // LookupAuthorization looks for an authorization

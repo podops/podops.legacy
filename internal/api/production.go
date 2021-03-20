@@ -26,7 +26,7 @@ func ProductionEndpoint(c echo.Context) error {
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
-	ctx := appengine.NewContext(c.Request())
+	ctx := appengine.NewContext(c.Request()) // FIXME replace this with a generic NewContext function
 
 	// validate and normalize the name
 	showName := strings.ToLower(strings.TrimSpace(req.Name))
@@ -34,7 +34,7 @@ func ProductionEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid name '%s'", showName))
 	}
 	// create a new production
-	clientID, _ := auth.GetClientID(c)
+	clientID, _ := auth.GetClientID(ctx, c.Request())
 	p, err := backend.CreateProduction(ctx, showName, req.Title, req.Summary, clientID)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
@@ -58,9 +58,10 @@ func ListProductionsEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, status, err)
 	}
 
-	clientID, _ := auth.GetClientID(c)
+	ctx := appengine.NewContext(c.Request())
+	clientID, _ := auth.GetClientID(ctx, c.Request())
 
-	productions, err := backend.FindProductionsByOwner(appengine.NewContext(c.Request()), clientID)
+	productions, err := backend.FindProductionsByOwner(ctx, clientID)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}

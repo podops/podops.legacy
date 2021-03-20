@@ -34,9 +34,6 @@ const (
 	// GetAuthorizationRoute route to GetAuthorizationEndpoint
 	GetAuthorizationRoute = "/auth"
 
-	// AuthenticationRoute is used to create and verify a token
-	AuthenticationRoute = "/token"
-
 	// ProductionRoute route to ProductionEndpoint
 	ProductionRoute = "/production"
 
