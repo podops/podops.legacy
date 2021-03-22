@@ -1,7 +1,6 @@
 .PHONY: all
 all: build_test cli web cdn api
 
-VERSION_TAG = 0.9.7
 PLATFORM_LINUX = GOARCH=amd64 GOOS=linux
 PLATFORM_MAC = GOARCH=amd64 GOOS=darwin
 PLATFORM_WINDOWS = GOARCH=amd64 GOOS=windows
@@ -36,12 +35,3 @@ cdn:
 .PHONY: cli
 cli:
 	cd cmd/cli && go build -o po cli.go && mv po /Users/turing/devel/go/bin/po
-	
-#.PHONY: cli
-#cli:
-#	rm -f build/po-*
-#	cd cmd/cli && ${PLATFORM_LINUX} go build -o ../../build/po-linux-${VERSION_TAG} po.go
-#	cd cmd/cli && ${PLATFORM_MAC} go build -o ../../build/po-mac-${VERSION_TAG} po.go
-#	cd cmd/cli && ${PLATFORM_WINDOWS} go build -o ../../build/po-windows-${VERSION_TAG} po.go
-#	cd build && chmod 755 po* && gzip po-linux-${VERSION_TAG} && gzip po-mac-${VERSION_TAG} && gzip po-windows-${VERSION_TAG}
-#	gsutil rsync build gs://cdn.podops.dev/downloads

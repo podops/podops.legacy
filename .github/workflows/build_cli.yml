@@ -33,9 +33,9 @@ jobs:
     - name: build cli
       run: |
         cd cmd/cli
-        GOOS=linux GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../$BUILDDIR/po-linux-$VERSION.gz
-        GOOS=darwin GOARCH=amd64 go build po.go && chmod +x po && gzip po && mv po.gz ../../$BUILDDIR/po-mac-$VERSION.gz
-        GOOS=windows GOARCH=amd64 go build po.go && gzip po.exe && mv po.exe.gz ../../$BUILDDIR/po-win-$VERSION.zip
+        GOOS=linux GOARCH=amd64 go build -o po cli.go && chmod +x po && gzip po && mv po.gz ../../$BUILDDIR/po-linux-$VERSION.gz
+        GOOS=darwin GOARCH=amd64 go build -o po cli.go && chmod +x po && gzip po && mv po.gz ../../$BUILDDIR/po-mac-$VERSION.gz
+        GOOS=windows GOARCH=amd64 go build -o po.exe cli.go && gzip po.exe && mv po.exe.gz ../../$BUILDDIR/po-win-$VERSION.zip
 
     - name: setup gcloud
       uses: google-github-actions/setup-gcloud@master
