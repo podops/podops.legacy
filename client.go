@@ -28,40 +28,6 @@ func NewClient(ctx context.Context, token string, opts ...*cl.ClientOption) (*cl
 	return cl.New(ctx, co)
 }
 
-/*
-// NewClientFromFile creates a client by reading values from a file
-//
-// Clients should be reused instead of created as needed. The methods of Client
-// are safe for concurrent use by multiple goroutines.
-func _NewClientFromFile(path string) (*cl.Client, error) {
-	var client *cl.Client
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		client = cl.DefaultClient("")
-	} else {
-		jsonFile, err := os.Open(path)
-		if err != nil {
-			return nil, err
-		}
-		defer jsonFile.Close()
-
-		byteValue, _ := ioutil.ReadAll(jsonFile)
-		json.Unmarshal(byteValue, &client)
-
-		client.Namespace = api.NamespacePrefix
-		client.ServiceEndpoint = a.DefaultAPIEndpoint
-	}
-	return client, nil
-}
-
-
-// DefaultConfigLocation returns the suggested default location for the config file
-func DefaultConfigLocation() string {
-	usr, _ := user.Current()
-	return filepath.Join(usr.HomeDir, ".po/config")
-}
-*/
-
 // DefaultClientOptions returns a default client configuration bases on ENV variables
 func DefaultClientOptions() *cl.ClientOption {
 	o := &cl.ClientOption{}

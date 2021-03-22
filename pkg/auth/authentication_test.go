@@ -24,7 +24,7 @@ const (
 // Scenario 1: new account, login, account confirmation, token swap
 func TestLoginScenario1(t *testing.T) {
 	apiv1.DefaultAPIEndpoint = endpoint
-	//t.Cleanup(cleaner)
+	t.Cleanup(cleaner)
 	cleaner()
 
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
