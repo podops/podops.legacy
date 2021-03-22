@@ -2,13 +2,21 @@ package cli
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
+	"os/user"
+	"path/filepath"
 
+	"github.com/fupas/commons/pkg/env"
 	"github.com/urfave/cli/v2"
 
+	"github.com/podops/podops"
 	a "github.com/podops/podops/apiv1"
+	cl "github.com/podops/podops/pkg/client"
 )
 
 const (
@@ -20,7 +28,31 @@ const (
 	ShowCmdGroup = "\nContent Creation Commands"
 	// ShowMgmtCmdGroup groups advanced show commands
 	ShowMgmtCmdGroup = "\nContent Management Commands"
+
+	machineEntry = "api.podops.dev"
 )
+
+var (
+	client *cl.Client
+)
+
+func init() {
+	cl := podops.DefaultClientOptions()
+
+	nrc := loadNetrc()
+	m := nrc.FindMachine(machineEntry)
+	if m != nil {
+		cl.Token = m.Password
+	}
+
+	c, err := podops.NewClient(context.TODO(), cl.Token, cl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if c != nil {
+		client = c
+	}
+}
 
 // NoOpCommand is just a placeholder
 func NoOpCommand(c *cli.Context) error {
@@ -46,6 +78,9 @@ func invoke(req *http.Request, response interface{}) (int, error) {
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("User-Agent", a.UserAgentString)
+	if client.Token() != "" {
+		req.Header.Set("Authorization", "Bearer "+client.Token())
+	}
 
 	// perform the request
 	client := &http.Client{}
@@ -58,20 +93,6 @@ func invoke(req *http.Request, response interface{}) (int, error) {
 	}
 	defer resp.Body.Close()
 
-	/*
-		// anything other than OK, Created, Accepted, NoContent is treated as an error
-		if resp.StatusCode > http.StatusNoContent {
-			if response != nil {
-				// as we expect a response, there might be a StatusObject
-				status := &a.StatusObject{}
-				err = json.NewDecoder(resp.Body).Decode(&status)
-				if err != nil {
-					return resp.StatusCode, fmt.Errorf("status: %d", resp.StatusCode)
-				}
-				return status.Status, fmt.Errorf(status.Message)
-			}
-		}
-	*/
 	// unmarshal the response if one is expected
 	if response != nil {
 		err = json.NewDecoder(resp.Body).Decode(response)
@@ -81,4 +102,34 @@ func invoke(req *http.Request, response interface{}) (int, error) {
 	}
 
 	return resp.StatusCode, nil
+}
+
+func netrcPath() string {
+	path := env.GetString("PODOPS_CREDENTIALS", "")
+	if path == "" {
+		usr, _ := user.Current()
+		path = filepath.Join(usr.HomeDir, ".netrc")
+	}
+	return path
+}
+
+func loadNetrc() *Netrc {
+	nrc, _ := ParseFile(netrcPath()) // FIXME test this, can we ignore err?
+	if nrc == nil {
+		nrc = &Netrc{machines: make([]*Machine, 0, 20), macros: make(Macros, 10)}
+	}
+	return nrc
+}
+
+func updateNetrc(userID, clientID, token string) error {
+	nrc := loadNetrc()
+	m := nrc.FindMachine(machineEntry)
+	if m == nil {
+		m = nrc.NewMachine(machineEntry, userID, token, clientID)
+	} else {
+		m.UpdateLogin(userID)
+		m.UpdatePassword(token)
+	}
+	data, _ := nrc.MarshalText()
+	return ioutil.WriteFile(netrcPath(), data, 0644)
 }

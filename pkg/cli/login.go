@@ -85,7 +85,11 @@ func AuthCommand(c *cli.Context) error {
 
 	switch status {
 	case http.StatusOK:
-		fmt.Printf("Sucessfully authenticated. client id=%s, token=%s\n", response.ClientID, response.Token)
+		if err := updateNetrc(response.UserID, response.ClientID, response.Token); err != nil {
+			fmt.Println("Error updating config.")
+			return nil
+		}
+		fmt.Println("Sucessfully authenticated.")
 		return nil
 	case http.StatusUnauthorized:
 		fmt.Println("Token is expired")

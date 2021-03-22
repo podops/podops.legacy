@@ -1,7 +1,7 @@
 .PHONY: all
 all: build_test cli web cdn api
 
-VERSION_TAG = 0.9.6
+VERSION_TAG = 0.9.7
 PLATFORM_LINUX = GOARCH=amd64 GOOS=linux
 PLATFORM_MAC = GOARCH=amd64 GOOS=darwin
 PLATFORM_WINDOWS = GOARCH=amd64 GOOS=windows
@@ -34,7 +34,7 @@ cdn:
 
 .PHONY: cli
 cli:
-	cd cmd/cli && go install po.go
+	cd cmd/cli && go build -o po cli.go && mv po /Users/turing/devel/go/bin/po
 	
 #.PHONY: cli
 #cli:

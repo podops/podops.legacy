@@ -42,10 +42,8 @@ func setup() *echo.Echo {
 
 	// admin endpoints
 	admin := e.Group(api.AdminNamespacePrefix)
-	//admin.POST(api.AuthenticationRoute, auth.CreateAuthorizationEndpoint)  // FIXME REMOVE LEGACY
-	//admin.GET(api.AuthenticationRoute, auth.ValidateAuthorizationEndpoint) // FIXME REMOVE LEGACY
-
 	admin.POST(api.LoginRequestRoute, auth.LoginRequestEndpoint)
+	admin.POST(api.LogoutRequestRoute, auth.LogoutRequestEndpoint)
 	admin.GET(api.LoginConfirmationRoute, auth.LoginConfirmationEndpoint)
 	admin.POST(api.GetAuthorizationRoute, auth.GetAuthorizationEndpoint)
 

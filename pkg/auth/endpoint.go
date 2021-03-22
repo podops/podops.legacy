@@ -18,6 +18,7 @@ import (
 // POST /login
 // status 201: new account, account confirmation sent
 // status 204: existing account, email with auth token sent
+// status 400: invalid request data
 // status 403: only logged-out and confirmed users can proceed
 func LoginRequestEndpoint(c echo.Context) error {
 	var req *AuthorizationRequest = new(AuthorizationRequest)
@@ -86,6 +87,55 @@ func LoginRequestEndpoint(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// LogoutRequestEndpoint removes the session data and state
+//
+// POST /logout
+
+func LogoutRequestEndpoint(c echo.Context) error {
+	var req *AuthorizationRequest = new(AuthorizationRequest)
+	ctx := api.NewHttpContext(c)
+	clientID, err := GetClientID(ctx, c.Request())
+	if err != nil {
+		return c.NoContent(http.StatusForbidden)
+	}
+
+	err = c.Bind(req)
+	if err != nil {
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+	}
+	if req.Realm == "" || req.UserID == "" || req.ClientID == "" {
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
+	}
+	token := GetBearerToken(c.Request())
+
+	if req.ClientID != clientID {
+		return c.NoContent(http.StatusForbidden)
+	}
+
+	auth, err := FindAuthorizationByToken(ctx, token)
+	if err != nil {
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
+	}
+
+	if auth.UserID != req.UserID || auth.Realm != req.Realm {
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
+	}
+
+	account, err := LookupAccount(ctx, req.Realm, req.ClientID)
+	if err != nil {
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+	}
+	if account.Status < 0 {
+		return c.NoContent(http.StatusForbidden) // account is blocked or deactivated etc ...
+	}
+	// if we made until here, logout shoud be OK
+	account.Status = AccountLoggedOut
+	if err := UpdateAccount(ctx, account); err != nil {
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+	}
+	return c.NoContent(http.StatusNoContent)
+}
+
 // LoginConfirmationEndpoint validates an email.
 //
 // GET /login/:token
@@ -149,9 +199,4 @@ func GetAuthorizationEndpoint(c echo.Context) error {
 	req.ClientID = auth.ClientID
 
 	return api.StandardResponse(c, status, req)
-}
-
-// CreateAuthorizationEndpoint creates an authorization and JWT token
-func CreateAuthorizationEndpoint(c echo.Context) error {
-	return nil
 }

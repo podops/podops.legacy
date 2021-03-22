@@ -82,6 +82,10 @@ func (cl *Client) Realm() string {
 	return cl.realm
 }
 
+func (cl *Client) Token() string {
+	return cl.opts.Token
+}
+
 // Merge clones co and combines it with the provided options
 func (co ClientOption) Merge(opts *ClientOption) *ClientOption {
 	o := &ClientOption{}

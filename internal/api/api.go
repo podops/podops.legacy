@@ -24,8 +24,10 @@ const (
 
 	// All the API & CLI endpoint routes
 
-	// LoginRequestRoute route to LoginEndpoint
+	// LoginRequestRoute route to LoginRequestEndpoint
 	LoginRequestRoute = "/login"
+	// LogoutRequestRoute route to LogoutRequestEndpoint
+	LogoutRequestRoute = "/logout"
 	// LoginConfirmationRoute route to LoginConfirmationEndpoint
 	LoginConfirmationRoute = "/login/:token"
 	// GetAuthorizationRoute route to GetAuthorizationEndpoint
