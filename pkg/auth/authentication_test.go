@@ -38,10 +38,9 @@ func TestLoginScenario1(t *testing.T) {
 	verifyAccountAndAuth(t)
 
 	auth, _ := LookupAuthorization(context.TODO(), account.Realm, account.ClientID)
-	logoutStep(t, realm, userID, account.ClientID, auth.Token, AccountActive, http.StatusOK, true)
+	logoutStep(t, realm, userID, account.ClientID, auth.Token, http.StatusNoContent, true)
 }
 
-/*
 // Scenario 2: new account, login, duplicate login request
 func TestLoginScenario2(t *testing.T) {
 	apiv1.DefaultAPIEndpoint = endpoint
@@ -128,7 +127,6 @@ func TestLoginScenario6(t *testing.T) {
 	loginStep3(t, "wrong_realm", "wrong_user", account.ClientID, account.Ext2, AccountLoggedOut, http.StatusNotFound, false)
 	loginStep3(t, realm, userID, account.ClientID, "wrong_auth_token", AccountLoggedOut, http.StatusUnauthorized, false)
 }
-*/
 
 // FIXME test account confirmation timeout
 
@@ -197,7 +195,7 @@ func loginStep3(t *testing.T, testRealm, testUser, testClient, testToken string,
 	}
 }
 
-func logoutStep(t *testing.T, testRealm, testUser, testClient, testToken string, state, status int, validate bool) {
+func logoutStep(t *testing.T, testRealm, testUser, testClient, testToken string, status int, validate bool) {
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, api.LogoutRequestRoute, strings.NewReader(createAuthRequestJSON(testRealm, testUser, testClient, "")))
 	rec := httptest.NewRecorder()
@@ -209,14 +207,11 @@ func logoutStep(t *testing.T, testRealm, testUser, testClient, testToken string,
 
 	if assert.NoError(t, err) {
 		assert.Equal(t, status, rec.Result().StatusCode)
-		/*
-			if validate {
-				account := getAccount(t)
-				assert.Equal(t, state, account.Status)
-				assert.Equal(t, "", account.Ext1)
-				assert.Equal(t, "", account.Ext2)
-			}
-		*/
+		if validate {
+			account := getAccount(t)
+			assert.Equal(t, AccountLoggedOut, account.Status)
+
+		}
 	}
 }
 

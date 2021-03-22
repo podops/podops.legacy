@@ -1,18 +1,17 @@
 package cli
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
-	"github.com/podops/podops"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/urfave/cli/v2"
 )
 
 const (
-	loginEndpoint = "/_a/login"
-	authEndpoint  = "/_a/auth"
+	loginEndpoint  = "/_a/login"
+	logoutEndpoint = "/_a/logout"
+	authEndpoint   = "/_a/auth"
 )
 
 // LoginCommand logs into the service
@@ -20,17 +19,12 @@ func LoginCommand(c *cli.Context) error {
 	email := c.Args().First()
 
 	if email != "" {
-		cl, err := podops.NewClient(context.TODO(), "")
-		if err != nil {
-			return err
-		}
-
 		loginRequest := auth.AuthorizationRequest{
-			Realm:  cl.Realm(),
+			Realm:  client.Realm(),
 			UserID: email,
 		}
 
-		status, err := post(cl.APIEndpoint()+loginEndpoint, &loginRequest, nil)
+		status, err := post(client.APIEndpoint()+loginEndpoint, &loginRequest, nil)
 		if err != nil {
 			return err
 		}
@@ -63,22 +57,14 @@ func AuthCommand(c *cli.Context) error {
 		return nil
 	}
 
-	email := c.Args().Get(0)
-	token := c.Args().Get(1)
-
-	cl, err := podops.NewClient(context.TODO(), "")
-	if err != nil {
-		return err
-	}
-
 	authRequest := auth.AuthorizationRequest{
-		Realm:  cl.Realm(),
-		UserID: email,
-		Token:  token,
+		Realm:  client.Realm(),
+		UserID: c.Args().Get(0),
+		Token:  c.Args().Get(1),
 	}
 	response := auth.AuthorizationRequest{}
 
-	status, err := post(cl.APIEndpoint()+authEndpoint, &authRequest, &response)
+	status, err := post(client.APIEndpoint()+authEndpoint, &authRequest, &response)
 	if err != nil {
 		return err
 	}
@@ -106,6 +92,26 @@ func AuthCommand(c *cli.Context) error {
 // LogoutCommand clears all session information
 func LogoutCommand(c *cli.Context) error {
 
-	fmt.Println("logout successful")
+	m := loadNetrc().FindMachine(machineEntry)
+	if m == nil {
+		return fmt.Errorf("cli error")
+	}
+	request := auth.AuthorizationRequest{
+		Realm:    client.Realm(),
+		ClientID: m.Account,
+		UserID:   m.Login,
+	}
+
+	status, err := post(client.APIEndpoint()+logoutEndpoint, &request, nil)
+	if err != nil {
+		return err
+	}
+
+	if status == http.StatusNoContent {
+		fmt.Println("Logout successful.")
+	} else {
+		return fmt.Errorf("api error %d", status)
+	}
+
 	return nil
 }
