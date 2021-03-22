@@ -11,7 +11,7 @@ const (
 	// MinorVersion of the API
 	MinorVersion = 9
 	// FixVersion of the API
-	FixVersion = 7
+	FixVersion = 8
 )
 
 var (

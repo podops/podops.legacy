@@ -17,7 +17,7 @@ func ListProductionsCommand(c *cli.Context) error {
 	if len(l.Productions) == 0 {
 		fmt.Println("No productions found.")
 	} else {
-		fmt.Println(productionListing("GUID", "NAME", "TITLE", false))
+		fmt.Println(productionListing("ID", "NAME", "TITLE", false))
 		for _, details := range l.Productions {
 			if details.GUID == client.DefaultProduction() {
 				fmt.Println(productionListing(details.GUID, details.Name, details.Title, true))
@@ -30,8 +30,8 @@ func ListProductionsCommand(c *cli.Context) error {
 	return nil
 }
 
-// SetProductionsCommand retrieves all productions or sets the default production
-func SetProductionsCommand(c *cli.Context) error {
+// SetProductionCommand retrieves all productions or sets the default production
+func SetProductionCommand(c *cli.Context) error {
 
 	l, err := client.Productions()
 	if err != nil {
@@ -48,25 +48,25 @@ func SetProductionsCommand(c *cli.Context) error {
 	if production == "" {
 		// print the current show if one has been selected
 		if client.DefaultProduction() == "" {
-			fmt.Println("No production selected. Use 'po set GUID' first")
+			fmt.Println("No production set. Use 'po set ID' first")
 			return nil
 		}
 		for _, details := range l.Productions {
 			if details.GUID == client.DefaultProduction() {
-				fmt.Println(productionListing("GUID", "NAME", "TITLE", false))
+				fmt.Println(productionListing("ID", "NAME", "TITLE", false))
 				fmt.Println(productionListing(details.GUID, details.Name, details.Title, false))
 
 				return nil
 			}
 		}
-		fmt.Println("No shows selected. Use 'po set NAME' first")
+		fmt.Println("No production set. Use 'po set ID' first")
 		return nil
 	}
 
 	for _, details := range l.Productions {
 		if production == details.GUID {
 			storeDefaultProduction(production)
-			fmt.Println(productionListing("GUID", "NAME", "TITLE", false))
+			fmt.Println(productionListing("ID", "NAME", "TITLE", false))
 			fmt.Println(productionListing(details.GUID, details.Name, details.Title, true))
 
 			return nil

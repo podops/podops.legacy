@@ -13,6 +13,7 @@ import (
 
 	"github.com/fupas/commons/pkg/env"
 	"github.com/urfave/cli/v2"
+	"gopkg.in/yaml.v2"
 
 	"github.com/podops/podops"
 	a "github.com/podops/podops/apiv1"
@@ -25,18 +26,25 @@ const (
 	// SettingsCmdGroup groups settings
 	SettingsCmdGroup = "\nSettings Commands"
 	// ShowCmdGroup groups basic show commands
-	ShowCmdGroup = "\nContent Creation Commands"
-	// ShowMgmtCmdGroup groups advanced show commands
-	ShowMgmtCmdGroup = "\nContent Management Commands"
+	ShowCmdGroup = "\nContent Commands"
+	// ShowBuildCmdGroup groups advanced show commands
+	ShowBuildCmdGroup = "\nBuild and Management Commands"
 
 	machineEntry = "api.podops.dev"
 )
 
 var (
-	client *cl.Client
+	client      *cl.Client
+	resourceMap map[string]string
 )
 
 func init() {
+	resourceMap = make(map[string]string)
+	resourceMap["show"] = "show"
+	resourceMap["shows"] = "show"
+	resourceMap["episode"] = "episode"
+	resourceMap["episodes"] = "episode"
+
 	cl := podops.DefaultClientOptions()
 
 	nrc := loadNetrc()
@@ -147,4 +155,40 @@ func storeDefaultProduction(production string) error {
 	}
 	data, _ := nrc.MarshalText()
 	return ioutil.WriteFile(netrcPath(), data, 0644)
+}
+
+func loadResource(path string) (interface{}, string, string, error) {
+	// FIXME: only local yaml is supported at the moment !
+
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, "", "", fmt.Errorf("can not read file '%s': %w", path, err)
+	}
+
+	r, kind, guid, err := a.LoadResource(data)
+	if err != nil {
+		return nil, "", "", err
+	}
+
+	return r, kind, guid, nil
+}
+
+func dumpResource(path string, doc interface{}) error {
+	data, err := yaml.Marshal(doc)
+	if err != nil {
+		return err
+	}
+
+	ioutil.WriteFile(path, data, 0644)
+	fmt.Printf("-- %s\n\n%s\n", path, string(data))
+
+	return nil
+}
+
+func getProduction(c *cli.Context) string {
+	prod := c.String("prod")
+	if prod == "" {
+		prod = client.DefaultProduction()
+	}
+	return prod
 }
