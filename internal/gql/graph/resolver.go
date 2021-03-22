@@ -40,7 +40,10 @@ func LoadShow(ctx context.Context, key string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	show := s.(*a.Show) // BUG this s can be NIL
+	if s == nil {
+		return nil, fmt.Errorf("show '%s': no content", key)
+	}
+	show := s.(*a.Show)
 
 	category := make([]*model.Category, 1)
 	category[0] = &model.Category{

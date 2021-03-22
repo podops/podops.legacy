@@ -127,7 +127,7 @@ func DeleteResourcesCommand(c *cli.Context) error {
 		return nil
 	}
 
-	fmt.Println(fmt.Sprintf("successfully delete resource '%s/%s-%s'", prod, kind, guid))
+	fmt.Println(fmt.Sprintf("successfully deleted resource '%s/%s-%s'", prod, kind, guid))
 	return nil
 }
 
