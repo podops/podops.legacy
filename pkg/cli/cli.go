@@ -50,6 +50,9 @@ func init() {
 		log.Fatal(err)
 	}
 	if c != nil {
+		if m != nil {
+			c.SetProduction(m.Account)
+		}
 		client = c
 	}
 }
@@ -121,14 +124,26 @@ func loadNetrc() *Netrc {
 	return nrc
 }
 
-func updateNetrc(userID, clientID, token string) error {
+func storeLogin(userID, token string) error {
 	nrc := loadNetrc()
 	m := nrc.FindMachine(machineEntry)
 	if m == nil {
-		m = nrc.NewMachine(machineEntry, userID, token, clientID)
+		m = nrc.NewMachine(machineEntry, userID, token, "GUID")
 	} else {
 		m.UpdateLogin(userID)
 		m.UpdatePassword(token)
+	}
+	data, _ := nrc.MarshalText()
+	return ioutil.WriteFile(netrcPath(), data, 0644)
+}
+
+func storeDefaultProduction(production string) error {
+	nrc := loadNetrc()
+	m := nrc.FindMachine(machineEntry)
+	if m == nil {
+		m = nrc.NewMachine(machineEntry, "", "", production)
+	} else {
+		m.UpdateAccount(production)
 	}
 	data, _ := nrc.MarshalText()
 	return ioutil.WriteFile(netrcPath(), data, 0644)

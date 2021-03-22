@@ -6,9 +6,10 @@ import (
 	"os"
 	"sort"
 
+	"github.com/urfave/cli/v2"
+
 	a "github.com/podops/podops/apiv1"
 	cmd "github.com/podops/podops/pkg/cli"
-	"github.com/urfave/cli/v2"
 )
 
 const (
@@ -27,6 +28,7 @@ func main() {
 			return nil
 		},
 		Commands: setupCommands(),
+		Flags:    globalFlags(),
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
@@ -39,7 +41,20 @@ func main() {
 
 func setupCommands() []*cli.Command {
 	c := []*cli.Command{
-
+		// Basic Commands
+		{
+			Name:     "list",
+			Usage:    "List all productions",
+			Category: cmd.BasicCmdGroup,
+			Action:   cmd.ListProductionsCommand,
+		},
+		{
+			Name:      "set",
+			Usage:     "Sets/shows the default production",
+			UsageText: setUsageText,
+			Category:  cmd.BasicCmdGroup,
+			Action:    cmd.SetProductionsCommand,
+		},
 		// Settings
 		{
 			Name:      "login",
@@ -67,65 +82,10 @@ func setupCommands() []*cli.Command {
 
 func globalFlags() []cli.Flag {
 	f := []cli.Flag{
-		&cli.BoolFlag{
-			Name:    "debug",
-			Usage:   "Prints debug information",
-			Aliases: []string{"d"},
-		},
-	}
-	return f
-}
-
-func newShowFlags() []cli.Flag {
-	f := []cli.Flag{
 		&cli.StringFlag{
-			Name:    "title",
-			Usage:   "Show title",
-			Aliases: []string{"t"},
-		},
-		&cli.StringFlag{
-			Name:    "summary",
-			Usage:   "Show summary",
-			Aliases: []string{"s"},
-		},
-	}
-	return f
-}
-
-func createFlags() []cli.Flag {
-	f := []cli.Flag{
-		&cli.BoolFlag{
-			Name:    "force",
-			Usage:   "Force create/update/upload",
-			Aliases: []string{"f"},
-		},
-	}
-	return f
-}
-
-func templateFlags() []cli.Flag {
-	f := []cli.Flag{
-		/*
-			&cli.StringFlag{
-				Name:    "name",
-				Usage:   "Resource name",
-				Aliases: []string{"n"},
-			},
-		*/
-		&cli.StringFlag{
-			Name:    "parent",
-			Usage:   "Parent resource name",
+			Name:    "prod",
+			Usage:   "If present, the podcast scope for the CLI request",
 			Aliases: []string{"p"},
-		},
-		&cli.StringFlag{
-			Name:    "guid",
-			Usage:   "Resource GUID",
-			Aliases: []string{"id"},
-		},
-		&cli.StringFlag{
-			Name:    "parentid",
-			Usage:   "Parent resource GUID",
-			Aliases: []string{"pid"},
 		},
 	}
 	return f
@@ -142,13 +102,13 @@ It also includes administrative commands for managing your live podcasts.
 
 To see the full list of supported commands, run 'po help'`
 
-	setUsageText = `set [NAME]
+	setUsageText = `set [GUID]
 
 	 # Display the current show/production
 	 po set
 	 
 	 # Set the current show/production
-	 po set [NAME]`
+	 po set GUID`
 
 	getUsageText = `get [RESOURCE]
 

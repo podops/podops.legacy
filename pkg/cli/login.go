@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/podops/podops/pkg/auth"
+
 	"github.com/urfave/cli/v2"
 )
 
@@ -71,7 +72,7 @@ func AuthCommand(c *cli.Context) error {
 
 	switch status {
 	case http.StatusOK:
-		if err := updateNetrc(response.UserID, response.ClientID, response.Token); err != nil {
+		if err := storeLogin(response.UserID, response.Token); err != nil {
 			fmt.Println("Error updating config.")
 			return nil
 		}
@@ -97,9 +98,8 @@ func LogoutCommand(c *cli.Context) error {
 		return fmt.Errorf("cli error")
 	}
 	request := auth.AuthorizationRequest{
-		Realm:    client.Realm(),
-		ClientID: m.Account,
-		UserID:   m.Login,
+		Realm:  client.Realm(),
+		UserID: m.Login,
 	}
 
 	status, err := post(client.APIEndpoint()+logoutEndpoint, &request, nil)

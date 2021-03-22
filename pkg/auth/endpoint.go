@@ -94,29 +94,19 @@ func LoginRequestEndpoint(c echo.Context) error {
 func LogoutRequestEndpoint(c echo.Context) error {
 	var req *AuthorizationRequest = new(AuthorizationRequest)
 	ctx := api.NewHttpContext(c)
-	clientID, err := GetClientID(ctx, c.Request())
-	if err != nil {
-		return c.NoContent(http.StatusForbidden)
-	}
 
-	err = c.Bind(req)
+	err := c.Bind(req)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
-	if req.Realm == "" || req.UserID == "" || req.ClientID == "" {
+	if req.Realm == "" || req.UserID == "" {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
-	token := GetBearerToken(c.Request())
 
-	if req.ClientID != clientID {
-		return c.NoContent(http.StatusForbidden)
-	}
-
-	auth, err := FindAuthorizationByToken(ctx, token)
+	auth, err := FindAuthorizationByToken(ctx, GetBearerToken(c.Request()))
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
-
 	if auth.UserID != req.UserID || auth.Realm != req.Realm {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}

@@ -31,7 +31,8 @@ type (
 	}
 
 	Client struct {
-		opts *ClientOption
+		opts              *ClientOption
+		defaultProduction string
 		// internal for now
 		validated bool
 		valid     bool
@@ -70,6 +71,10 @@ func (cl *Client) Valid() bool {
 	return true
 }
 
+func (cl *Client) SetProduction(production string) {
+	cl.defaultProduction = production
+}
+
 func (cl *Client) APIEndpoint() string {
 	return cl.opts.APIEndpoint
 }
@@ -84,6 +89,10 @@ func (cl *Client) Realm() string {
 
 func (cl *Client) Token() string {
 	return cl.opts.Token
+}
+
+func (cl *Client) DefaultProduction() string {
+	return cl.defaultProduction
 }
 
 // Merge clones co and combines it with the provided options
