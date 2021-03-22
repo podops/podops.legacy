@@ -197,18 +197,18 @@ func createAuthRequestJSON(real, user, client, token string) string {
 }
 
 func cleaner() {
-	account, err := LookupAccount(context.TODO(), realm, userID)
+	account, err := FindAccountByUserID(context.TODO(), realm, userID)
 	if err == nil && account != nil {
 		a := authorizationKey(account.Realm, account.ClientID)
 		platform.DataStore().Delete(context.TODO(), a)
 
-		k := accountKey(realm, userID)
+		k := accountKey(realm, account.ClientID)
 		platform.DataStore().Delete(context.TODO(), k)
 	}
 }
 
 func getAccount(t *testing.T) *Account {
-	account, err := LookupAccount(context.TODO(), realm, userID)
+	account, err := FindAccountByUserID(context.TODO(), realm, userID)
 	if assert.NoError(t, err) {
 		if assert.NotNil(t, account) {
 			return account
@@ -219,7 +219,7 @@ func getAccount(t *testing.T) *Account {
 }
 
 func verifyAccountAndAuth(t *testing.T) {
-	account, err := LookupAccount(context.TODO(), realm, userID)
+	account, err := FindAccountByUserID(context.TODO(), realm, userID)
 	if err == nil && account != nil {
 		auth, err := LookupAuthorization(context.TODO(), account.Realm, account.ClientID)
 		if err == nil && auth != nil {

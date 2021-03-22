@@ -61,7 +61,7 @@ A description how to build the codebase and how to test locally is [here](/docs/
 
 ## Open-source but not open-contribution?
 
-I am grateful for community involvement, bug reports, & feature requests but I do not expect code contributions. I will gladly review [pull requests](https://github.com/podops/podops/pulls) however.
+I am grateful for community involvement, bug reports, & feature requests but I do not expect code contributions at this point in time as there is not really a substantial user base or community in general. In case someone wants to contribute, I will gladly review [pull requests](https://github.com/podops/podops/pulls).
 
 There is another way to help the project: many of the most valuable contributions are in the forms of [testing, feedback, and documentation](https://github.com/podops/podops/issues). This helps to harden the software and streamlines its usage for other users.
 

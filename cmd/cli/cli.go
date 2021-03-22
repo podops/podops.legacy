@@ -7,7 +7,7 @@ import (
 	"sort"
 
 	a "github.com/podops/podops/apiv1"
-	cmd "github.com/podops/podops/cmd/cli/commands"
+	cmd "github.com/podops/podops/pkg/cli"
 	"github.com/urfave/cli/v2"
 )
 
@@ -39,41 +39,11 @@ func main() {
 
 func setupCommands() []*cli.Command {
 	c := []*cli.Command{
-		// Basic Commands
-		{
-			Name:     "list",
-			Usage:    "List all shows/productions",
-			Category: cmd.BasicCmdGroup,
-			Action:   cmd.ListProductionsCommand,
-		},
-		{
-			Name:      "set",
-			Usage:     "List the current show/production, switch to another show/production",
-			UsageText: setUsageText,
-			Category:  cmd.BasicCmdGroup,
-			Action:    cmd.SetProductionCommand,
-		},
-		{
-			Name:      "new-show",
-			Usage:     "Setup a new show/production",
-			UsageText: "new-show NAME",
-			Category:  cmd.BasicCmdGroup,
-			Action:    cmd.NewProductionCommand,
-			Flags:     newShowFlags(),
-		},
-		{
-			Name:      "template",
-			Usage:     "Create a resource template with default values",
-			UsageText: "template [show|episode] NAME",
-			Category:  cmd.BasicCmdGroup,
-			Action:    cmd.TemplateCommand,
-			Flags:     templateFlags(),
-		},
 
 		// Settings
 		{
 			Name:      "login",
-			Usage:     "Login to the service",
+			Usage:     "Log in to the service",
 			UsageText: "login EMAIL",
 			Category:  cmd.SettingsCmdGroup,
 			Action:    cmd.LoginCommand,
@@ -87,56 +57,9 @@ func setupCommands() []*cli.Command {
 		{
 			Name:      "auth",
 			Usage:     "Exchange the token for the API access key",
-			UsageText: "auth TOKEN",
+			UsageText: "auth EMAIL TOKEN",
 			Category:  cmd.SettingsCmdGroup,
 			Action:    cmd.AuthCommand,
-		},
-		// Show/production commands
-		{
-			Name:      "get",
-			Usage:     "Lists a single resource/a collection of resources",
-			UsageText: getUsageText,
-			Category:  cmd.ShowCmdGroup,
-			Action:    cmd.ListResourcesCommand,
-			//Flags:     createFlags(),
-		},
-		{
-			Name:      "create",
-			Usage:     "Create a resource from a file, directory or URL",
-			UsageText: "create FILENAME",
-			Category:  cmd.ShowCmdGroup,
-			Action:    cmd.CreateCommand,
-			Flags:     createFlags(),
-		},
-		{
-			Name:      "update",
-			Usage:     "Update a resource from a file, directory or URL",
-			UsageText: "update FILENAME",
-			Category:  cmd.ShowCmdGroup,
-			Action:    cmd.UpdateCommand,
-			Flags:     createFlags(),
-		},
-		{
-			Name:      "upload",
-			Usage:     "Upload an asset from a file",
-			UsageText: "upload FILENAME",
-			Category:  cmd.ShowCmdGroup,
-			Action:    cmd.UploadCommand,
-			Flags:     createFlags(),
-		},
-		{
-			Name:      "build",
-			Usage:     "Start a new build",
-			UsageText: "po build",
-			Category:  cmd.ShowMgmtCmdGroup,
-			Action:    cmd.BuildCommand,
-		},
-		{
-			Name:      "delete",
-			Usage:     "Delete a resource",
-			UsageText: "po delete [show|episode] NAME",
-			Category:  cmd.ShowMgmtCmdGroup,
-			Action:    cmd.DeleteResourcesCommand,
 		},
 	}
 	return c

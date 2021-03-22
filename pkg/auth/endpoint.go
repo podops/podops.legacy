@@ -31,7 +31,7 @@ func LoginRequestEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	account, err := LookupAccount(ctx, req.Realm, req.UserID)
+	account, err := FindAccountByUserID(ctx, req.Realm, req.UserID)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}

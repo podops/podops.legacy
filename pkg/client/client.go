@@ -2,10 +2,10 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -15,82 +15,104 @@ import (
 	"github.com/podops/podops/pkg/api"
 )
 
+var (
+	PodopsClientConfigurationErr error = fmt.Errorf("new client: invalid configuration")
+)
+
 // Client is a client for interacting with the PodOps service.
 //
 // Clients should be reused instead of created as needed.
 // The methods of Client are safe for concurrent use by multiple goroutines.
 type (
+	ClientOption struct {
+		Token       string
+		APIEndpoint string
+		CDNEndpoint string
+	}
+
 	Client struct {
-		ServiceEndpoint string `json:"url" binding:"required"`
-		Token           string `json:"token" binding:"required"`
-		GUID            string `json:"guid" binding:"required"`
-		Namespace       string
+		opts *ClientOption
+		// internal for now
+		validated bool
+		valid     bool
+		ns        string
+		realm     string
 	}
 )
 
-// DefaultClient returns the default configuration
-func DefaultClient(token string) *Client {
-	return &Client{
-		ServiceEndpoint: a.DefaultAPIEndpoint,
-		Token:           token,
-		GUID:            "",
-		Namespace:       api.NamespacePrefix,
+func New(ctx context.Context, o *ClientOption) (*Client, error) {
+	if o == nil || !o.Valid() {
+		return nil, PodopsClientConfigurationErr
 	}
+	return &Client{
+		opts:      o,
+		validated: false,
+		valid:     false,
+		ns:        api.NamespacePrefix,
+		realm:     "podops",
+	}, nil
 }
 
-// Store persists the Client state
-func (cl *Client) Store(path string) error {
-	config, _ := json.Marshal(cl)
+// Valid checks if all configuration parameters are provided
+func (cl *Client) Valid() bool {
+	if cl.validated {
+		return cl.valid
+	}
+	cl.validated = true
+	// verify the opts first
+	if !cl.opts.Valid() {
+		cl.valid = false
+		return false
+	}
 
-	// create the location if it does not exist
-	baseDir := filepath.Dir(path)
-	if baseDir != "." && baseDir != ".." {
-		// path is contains a location
-		if err := os.MkdirAll(baseDir, os.ModePerm); err != nil {
-			return err
+	cl.valid = true // FIXME try to verify the token against the API
+
+	return true
+}
+
+func (cl *Client) APIEndpoint() string {
+	return cl.opts.APIEndpoint
+}
+
+func (cl *Client) CDNEndpoint() string {
+	return cl.opts.CDNEndpoint
+}
+
+func (cl *Client) Realm() string {
+	return cl.realm
+}
+
+// Merge clones co and combines it with the provided options
+func (co ClientOption) Merge(opts *ClientOption) *ClientOption {
+	o := &ClientOption{}
+	o.Token = co.Token
+	o.APIEndpoint = co.APIEndpoint
+	o.CDNEndpoint = co.CDNEndpoint
+
+	if opts != nil {
+		if opts.Token != "" {
+			o.Token = opts.Token
+		}
+		if opts.APIEndpoint != "" {
+			o.APIEndpoint = opts.APIEndpoint
+		}
+		if opts.CDNEndpoint != "" {
+			o.CDNEndpoint = opts.CDNEndpoint
 		}
 	}
-	return ioutil.WriteFile(path, config, 0644)
+
+	return o
 }
 
-// Validate verifies the token against the backend service
-func (cl *Client) Validate() error {
-	if cl.Token == "" {
-		return a.ErrNoToken
-	}
-	status, err := cl.get(authenticationRoute, nil)
-	if err != nil {
-		return err
-	}
-	if status != http.StatusAccepted {
-		// the only valid positive response
-		return a.ErrNotAuthorized
-	}
-	return nil
-}
-
-// HasToken verifies that remote commands can be executed
-func (cl *Client) HasToken() error {
-	if cl.Token == "" {
-		return a.ErrNotAuthorized
-	}
-	return nil
-}
-
-// HasTokenAndGUID verifies the presence of a token and GUID
-func (cl *Client) HasTokenAndGUID() error {
-	if cl.Token == "" {
-		return a.ErrNotAuthorized
-	}
-	if cl.GUID == "" {
-		return a.ErrInvalidParameters
-	}
-	return nil
+// Valid checks if all configuration parameters are provided
+func (co ClientOption) Valid() bool {
+	return co.APIEndpoint != "" && co.CDNEndpoint != ""
+	// we can not validate token. There are some API calls that do not need one...
 }
 
 // Get is used to request data from the API. No payload, only queries!
 func (cl *Client) get(cmd string, response interface{}) (int, error) {
-	url := cl.ServiceEndpoint + cmd
+	url := cl.opts.APIEndpoint + cmd
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -102,7 +124,7 @@ func (cl *Client) get(cmd string, response interface{}) (int, error) {
 
 // Post is used to invoke an API method using http POST
 func (cl *Client) post(cmd string, request, response interface{}) (int, error) {
-	url := cl.ServiceEndpoint + cmd
+	url := cl.opts.APIEndpoint + cmd
 
 	m, err := json.Marshal(&request)
 	if err != nil {
@@ -119,7 +141,7 @@ func (cl *Client) post(cmd string, request, response interface{}) (int, error) {
 
 // Put is used to invoke an API method using http PUT
 func (cl *Client) put(cmd string, request, response interface{}) (int, error) {
-	url := cl.ServiceEndpoint + cmd
+	url := cl.opts.APIEndpoint + cmd
 
 	m, err := json.Marshal(&request)
 	if err != nil {
@@ -136,7 +158,7 @@ func (cl *Client) put(cmd string, request, response interface{}) (int, error) {
 
 // DELETE is used to request the deletion of a resource. Maybe apayload, no response!
 func (cl *Client) delete(cmd string, request interface{}) (int, error) {
-	url := cl.ServiceEndpoint + cmd
+	url := cl.opts.APIEndpoint + cmd
 
 	var req *http.Request
 	var err error
@@ -161,8 +183,8 @@ func (cl *Client) invoke(req *http.Request, response interface{}) (int, error) {
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("User-Agent", a.UserAgentString)
-	if cl.Token != "" {
-		req.Header.Set("Authorization", "Bearer "+cl.Token)
+	if cl.opts.Token != "" {
+		req.Header.Set("Authorization", "Bearer "+cl.opts.Token)
 	}
 
 	// perform the request
@@ -226,7 +248,7 @@ func (cl *Client) fileUploadRequest(uri, guid, path string) (*http.Request, erro
 
 	req, err := http.NewRequest("POST", uri+"/"+guid, body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req.Header.Set("Authorization", "Bearer "+cl.Token)
+	req.Header.Set("Authorization", "Bearer "+cl.opts.Token)
 
 	return req, err
 }

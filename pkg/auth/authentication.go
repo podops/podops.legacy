@@ -39,14 +39,14 @@ func ResetAuthToken(ctx context.Context, account *Account) (*Account, error) {
 	return account, nil
 }
 
-func LogoutAccount(ctx context.Context, realm, userID string) error {
+func LogoutAccount(ctx context.Context, realm, clientID string) error {
 	// FIXME add a mutex
-	account, err := LookupAccount(ctx, realm, userID)
+	account, err := LookupAccount(ctx, realm, clientID)
 	if err != nil {
 		return err
 	}
 	if account == nil {
-		return fmt.Errorf("account %s.%s not found", realm, userID)
+		return fmt.Errorf("account %s.%s not found", realm, clientID)
 	}
 
 	auth, err := LookupAuthorization(ctx, account.Realm, account.ClientID)
@@ -65,14 +65,14 @@ func LogoutAccount(ctx context.Context, realm, userID string) error {
 	return UpdateAccount(ctx, account)
 }
 
-func BlockAccount(ctx context.Context, realm, userID string) error {
+func BlockAccount(ctx context.Context, realm, clientID string) error {
 	// FIXME add a mutex
-	account, err := LookupAccount(ctx, realm, userID)
+	account, err := LookupAccount(ctx, realm, clientID)
 	if err != nil {
 		return err
 	}
 	if account == nil {
-		return fmt.Errorf("account %s.%s not found", realm, userID)
+		return fmt.Errorf("account %s.%s not found", realm, clientID)
 	}
 
 	auth, err := LookupAuthorization(ctx, account.Realm, account.ClientID)
@@ -146,7 +146,7 @@ func exchangeToken(ctx context.Context, req *AuthorizationRequest, loginFrom str
 	// FIXME add a mutex
 	var auth *Authorization
 
-	account, err := LookupAccount(ctx, req.Realm, req.UserID)
+	account, err := FindAccountByUserID(ctx, req.Realm, req.UserID)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}

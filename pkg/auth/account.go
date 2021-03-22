@@ -50,9 +50,9 @@ type (
 )
 
 // LookupAccount retrieves an account within a given realm
-func LookupAccount(ctx context.Context, realm, userID string) (*Account, error) {
+func LookupAccount(ctx context.Context, realm, clientID string) (*Account, error) {
 	var account Account
-	k := accountKey(realm, userID)
+	k := accountKey(realm, clientID)
 
 	err := platform.DataStore().Get(ctx, k, &account)
 	if err != nil {
@@ -62,6 +62,18 @@ func LookupAccount(ctx context.Context, realm, userID string) (*Account, error) 
 		return nil, err
 	}
 	return &account, nil
+}
+
+// FindAccountUserID retrieves an account bases on the user id
+func FindAccountByUserID(ctx context.Context, realm, userID string) (*Account, error) {
+	var accounts []*Account
+	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreAccounts).Filter("Realm =", realm).Filter("UserID =", userID), &accounts); err != nil {
+		return nil, err
+	}
+	if accounts == nil {
+		return nil, nil
+	}
+	return accounts[0], nil
 }
 
 // FindAccountByToken retrieves an account bases on either the temporary token or the auth token
@@ -101,7 +113,7 @@ func CreateAccount(ctx context.Context, realm, userID string) (*Account, error) 
 }
 
 func UpdateAccount(ctx context.Context, account *Account) error {
-	k := accountKey(account.Realm, account.UserID)
+	k := accountKey(account.Realm, account.ClientID)
 	account.Updated = util.Timestamp()
 
 	if _, err := platform.DataStore().Put(ctx, k, account); err != nil {
@@ -110,6 +122,6 @@ func UpdateAccount(ctx context.Context, account *Account) error {
 	return nil
 }
 
-func accountKey(realm, user string) *datastore.Key {
-	return datastore.NameKey(DatastoreAccounts, namedKey(realm, user), nil)
+func accountKey(realm, client string) *datastore.Key {
+	return datastore.NameKey(DatastoreAccounts, namedKey(realm, client), nil)
 }

@@ -1,15 +1,24 @@
 package podops
 
 import (
+	"context"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func TestNewClientFromFile(t *testing.T) {
-	client, err := NewClientFromFile(DefaultConfigLocation())
-	if err != nil {
-		t.Error(err)
+func TestInvalidConfiguration(t *testing.T) {
+	client, err := NewClient(context.TODO(), "")
+
+	if assert.Error(t, err) {
+		assert.Nil(t, client)
 	}
-	if err := client.Validate(); err != nil {
-		t.Error(err)
+}
+
+func TestSimpleConfiguration(t *testing.T) {
+	client, err := NewClient(context.TODO(), "po-xxx-xxx")
+
+	if assert.NoError(t, err) {
+		assert.NotNil(t, client)
 	}
 }

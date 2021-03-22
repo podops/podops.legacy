@@ -14,8 +14,18 @@ const (
 	accountTestUser  = "account_test_user"
 )
 
-func TestLookupFailure(t *testing.T) {
-	account, err := LookupAccount(context.TODO(), accountTestRealm, accountTestUser)
+func cleanup() {
+	account, _ := FindAccountByUserID(context.TODO(), accountTestRealm, accountTestUser)
+	if account != nil {
+		k := accountKey(accountTestRealm, account.ClientID)
+		platform.DataStore().Delete(context.TODO(), k)
+	}
+}
+
+func TestFindAccountByUserIDFail(t *testing.T) {
+	cleanup()
+
+	account, err := FindAccountByUserID(context.TODO(), accountTestRealm, accountTestUser)
 	if assert.NoError(t, err) {
 		assert.Nil(t, account)
 	}
@@ -31,21 +41,23 @@ func TestCreateAccount(t *testing.T) {
 }
 
 func TestLookupAccount(t *testing.T) {
-	account, err := LookupAccount(context.TODO(), accountTestRealm, accountTestUser)
+	account1, err := FindAccountByUserID(context.TODO(), accountTestRealm, accountTestUser)
 	if assert.NoError(t, err) {
-		assert.NotNil(t, account)
-		assert.Equal(t, accountTestRealm, account.Realm)
-		assert.Equal(t, accountTestUser, account.UserID)
+		assert.NotNil(t, account1)
+	}
+
+	account2, err := LookupAccount(context.TODO(), accountTestRealm, account1.ClientID)
+	if assert.NoError(t, err) {
+		assert.NotNil(t, account2)
+		assert.Equal(t, account1.Realm, account2.Realm)
+		assert.Equal(t, account1.UserID, account2.UserID)
 	}
 }
 
 func TestUpdateAccount(t *testing.T) {
-	t.Cleanup(func() {
-		k := accountKey(accountTestRealm, accountTestUser)
-		platform.DataStore().Delete(context.TODO(), k)
-	})
+	t.Cleanup(cleanup)
 
-	account1, err := LookupAccount(context.TODO(), accountTestRealm, accountTestUser)
+	account1, err := FindAccountByUserID(context.TODO(), accountTestRealm, accountTestUser)
 	if assert.NoError(t, err) {
 		assert.NotNil(t, account1)
 
@@ -54,7 +66,7 @@ func TestUpdateAccount(t *testing.T) {
 		err = UpdateAccount(context.TODO(), account1)
 
 		if assert.NoError(t, err) {
-			account2, err := LookupAccount(context.TODO(), account1.Realm, account1.UserID)
+			account2, err := LookupAccount(context.TODO(), account1.Realm, account1.ClientID)
 			if assert.NoError(t, err) {
 				assert.Equal(t, now, account2.Confirmed)
 			}
