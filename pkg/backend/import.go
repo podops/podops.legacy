@@ -11,18 +11,8 @@ import (
 
 	"github.com/fupas/commons/pkg/util"
 	ds "github.com/fupas/platform/pkg/platform"
-	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/platform"
-	"github.com/podops/podops/pkg/api"
-)
-
-const (
-	// ImportTask route to ImportTaskEndpoint
-	ImportTask = "/import"
-
-	// full canonical route
-	importTaskWithPrefix = "/_t/import"
 )
 
 type (
@@ -36,23 +26,8 @@ type (
 	}
 )
 
-// ImportTaskEndpoint implements async file import
-func ImportTaskEndpoint(c echo.Context) error {
-	var req *a.Import = new(a.Import)
-
-	err := c.Bind(req)
-	if err != nil {
-		// just report and return, resending will not change anything
-		platform.ReportError(err)
-		return c.NoContent(http.StatusOK)
-	}
-
-	// FIXME does it make sense to retry? If not, send StatusOK
-	status := importResource(api.NewHttpContext(c), req.Source, req.Dest)
-	return c.NoContent(status)
-}
-
-func importResource(ctx context.Context, src, dest string) int {
+// ImportResource import a resource from a src and place it into the CDN
+func ImportResource(ctx context.Context, src, dest, original string) int {
 	resp, err := http.Get(src)
 	if err != nil {
 		return resp.StatusCode
@@ -91,11 +66,11 @@ func importResource(ctx context.Context, src, dest string) int {
 		URI: src,
 		Rel: a.ResourceTypeImport,
 	}
-	name := strings.Split(temp.FingerprintURI(parent), "/")[1]
 
+	name := strings.Split(temp.FingerprintURI(parent), "/")[1]
 	duration := int64(0) // FIXME implement it
 
-	if err := UpdateAssetResource(ctx, name, util.Checksum(src), a.ResourceAsset, parent, dest, meta.ContentType, meta.Size, duration); err != nil {
+	if err := UpdateAssetResource(ctx, name, util.Checksum(src), a.ResourceAsset, parent, dest, meta.ContentType, original, meta.Size, duration); err != nil {
 		platform.ReportError(fmt.Errorf("error updating inventory: %v", err))
 		return http.StatusBadRequest
 	}

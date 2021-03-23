@@ -57,8 +57,9 @@ type (
 
 	// Import is used by the import task
 	Import struct {
-		Source string `json:"src" binding:"required"`
-		Dest   string `json:"dest" binding:"required"`
+		Source   string `json:"src" binding:"required"`
+		Dest     string `json:"dest" binding:"required"`
+		Original string `json:"original" binding:"required"`
 	}
 
 	// OldAuthorizationRequest struct is used to request a token

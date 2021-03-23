@@ -14,6 +14,15 @@ import (
 
 const (
 	cmdLineName = "po"
+
+	// BasicCmdGroup groups basic commands
+	BasicCmdGroup = "\nBasic Commands"
+	// SettingsCmdGroup groups settings
+	SettingsCmdGroup = "\nSettings Commands"
+	// ShowCmdGroup groups basic show commands
+	ShowCmdGroup = "\nContent Commands"
+	// ShowBuildCmdGroup groups advanced show commands
+	ShowBuildCmdGroup = "\nBuild and Management Commands"
 )
 
 func main() {
@@ -41,18 +50,18 @@ func main() {
 
 func setupCommands() []*cli.Command {
 	c := []*cli.Command{
-		// Basic Commands
+		// basic commands
 		{
 			Name:     "shows",
 			Usage:    "List all podcasts",
-			Category: cmd.BasicCmdGroup,
+			Category: BasicCmdGroup,
 			Action:   cmd.ListProductionsCommand,
 		},
 		{
 			Name:      "show",
 			Usage:     "Sets the default podcast",
 			UsageText: setUsageText,
-			Category:  cmd.BasicCmdGroup,
+			Category:  BasicCmdGroup,
 			Action:    cmd.SetProductionCommand,
 		},
 		// resources
@@ -60,7 +69,7 @@ func setupCommands() []*cli.Command {
 			Name:      "create",
 			Usage:     "Create a resource from a file, directory or URL",
 			UsageText: "create FILENAME",
-			Category:  cmd.ShowCmdGroup,
+			Category:  ShowCmdGroup,
 			Action:    cmd.CreateCommand,
 			Flags:     createFlags(),
 		},
@@ -68,7 +77,7 @@ func setupCommands() []*cli.Command {
 			Name:      "update",
 			Usage:     "Update a resource from a file, directory or URL",
 			UsageText: "update FILENAME",
-			Category:  cmd.ShowCmdGroup,
+			Category:  ShowCmdGroup,
 			Action:    cmd.UpdateCommand,
 			Flags:     createFlags(),
 		},
@@ -76,21 +85,21 @@ func setupCommands() []*cli.Command {
 			Name:      "get",
 			Usage:     "List one or many resources",
 			UsageText: getUsageText,
-			Category:  cmd.ShowCmdGroup,
+			Category:  ShowCmdGroup,
 			Action:    cmd.GetResourcesCommand,
 		},
 		{
 			Name:      "delete",
 			Usage:     "Delete a resource",
 			UsageText: "po delete [show|episode] ID",
-			Category:  cmd.ShowCmdGroup,
+			Category:  ShowCmdGroup,
 			Action:    cmd.DeleteResourcesCommand,
 		},
 		{
 			Name:      "template",
 			Usage:     "Create a resource template with default values",
 			UsageText: "template [show|episode] NAME",
-			Category:  cmd.ShowCmdGroup,
+			Category:  ShowCmdGroup,
 			Action:    cmd.TemplateCommand,
 			Flags:     templateFlags(),
 		},
@@ -99,7 +108,7 @@ func setupCommands() []*cli.Command {
 			Name:      "new",
 			Usage:     "Create a new podcast",
 			UsageText: "new NAME",
-			Category:  cmd.ShowBuildCmdGroup,
+			Category:  ShowBuildCmdGroup,
 			Action:    cmd.NewProductionCommand,
 			Flags:     newShowFlags(),
 		},
@@ -107,7 +116,7 @@ func setupCommands() []*cli.Command {
 			Name:      "upload",
 			Usage:     "Upload an asset from a file",
 			UsageText: "upload FILENAME",
-			Category:  cmd.ShowBuildCmdGroup,
+			Category:  ShowBuildCmdGroup,
 			Action:    cmd.UploadCommand,
 			Flags:     createFlags(),
 		},
@@ -115,28 +124,28 @@ func setupCommands() []*cli.Command {
 			Name:      "build",
 			Usage:     "Build the podcast feed",
 			UsageText: "po build",
-			Category:  cmd.ShowBuildCmdGroup,
+			Category:  ShowBuildCmdGroup,
 			Action:    cmd.BuildCommand,
 		},
-		// Settings
+		// settings
 		{
 			Name:      "login",
 			Usage:     "Log in to the service",
 			UsageText: "login EMAIL",
-			Category:  cmd.SettingsCmdGroup,
+			Category:  SettingsCmdGroup,
 			Action:    cmd.LoginCommand,
 		},
 		{
 			Name:     "logout",
 			Usage:    "Logout and clear all session information",
-			Category: cmd.SettingsCmdGroup,
+			Category: SettingsCmdGroup,
 			Action:   cmd.LogoutCommand,
 		},
 		{
 			Name:      "auth",
 			Usage:     "Exchange the token for the API access key",
 			UsageText: "auth EMAIL TOKEN",
-			Category:  cmd.SettingsCmdGroup,
+			Category:  SettingsCmdGroup,
 			Action:    cmd.AuthCommand,
 		},
 	}

@@ -13,8 +13,8 @@ import (
 	gcp "github.com/fupas/platform/provider/google"
 
 	"github.com/podops/podops/internal/api"
+	a "github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
-	"github.com/podops/podops/pkg/backend"
 )
 
 // ShutdownDelay is the delay before exiting the process
@@ -38,7 +38,7 @@ func setup() *echo.Echo {
 
 	// task endpoints
 	tasks := e.Group(api.TaskNamespacePrefix)
-	tasks.POST(backend.ImportTask, backend.ImportTaskEndpoint)
+	tasks.POST(a.ImportTask, api.ImportTaskEndpoint)
 
 	// admin endpoints
 	admin := e.Group(api.AdminNamespacePrefix)

@@ -8,11 +8,14 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"google.golang.org/api/iterator"
+
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
+
 	a "github.com/podops/podops/apiv1"
 	p "github.com/podops/podops/internal/platform"
-	"google.golang.org/api/iterator"
+	"github.com/podops/podops/pkg/api"
 )
 
 type (
@@ -160,7 +163,7 @@ func EnsureAsset(ctx context.Context, parent string, rsrc *a.Asset) error {
 		}
 
 		// dispatch a request for background import
-		_, err = p.CreateTask(ctx, importTaskWithPrefix, &a.Import{Source: rsrc.URI, Dest: path})
+		_, err = p.CreateTask(ctx, api.ImportTaskWithPrefix, &a.Import{Source: rsrc.URI, Dest: path, Original: rsrc.AssetName()})
 		if err != nil {
 			return err
 		}

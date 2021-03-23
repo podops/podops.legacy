@@ -45,7 +45,11 @@ func GetResourcesCommand(c *cli.Context) error {
 		} else {
 			fmt.Println(assetListing("ID", "NAME", "KIND"))
 			for _, details := range l.Resources {
-				fmt.Println(assetListing(details.GUID, details.Name, details.Kind))
+				if details.Kind == a.ResourceAsset {
+					fmt.Println(assetListing(details.GUID, details.Extra1, details.Kind))
+				} else {
+					fmt.Println(assetListing(details.GUID, details.Name, details.Kind))
+				}
 			}
 		}
 	} else {
@@ -63,7 +67,7 @@ func GetResourcesCommand(c *cli.Context) error {
 			return err
 		}
 
-		fmt.Printf("\n--- %s/%s-%s:\n\n%s\n\n", prod, kind, guid, string(data))
+		fmt.Printf("\n---\n# %s/%s\n%s\n\n", prod, guid, string(data))
 	}
 
 	return nil
@@ -149,7 +153,7 @@ func TemplateCommand(c *cli.Context) error {
 		return nil
 	}
 
-	parent := "PARENT-NAME"
+	parentName := "PARENT-NAME"
 
 	name := "NAME"
 	if c.NArg() == 2 {
@@ -173,7 +177,7 @@ func TemplateCommand(c *cli.Context) error {
 			return nil
 		}
 	} else {
-		episode := a.DefaultEpisode(name, parent, guid, parentGUID, a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
+		episode := a.DefaultEpisode(name, parentName, guid, parentGUID, a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
 		err := dumpResource(fmt.Sprintf("episode-%s.yaml", guid), episode)
 		if err != nil {
 			printError(c, err)

@@ -229,3 +229,11 @@ func (r *Asset) FingerprintURI(parent string) string {
 	}
 	return fmt.Sprintf("%s/%s.%s", parent, id, parts[len(parts)-1])
 }
+
+func (r *Asset) AssetName() string {
+	parts := strings.Split(r.URI, "/")
+	if len(parts) == 0 {
+		return r.URI
+	}
+	return parts[len(parts)-1]
+}

@@ -110,7 +110,7 @@ func UpdateResource(ctx context.Context, name, guid, kind, parent, location stri
 }
 
 // UpdateAssetResource updates the resource inventory
-func UpdateAssetResource(ctx context.Context, name, guid, kind, parent, location, contentType string, size, duration int64) error {
+func UpdateAssetResource(ctx context.Context, name, guid, kind, parent, location, contentType, original string, size, duration int64) error {
 	r, _ := GetResource(ctx, guid)
 
 	_kind, err := NormalizeKind(kind)
@@ -126,6 +126,7 @@ func UpdateAssetResource(ctx context.Context, name, guid, kind, parent, location
 		r.Name = name
 		r.ParentGUID = parent
 		r.Location = location
+		r.Extra1 = original
 		r.ContentType = contentType
 		r.Size = size
 		r.Duration = duration
@@ -142,6 +143,7 @@ func UpdateAssetResource(ctx context.Context, name, guid, kind, parent, location
 		Kind:        _kind,
 		ParentGUID:  parent,
 		Location:    location,
+		Extra1:      original,
 		ContentType: contentType,
 		Size:        size,
 		Duration:    duration,
@@ -235,10 +237,11 @@ func GetResourceContent(ctx context.Context, guid string) (interface{}, error) {
 
 	if r.Kind == a.ResourceAsset {
 		asset := a.Asset{
-			URI:  fmt.Sprintf("%s/%s", a.DefaultCDNEndpoint, r.Location),
-			Type: r.ContentType,
-			Size: int(r.Size),
-			Rel:  a.ResourceTypeLocal,
+			URI:   fmt.Sprintf("%s/%s", a.DefaultCDNEndpoint, r.Location),
+			Title: r.Extra1,
+			Type:  r.ContentType,
+			Size:  int(r.Size),
+			Rel:   a.ResourceTypeLocal,
 		}
 		return &asset, nil
 	}

@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os/user"
 	"path/filepath"
+	"strings"
 
 	"github.com/fupas/commons/pkg/env"
 	"github.com/urfave/cli/v2"
@@ -17,19 +18,11 @@ import (
 
 	"github.com/podops/podops"
 	a "github.com/podops/podops/apiv1"
+	"github.com/podops/podops/pkg/cli/netrc"
 	cl "github.com/podops/podops/pkg/client"
 )
 
 const (
-	// BasicCmdGroup groups basic commands
-	BasicCmdGroup = "\nBasic Commands"
-	// SettingsCmdGroup groups settings
-	SettingsCmdGroup = "\nSettings Commands"
-	// ShowCmdGroup groups basic show commands
-	ShowCmdGroup = "\nContent Commands"
-	// ShowBuildCmdGroup groups advanced show commands
-	ShowBuildCmdGroup = "\nBuild and Management Commands"
-
 	machineEntry = "api.podops.dev"
 )
 
@@ -50,6 +43,11 @@ func init() {
 	}
 }
 
+// NoOpCommand is just a placeholder
+func NoOpCommand(c *cli.Context) error {
+	return cli.Exit(fmt.Sprintf("Command '%s' is not implemented", c.Command.Name), 0)
+}
+
 func LoadConfiguration() *cl.ClientOption {
 	cl := podops.DefaultClientOptions()
 
@@ -62,11 +60,6 @@ func LoadConfiguration() *cl.ClientOption {
 		}
 	}
 	return cl
-}
-
-// NoOpCommand is just a placeholder
-func NoOpCommand(c *cli.Context) error {
-	return cli.Exit(fmt.Sprintf("Command '%s' is not implemented", c.Command.Name), 0)
 }
 
 // Post is used to invoke an API method using http POST
@@ -123,10 +116,10 @@ func netrcPath() string {
 	return path
 }
 
-func loadNetrc() *Netrc {
-	nrc, _ := ParseFile(netrcPath()) // FIXME test this, can we ignore err?
+func loadNetrc() *netrc.Netrc {
+	nrc, _ := netrc.ParseFile(netrcPath()) // FIXME test this, can we ignore err?
 	if nrc == nil {
-		nrc = &Netrc{machines: make([]*Machine, 0, 20), macros: make(Macros, 10)}
+		nrc = &netrc.Netrc{}
 	}
 	return nrc
 }
@@ -179,7 +172,7 @@ func dumpResource(path string, doc interface{}) error {
 	}
 
 	ioutil.WriteFile(path, data, 0644)
-	fmt.Printf("-- %s\n\n%s\n", path, string(data))
+	fmt.Printf("\n---\n# %s\n%s\n", path, string(data))
 
 	return nil
 }
@@ -190,4 +183,28 @@ func getProduction(c *cli.Context) string {
 		prod = client.DefaultProduction()
 	}
 	return prod
+}
+
+func shorten(s string, l int) string {
+	if len(s) <= l {
+		return s
+	}
+	return fmt.Sprintf("%s..%s", s[0:(l-11)], s[(len(s)-9):])
+}
+
+func productionListing(guid, name, title string, current bool) string {
+	if current {
+		return fmt.Sprintf("* %-20s%-50s%s", guid, name, title)
+	}
+	return fmt.Sprintf("  %-20s%-50s%s", guid, name, title)
+}
+
+func assetListing(guid, name, kind string) string {
+	return fmt.Sprintf("  %-20s%-50s%s", guid, name, kind)
+}
+
+// printError formats a CLI error and prints it
+func printError(c *cli.Context, err error) {
+	msg := fmt.Sprintf("%s: %v", c.Command.Name, strings.ToLower(err.Error()))
+	fmt.Println(msg)
 }

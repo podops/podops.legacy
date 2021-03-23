@@ -51,6 +51,11 @@ const (
 	// DeleteResourceRoute route to ResourceEndpoint
 	DeleteResourceRoute = "/resource/:prod/:kind/:id"
 
+	// ImportTask route to ImportTaskEndpoint
+	ImportTask = "/import"
+	// full canonical route
+	ImportTaskWithPrefix = "/_t/import"
+
 	// BuildRoute route to BuildEndpoint
 	BuildRoute = "/build"
 	// UploadRoute route to UploadEndpoint
