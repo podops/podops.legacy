@@ -25,9 +25,11 @@ var (
 // The methods of Client are safe for concurrent use by multiple goroutines.
 type (
 	ClientOption struct {
-		Token       string
-		APIEndpoint string
-		CDNEndpoint string
+		Token          string
+		Production     string
+		APIEndpoint    string
+		CDNEndpoint    string
+		PortalEndpoint string
 	}
 
 	Client struct {
@@ -83,6 +85,10 @@ func (cl *Client) CDNEndpoint() string {
 	return cl.opts.CDNEndpoint
 }
 
+func (cl *Client) PortalEndpoint() string {
+	return cl.opts.PortalEndpoint
+}
+
 func (cl *Client) Realm() string {
 	return cl.realm
 }
@@ -101,6 +107,7 @@ func (co ClientOption) Merge(opts *ClientOption) *ClientOption {
 	o.Token = co.Token
 	o.APIEndpoint = co.APIEndpoint
 	o.CDNEndpoint = co.CDNEndpoint
+	o.PortalEndpoint = co.PortalEndpoint
 
 	if opts != nil {
 		if opts.Token != "" {
@@ -112,6 +119,9 @@ func (co ClientOption) Merge(opts *ClientOption) *ClientOption {
 		if opts.CDNEndpoint != "" {
 			o.CDNEndpoint = opts.CDNEndpoint
 		}
+		if opts.PortalEndpoint != "" {
+			o.PortalEndpoint = opts.PortalEndpoint
+		}
 	}
 
 	return o
@@ -119,8 +129,8 @@ func (co ClientOption) Merge(opts *ClientOption) *ClientOption {
 
 // Valid checks if all configuration parameters are provided
 func (co ClientOption) Valid() bool {
-	return co.APIEndpoint != "" && co.CDNEndpoint != ""
-	// we can not validate token. There are some API calls that do not need one...
+	return co.APIEndpoint != "" && co.CDNEndpoint != "" && co.PortalEndpoint != ""
+	// we can not validate token and production. There are some API calls that do not need them...
 }
 
 // Get is used to request data from the API. No payload, only queries!

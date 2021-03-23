@@ -38,24 +38,30 @@ var (
 )
 
 func init() {
-	cl := podops.DefaultClientOptions()
-
-	nrc := loadNetrc()
-	m := nrc.FindMachine(machineEntry)
-	if m != nil {
-		cl.Token = m.Password
-	}
+	cl := LoadConfiguration()
 
 	c, err := podops.NewClient(context.TODO(), cl.Token, cl)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if c != nil {
-		if m != nil {
-			c.SetProduction(m.Account)
-		}
+		c.SetProduction(cl.Production)
 		client = c
 	}
+}
+
+func LoadConfiguration() *cl.ClientOption {
+	cl := podops.DefaultClientOptions()
+
+	nrc := loadNetrc()
+	m := nrc.FindMachine(machineEntry)
+	if m != nil {
+		cl.Token = m.Password
+		if m.Account != "" {
+			cl.Production = m.Account
+		}
+	}
+	return cl
 }
 
 // NoOpCommand is just a placeholder
