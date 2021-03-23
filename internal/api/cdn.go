@@ -1,4 +1,4 @@
-package cdn
+package api
 
 /* See the following resourced for reference:
 

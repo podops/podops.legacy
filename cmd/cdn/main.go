@@ -6,14 +6,15 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+
 	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/platform"
 	svc "github.com/fupas/platform/pkg/http"
 	gcp "github.com/fupas/platform/provider/google"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+
 	"github.com/podops/podops/internal/api"
-	"github.com/podops/podops/internal/cdn"
 	p "github.com/podops/podops/internal/platform"
 )
 
@@ -47,14 +48,14 @@ func setup() *echo.Echo {
 	// TODO: e.Logger.SetLevel(log.INFO)
 
 	// frontend routes for feed, show & episode
-	e.GET(api.ShowRoute, cdn.RewriteShowHandler)
-	e.GET(api.EpisodeRoute, cdn.RewriteEpisodeHandler)
-	e.GET(api.FeedRoute, cdn.FeedEndpoint)
+	e.GET(api.ShowRoute, api.RewriteShowHandler)
+	e.GET(api.EpisodeRoute, api.RewriteEpisodeHandler)
+	e.GET(api.FeedRoute, api.FeedEndpoint)
 
 	// cdn enpoints
 	content := e.Group(api.ContentNamespace)
-	content.GET(api.DefaultCDNRoute, cdn.RedirectCDNContentEndpoint)
-	content.HEAD(api.DefaultCDNRoute, cdn.RedirectCDNContentEndpoint)
+	content.GET(api.DefaultCDNRoute, api.RedirectCDNContentEndpoint)
+	content.HEAD(api.DefaultCDNRoute, api.RedirectCDNContentEndpoint)
 
 	// grapghql
 	gql := e.Group(api.GraphqlNamespacePrefix)

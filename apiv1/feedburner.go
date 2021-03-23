@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/podops/podops/pkg/rss"
+	"github.com/podops/podops/internal/rss"
 )
 
 var mediaTypeMap map[string]rss.EnclosureType
