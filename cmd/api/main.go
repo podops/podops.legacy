@@ -51,6 +51,7 @@ func setup() *echo.Echo {
 	apiEndpoints := e.Group(api.NamespacePrefix)
 	apiEndpoints.GET(api.ListProductionsRoute, api.ListProductionsEndpoint)
 	apiEndpoints.POST(api.ProductionRoute, api.ProductionEndpoint)
+	apiEndpoints.GET(api.FindResourceRoute, api.FindResourceEndpoint)
 	apiEndpoints.GET(api.GetResourceRoute, api.GetResourceEndpoint)
 	apiEndpoints.GET(api.ListResourcesRoute, api.ListResourcesEndpoint)
 	apiEndpoints.POST(api.UpdateResourceRoute, api.UpdateResourceEndpoint)

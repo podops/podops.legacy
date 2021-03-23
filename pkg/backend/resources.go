@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strconv"
+	"strings"
 
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
@@ -18,6 +19,29 @@ const (
 	// DatastoreResources collection RESOURCE
 	DatastoreResources = "RESOURCES"
 )
+
+var (
+	resourceMap map[string]string
+)
+
+func init() {
+	resourceMap = make(map[string]string)
+	resourceMap["show"] = "show"
+	resourceMap["shows"] = "show"
+	resourceMap["episode"] = "episode"
+	resourceMap["episodes"] = "episode"
+	resourceMap["asset"] = "asset"
+	resourceMap["assets"] = "asset"
+	resourceMap["all"] = "all"
+}
+
+func NormalizeKind(kind string) (string, error) {
+	k := resourceMap[strings.ToLower(kind)]
+	if k == "" {
+		return "", fmt.Errorf("invalid resource '%s'", kind)
+	}
+	return k, nil
+}
 
 // GetResource retrieves a resource
 func GetResource(ctx context.Context, guid string) (*a.Resource, error) {
@@ -53,10 +77,15 @@ func FindResource(ctx context.Context, parent, name string) (*a.Resource, error)
 func UpdateResource(ctx context.Context, name, guid, kind, parent, location string) error {
 	r, _ := GetResource(ctx, guid)
 
+	_kind, err := NormalizeKind(kind)
+	if err != nil {
+		return err
+	}
+
 	if r != nil {
 		// resource already exists, just update the inventory
-		if r.Kind != kind {
-			return fmt.Errorf("can not update resource: expected '%s', received '%s'", r.Kind, kind)
+		if r.Kind != _kind {
+			return fmt.Errorf("can not update resource: expected '%s', received '%s'", r.Kind, _kind)
 		}
 		r.Name = name
 		r.ParentGUID = parent
@@ -71,7 +100,7 @@ func UpdateResource(ctx context.Context, name, guid, kind, parent, location stri
 	rsrc := a.Resource{
 		Name:       name,
 		GUID:       guid,
-		Kind:       kind,
+		Kind:       _kind,
 		ParentGUID: parent,
 		Location:   location,
 		Created:    now,
@@ -84,10 +113,15 @@ func UpdateResource(ctx context.Context, name, guid, kind, parent, location stri
 func UpdateAssetResource(ctx context.Context, name, guid, kind, parent, location, contentType string, size, duration int64) error {
 	r, _ := GetResource(ctx, guid)
 
+	_kind, err := NormalizeKind(kind)
+	if err != nil {
+		return err
+	}
+
 	if r != nil {
 		// resource already exists, just update the inventory
-		if r.Kind != kind {
-			return fmt.Errorf("can not modify resource: expected '%s', received '%s'", r.Kind, kind)
+		if r.Kind != _kind {
+			return fmt.Errorf("can not modify resource: expected '%s', received '%s'", r.Kind, _kind)
 		}
 		r.Name = name
 		r.ParentGUID = parent
@@ -105,7 +139,7 @@ func UpdateAssetResource(ctx context.Context, name, guid, kind, parent, location
 	rsrc := a.Resource{
 		Name:        name,
 		GUID:        guid,
-		Kind:        kind,
+		Kind:        _kind,
 		ParentGUID:  parent,
 		Location:    location,
 		ContentType: contentType,
@@ -145,7 +179,12 @@ func DeleteResource(ctx context.Context, guid string) error {
 func ListResources(ctx context.Context, parent, kind string) ([]*a.Resource, error) {
 	var r []*a.Resource
 
-	if kind == a.ResourceALL {
+	_kind, err := NormalizeKind(kind)
+	if err != nil {
+		return nil, err
+	}
+
+	if _kind == a.ResourceALL {
 		if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", parent).Order("-Created"), &r); err != nil {
 			return nil, err
 		}
@@ -154,16 +193,18 @@ func ListResources(ctx context.Context, parent, kind string) ([]*a.Resource, err
 		if err == nil && show != nil { // SHOW could not be there, no worries ...
 			r = append(r, show)
 		}
-	} else if kind == a.ResourceShow {
+	} else if _kind == a.ResourceShow {
+		// there should only be ONE
 		show, err := GetResource(ctx, parent)
 		if err == nil && show != nil { // SHOW could not be there, no worries ...
 			r = append(r, show)
 		}
 	} else {
-		if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", parent).Filter("Kind =", kind).Order("-Created"), &r); err != nil {
+		if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", parent).Filter("Kind =", _kind).Order("-Created"), &r); err != nil {
 			return nil, err
 		}
 	}
+
 	if len(r) == 0 {
 		return nil, nil
 	}

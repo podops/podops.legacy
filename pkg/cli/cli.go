@@ -34,17 +34,10 @@ const (
 )
 
 var (
-	client      *cl.Client
-	resourceMap map[string]string
+	client *cl.Client
 )
 
 func init() {
-	resourceMap = make(map[string]string)
-	resourceMap["show"] = "show"
-	resourceMap["shows"] = "show"
-	resourceMap["episode"] = "episode"
-	resourceMap["episodes"] = "episode"
-
 	cl := podops.DefaultClientOptions()
 
 	nrc := loadNetrc()

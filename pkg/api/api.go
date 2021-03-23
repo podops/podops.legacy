@@ -37,25 +37,22 @@ const (
 
 	// ProductionRoute route to ProductionEndpoint
 	ProductionRoute = "/production"
-
 	// ListProductionsRoute route to ListProductionsEndpoint
 	ListProductionsRoute = "/productions"
 
+	// FindResourceRoute route to FindResourceEndpoint
+	FindResourceRoute = "/resource/:id"
 	// GetResourceRoute route to ResourceEndpoint
 	GetResourceRoute = "/resource/:prod/:kind/:id"
-
 	// ListResourcesRoute route to ResourceEndpoint GET
 	ListResourcesRoute = "/resource/:prod/:kind"
-
 	// UpdateResourceRoute route to ResourceEndpoint POST,PUT
 	UpdateResourceRoute = "/resource/:prod/:kind/:id"
-
 	// DeleteResourceRoute route to ResourceEndpoint
 	DeleteResourceRoute = "/resource/:prod/:kind/:id"
 
 	// BuildRoute route to BuildEndpoint
 	BuildRoute = "/build"
-
 	// UploadRoute route to UploadEndpoint
 	UploadRoute = "/upload/:prod"
 

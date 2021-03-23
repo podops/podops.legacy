@@ -214,14 +214,14 @@ To see the full list of supported commands, run 'po help'`
 	 # Sets the default podcast
 	 po show ID`
 
-	getUsageText = `list [RESOURCE]
+	getUsageText = `get [RESOURCE|ID]
 
 	 # List all resources
-	 po list
+	 po get
 
 	 # List all resources of a type
-	 po list [shows|episodes|assets]
+	 po get [show|episode|asset]
 
 	 # Show details about a resource
-	 po list [show|episode|asset] ID`
+	 po get ID`
 )

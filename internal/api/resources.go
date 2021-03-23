@@ -6,12 +6,41 @@ import (
 
 	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
+
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
 )
+
+// FindResourceEndpoint returns a resource
+func FindResourceEndpoint(c echo.Context) error {
+	if status, err := auth.Authorized(c, "ROLES"); err != nil {
+		return api.ErrorResponse(c, status, err)
+	}
+
+	guid := c.Param("id")
+	if guid == "" {
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':id"))
+	}
+
+	resource, err := backend.GetResourceContent(api.NewHttpContext(c), guid)
+	if err != nil {
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
+	}
+
+	// FIXME verify that we actually are the owner !!!
+
+	// track api access for billing etc
+	platform.TrackEvent(c.Request(), "api", "rsrc_find", guid, 1)
+
+	if resource == nil {
+		return api.StandardResponse(c, http.StatusNotFound, nil)
+	}
+	return api.StandardResponse(c, http.StatusOK, resource)
+
+}
 
 // GetResourceEndpoint returns a resource
 func GetResourceEndpoint(c echo.Context) error {

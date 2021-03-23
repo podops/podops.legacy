@@ -19,7 +19,8 @@ const (
 	listProductionsRoute = "/productions"
 
 	// resourceRoute route to call ResourceEndpoint
-	getResourceRoute    = "/resource/%s/%s/%s"      // "/update/:prod/:kind/:id"
+	findResourceRoute   = "/resource/%s"            // "/get/:id"
+	getResourceRoute    = "/resource/%s/%s/%s"      // "/get/:prod/:kind/:id"
 	updateResourceRoute = "/resource/%s/%s/%s?f=%v" // "/update/:prod/:kind/:id"
 	listResourcesRoute  = "/resource/%s/%s"
 	deleteResourceRoute = "/resource/%s/%s/%s"
@@ -94,6 +95,23 @@ func (cl *Client) GetResource(prod, kind, guid string, rsrc interface{}) error {
 	status, err := cl.get(cl.ns+fmt.Sprintf(getResourceRoute, prod, kind, guid), rsrc)
 	if status == http.StatusBadRequest {
 		return fmt.Errorf("not found: '%s/%s-%s'", prod, kind, guid)
+	}
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// FindResource returns a resource file
+func (cl *Client) FindResource(guid string, rsrc interface{}) error {
+	if !cl.Valid() {
+		return PodopsClientConfigurationErr
+	}
+
+	status, err := cl.get(cl.ns+fmt.Sprintf(findResourceRoute, guid), rsrc)
+	if status == http.StatusBadRequest {
+		return fmt.Errorf("not found: '%s'", guid)
 	}
 	if err != nil {
 		return err

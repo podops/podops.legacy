@@ -76,7 +76,7 @@ const (
 	// ResourceAsset is referencing any media or binary resource e.g. .mp3 or .png
 	ResourceAsset = "asset"
 	// ResourceALL is a wildcard for any kind of resource
-	ResourceALL = "ALL"
+	ResourceALL = "all"
 )
 
 type (

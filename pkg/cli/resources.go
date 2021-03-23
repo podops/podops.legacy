@@ -11,16 +11,29 @@ import (
 	"github.com/fupas/commons/pkg/util"
 
 	a "github.com/podops/podops/apiv1"
+	"github.com/podops/podops/pkg/backend"
 )
 
 // GetResourcesCommand list all resource associated with a show
 func GetResourcesCommand(c *cli.Context) error {
-
+	kind := a.ResourceALL
 	prod := getProduction(c)
-	kind := resourceMap[strings.ToLower(c.Args().First())]
 
-	if c.NArg() < 2 {
+	if c.NArg() == 1 {
+		k, err := backend.NormalizeKind(c.Args().First())
+		if err == nil {
+			kind = k
+		} else {
+			kind = ""
+		}
+	}
+
+	if kind != "" {
 		// get a list of resources
+		if kind == "" {
+			kind = a.ResourceALL
+		}
+
 		l, err := client.Resources(prod, kind)
 		if err != nil {
 			printError(c, err)
@@ -36,17 +49,14 @@ func GetResourcesCommand(c *cli.Context) error {
 			}
 		}
 	} else {
-		// get a single resource
-		guid := c.Args().Get(1)
+		guid := c.Args().First()
 
 		var rsrc interface{}
-		err := client.GetResource(prod, kind, guid, &rsrc)
+		err := client.FindResource(guid, &rsrc)
 		if err != nil {
-			printError(c, err)
+			fmt.Println("Resource not found.")
 			return nil
 		}
-
-		// FIXME verify that rsrc.Kind == kind
 
 		data, err := yaml.Marshal(rsrc)
 		if err != nil {
