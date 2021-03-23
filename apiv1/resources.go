@@ -188,7 +188,7 @@ func (e *Episode) GUID() string {
 }
 
 // ParentGUID is a convenience method to access the resources parent guid
-func (e *Episode) ParentGUID() string {
+func (e *Episode) Parent() string {
 	return e.Metadata.Labels[LabelParentGUID]
 }
 

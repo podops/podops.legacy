@@ -174,16 +174,16 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		}
 		payload = &episode
 
-		if prod != episode.ParentGUID() {
-			return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(":prod and GUID do not match. expected '%s', got '%s'", prod, episode.ParentGUID()))
+		if prod != episode.Parent() {
+			return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(":prod and GUID do not match. expected '%s', got '%s'", prod, episode.Parent()))
 		}
 
 		// ensure images and media files
-		if err := backend.EnsureAsset(ctx, episode.ParentGUID(), &episode.Image); err != nil {
+		if err := backend.EnsureAsset(ctx, episode.Parent(), &episode.Image); err != nil {
 			return api.ErrorResponse(c, http.StatusBadRequest, err)
 		}
 
-		if err := backend.EnsureAsset(ctx, episode.ParentGUID(), &episode.Enclosure); err != nil {
+		if err := backend.EnsureAsset(ctx, episode.Parent(), &episode.Enclosure); err != nil {
 			return api.ErrorResponse(c, http.StatusBadRequest, err)
 		}
 

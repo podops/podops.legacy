@@ -56,7 +56,7 @@ func GetResource(ctx context.Context, guid string) (*a.Resource, error) {
 	return &r, nil
 }
 
-// FindResource looks for a resource 'name' in the context of production 'parent'
+// FindResource looks for a resource 'name' in the context of production 'production'
 func FindResource(ctx context.Context, production, name string) (*a.Resource, error) {
 	var r []*a.Resource
 
@@ -375,7 +375,7 @@ func UpdateShow(ctx context.Context, location string, show *a.Show) error {
 // UpdateEpisode is a helper function to update a episode resource
 func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) error {
 	// check if resource with same name already exists for the parent production
-	rn, err := FindResource(ctx, episode.ParentGUID(), episode.Metadata.Name)
+	rn, err := FindResource(ctx, episode.Parent(), episode.Metadata.Name)
 	if err != nil {
 		return err
 	}
@@ -386,7 +386,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) err
 
 	if rn != nil && r != nil {
 		if rn.GUID != r.GUID {
-			return fmt.Errorf("can not update resource: '%s/%s' already exists", episode.ParentGUID(), episode.Metadata.Name)
+			return fmt.Errorf("can not update resource: '%s/%s' already exists", episode.Parent(), episode.Metadata.Name)
 		}
 	}
 
@@ -404,8 +404,8 @@ func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) err
 		r.Summary = episode.Description.Summary
 		r.Published = episode.PublishDateTimestamp()
 		r.Index = int(index) // episode number
-		r.Image = episode.Image.ResolveURI(a.StorageEndpoint, episode.ParentGUID())
-		r.Extra1 = episode.Enclosure.ResolveURI(a.DefaultCDNEndpoint+"/c", episode.ParentGUID())
+		r.Image = episode.Image.ResolveURI(a.StorageEndpoint, episode.Parent())
+		r.Extra1 = episode.Enclosure.ResolveURI(a.DefaultCDNEndpoint+"/c", episode.Parent())
 		r.Size = int64(episode.Enclosure.Size)
 		r.Duration = int64(episode.Description.Duration)
 		r.Updated = util.Timestamp()
@@ -427,8 +427,8 @@ func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) err
 		Summary:    episode.Description.Summary,
 		Published:  episode.PublishDateTimestamp(),
 		Index:      int(index), // episode number
-		Image:      episode.Image.ResolveURI(a.StorageEndpoint, episode.ParentGUID()),
-		Extra1:     episode.Enclosure.ResolveURI(a.DefaultCDNEndpoint+"/c", episode.ParentGUID()),
+		Image:      episode.Image.ResolveURI(a.StorageEndpoint, episode.Parent()),
+		Extra1:     episode.Enclosure.ResolveURI(a.DefaultCDNEndpoint+"/c", episode.Parent()),
 		Size:       int64(episode.Enclosure.Size),
 		Duration:   int64(episode.Description.Duration),
 		Created:    now,

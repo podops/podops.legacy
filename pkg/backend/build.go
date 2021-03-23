@@ -27,20 +27,20 @@ func (e EpisodeList) Less(i, j int) bool {
 }
 
 // Build gathers all resources and builds the feed
-func Build(ctx context.Context, guid string, validateOnly bool) error {
+func Build(ctx context.Context, production string, validateOnly bool) error {
 
 	var episodes EpisodeList
 
-	p, err := GetProduction(ctx, guid)
+	p, err := GetProduction(ctx, production)
 	if err != nil {
 		return err
 	}
 	if p == nil {
-		return fmt.Errorf("can not find '%s'", guid)
+		return fmt.Errorf("can not find '%s'", production)
 	}
 
-	if err = ValidateProduction(ctx, guid); err != nil {
-		p, err := GetProduction(ctx, guid)
+	if err = ValidateProduction(ctx, production); err != nil {
+		p, err := GetProduction(ctx, production)
 		if err != nil {
 			return err
 		}
@@ -89,7 +89,7 @@ func Build(ctx context.Context, guid string, validateOnly bool) error {
 	sort.Sort(episodes)
 
 	// read the show
-	s, kind, _, err := ReadResource(ctx, fmt.Sprintf("%s/show-%s.yaml", guid, guid))
+	s, kind, _, err := ReadResource(ctx, fmt.Sprintf("%s/show-%s.yaml", production, production))
 	if err != nil {
 		return err
 	}
@@ -123,7 +123,7 @@ func Build(ctx context.Context, guid string, validateOnly bool) error {
 	}
 
 	// dump the feed to the CDN location
-	obj := platform.Storage().Bucket(a.BucketCDN).Object(fmt.Sprintf("%s/feed.xml", guid))
+	obj := platform.Storage().Bucket(a.BucketCDN).Object(fmt.Sprintf("%s/feed.xml", production))
 	writer := obj.NewWriter(ctx)
 	if _, err := writer.Write(feed.Bytes()); err != nil {
 		return err

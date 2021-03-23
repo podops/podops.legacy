@@ -80,8 +80,8 @@ func TransformToItem(e *Episode) (*rss.Item, error) {
 		Description: e.Description.Summary,
 	}
 
-	ef.AddEnclosure(e.Enclosure.ResolveURI(DefaultCDNEndpoint+"/c", e.ParentGUID()), mediaTypeMap[e.Enclosure.Type], (int64)(e.Enclosure.Size))
-	ef.AddImage(e.Image.ResolveURI(StorageEndpoint, e.ParentGUID()))
+	ef.AddEnclosure(e.Enclosure.ResolveURI(DefaultCDNEndpoint+"/c", e.Parent()), mediaTypeMap[e.Enclosure.Type], (int64)(e.Enclosure.Size))
+	ef.AddImage(e.Image.ResolveURI(StorageEndpoint, e.Parent()))
 	ef.AddPubDate(&pubDate)
 	ef.AddSummary(e.Description.EpisodeText)
 	ef.AddDuration((int64)(e.Description.Duration))
