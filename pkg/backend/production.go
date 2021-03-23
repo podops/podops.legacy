@@ -6,8 +6,10 @@ import (
 	"strings"
 
 	"cloud.google.com/go/datastore"
+
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
+
 	a "github.com/podops/podops/apiv1"
 )
 
@@ -80,6 +82,45 @@ func GetProduction(ctx context.Context, guid string) (*a.Production, error) {
 		return nil, err
 	}
 	return &p, nil
+}
+
+// ValidateProduction checks the integrity of a production and fixes issues if possible
+func ValidateProduction(ctx context.Context, guid string) error {
+	var p a.Production
+	episodes := 0
+	show := 0
+	assets := 0
+
+	err := platform.DataStore().Get(ctx, productionKey(guid), &p)
+	if err != nil {
+		return err
+	}
+	rsrc, err := ListResources(ctx, guid, a.ResourceALL)
+	if err != nil {
+		return err
+	}
+	if rsrc == nil || len(rsrc) == 0 {
+		return fmt.Errorf("no resources")
+	}
+
+	for _, r := range rsrc {
+		if r.Kind == a.ResourceShow {
+			show++
+		} else if r.Kind == a.ResourceEpisode {
+			episodes++
+		} else if r.Kind == a.ResourceAsset {
+			assets++
+		}
+	}
+
+	// a podcast needs 1 show and >= 1 episodes to valid
+	if show != 1 {
+		return fmt.Errorf("missing show")
+	}
+	if episodes == 0 {
+		return fmt.Errorf("missing episodes")
+	}
+	return nil
 }
 
 // UpdateProduction does what the name suggests

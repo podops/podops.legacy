@@ -63,6 +63,7 @@ type (
 
 	// OldAuthorizationRequest struct is used to request a token
 	// Imported from https://github.com/txsvc/service/blob/main/pkg/auth/types.go
+	// FIXME remove this
 	OldAuthorizationRequest struct {
 		Secret     string `json:"secret" binding:"required"`
 		Realm      string `json:"realm" binding:"required"`
@@ -75,6 +76,7 @@ type (
 
 	// OldAuthorizationResponse provides a valid token
 	// Imported from https://github.com/txsvc/service/blob/main/pkg/auth/types.go
+	// FIXME remove this
 	OldAuthorizationResponse struct {
 		Realm    string `json:"realm" binding:"required"`
 		ClientID string `json:"client_id" binding:"required"`

@@ -39,6 +39,19 @@ func Build(ctx context.Context, guid string, validateOnly bool) error {
 		return fmt.Errorf("can not find '%s'", guid)
 	}
 
+	if err = ValidateProduction(ctx, guid); err != nil {
+		p, err := GetProduction(ctx, guid)
+		if err != nil {
+			return err
+		}
+		p.BuildDate = 0 // FIXME BuildDate is the only flag we currently have to mark a production as VALID
+		UpdateProduction(ctx, p)
+
+		return fmt.Errorf("can not build feed")
+	}
+
+	// FIXME build this new !
+
 	// find all episodes and sort them by pubDate
 	q := &storage.Query{
 		Prefix: fmt.Sprintf("%s/episode", p.GUID),

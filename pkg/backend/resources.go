@@ -161,13 +161,25 @@ func DeleteResource(ctx context.Context, guid string) error {
 		return a.ErrNoSuchResource
 	}
 
-	// FIXME verify ACL etc
-
 	if err := platform.DataStore().Delete(ctx, resourceKey(r.GUID)); err != nil {
-		return err
+		return err // FIXME put r back if this fails?
 	}
 
-	// FIXME put r back if this fails?
+	// validate the production after deleting a resource
+	prod := ""
+	if r.Kind == a.ResourceShow {
+		prod = r.GUID
+	} else {
+		prod = r.ParentGUID
+	}
+	if err = ValidateProduction(ctx, prod); err != nil {
+		p, err := GetProduction(ctx, prod)
+		if err != nil {
+			return err
+		}
+		p.BuildDate = 0 // FIXME BuildDate is the only flag we currently have to mark a production as VALID
+		UpdateProduction(ctx, p)
+	}
 
 	if r.Kind == a.ResourceAsset {
 		return RemoveAsset(ctx, r.Location)
