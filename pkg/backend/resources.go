@@ -57,10 +57,10 @@ func GetResource(ctx context.Context, guid string) (*a.Resource, error) {
 }
 
 // FindResource looks for a resource 'name' in the context of production 'parent'
-func FindResource(ctx context.Context, parent, name string) (*a.Resource, error) {
+func FindResource(ctx context.Context, production, name string) (*a.Resource, error) {
 	var r []*a.Resource
 
-	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", parent).Filter("Name =", name), &r); err != nil {
+	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Filter("Name =", name), &r); err != nil {
 		return nil, err
 	}
 	if r == nil {
@@ -74,7 +74,7 @@ func FindResource(ctx context.Context, parent, name string) (*a.Resource, error)
 }
 
 // UpdateResource updates the resource inventory
-func UpdateResource(ctx context.Context, name, guid, kind, parent, location string) error {
+func UpdateResource(ctx context.Context, name, guid, kind, production, location string) error {
 	r, _ := GetResource(ctx, guid)
 
 	_kind, err := NormalizeKind(kind)
@@ -88,7 +88,7 @@ func UpdateResource(ctx context.Context, name, guid, kind, parent, location stri
 			return fmt.Errorf("can not update resource: expected '%s', received '%s'", r.Kind, _kind)
 		}
 		r.Name = name
-		r.ParentGUID = parent
+		r.ParentGUID = production
 		r.Location = location
 		r.Updated = util.Timestamp()
 
@@ -101,7 +101,7 @@ func UpdateResource(ctx context.Context, name, guid, kind, parent, location stri
 		Name:       name,
 		GUID:       guid,
 		Kind:       _kind,
-		ParentGUID: parent,
+		ParentGUID: production,
 		Location:   location,
 		Created:    now,
 		Updated:    now,
@@ -110,7 +110,7 @@ func UpdateResource(ctx context.Context, name, guid, kind, parent, location stri
 }
 
 // UpdateAssetResource updates the resource inventory
-func UpdateAssetResource(ctx context.Context, name, guid, kind, parent, location, contentType, original, etag string, size, duration int64) error {
+func UpdateAssetResource(ctx context.Context, name, guid, kind, production, location, contentType, original, etag string, size, duration int64) error {
 	r, _ := GetResource(ctx, guid)
 
 	_kind, err := NormalizeKind(kind)
@@ -124,7 +124,7 @@ func UpdateAssetResource(ctx context.Context, name, guid, kind, parent, location
 			return fmt.Errorf("can not modify resource: expected '%s', received '%s'", r.Kind, _kind)
 		}
 		r.Name = name
-		r.ParentGUID = parent
+		r.ParentGUID = production
 		r.Location = location
 		r.Extra1 = original
 		r.Extra2 = etag
@@ -142,7 +142,7 @@ func UpdateAssetResource(ctx context.Context, name, guid, kind, parent, location
 		Name:        name,
 		GUID:        guid,
 		Kind:        _kind,
-		ParentGUID:  parent,
+		ParentGUID:  production,
 		Location:    location,
 		Extra1:      original,
 		Extra2:      etag,
@@ -192,7 +192,7 @@ func DeleteResource(ctx context.Context, guid string) error {
 }
 
 // ListResources returns all resources of type kind belonging to parentID
-func ListResources(ctx context.Context, parent, kind string) ([]*a.Resource, error) {
+func ListResources(ctx context.Context, production, kind string) ([]*a.Resource, error) {
 	var r []*a.Resource
 
 	_kind, err := NormalizeKind(kind)
@@ -201,22 +201,22 @@ func ListResources(ctx context.Context, parent, kind string) ([]*a.Resource, err
 	}
 
 	if _kind == a.ResourceALL {
-		if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", parent).Order("-Created"), &r); err != nil {
+		if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Order("-Created"), &r); err != nil {
 			return nil, err
 		}
 		// as we do not get SHOW with the query, we add it now
-		show, err := GetResource(ctx, parent)
+		show, err := GetResource(ctx, production)
 		if err == nil && show != nil { // SHOW could not be there, no worries ...
 			r = append(r, show)
 		}
 	} else if _kind == a.ResourceShow {
 		// there should only be ONE
-		show, err := GetResource(ctx, parent)
+		show, err := GetResource(ctx, production)
 		if err == nil && show != nil { // SHOW could not be there, no worries ...
 			r = append(r, show)
 		}
 	} else {
-		if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", parent).Filter("Kind =", _kind).Order("-Created"), &r); err != nil {
+		if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Filter("Kind =", _kind).Order("-Created"), &r); err != nil {
 			return nil, err
 		}
 	}

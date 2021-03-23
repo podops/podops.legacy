@@ -83,13 +83,13 @@ func ImportResource(ctx context.Context, src, dest, original string) int {
 }
 
 // EnsureAsset validates the existence of the asset and imports it if necessary
-func EnsureAsset(ctx context.Context, parent string, rsrc *a.Asset) error {
+func EnsureAsset(ctx context.Context, production string, rsrc *a.Asset) error {
 	if rsrc.Rel == a.ResourceTypeExternal {
 		_, err := pingURL(rsrc.URI)
 		return err
 	}
 	if rsrc.Rel == a.ResourceTypeLocal {
-		path := fmt.Sprintf("%s/%s", parent, rsrc.URI)
+		path := fmt.Sprintf("%s/%s", production, rsrc.URI)
 		if !resourceExists(ctx, path) {
 			return fmt.Errorf("can not find '%s'", rsrc.URI)
 		}
@@ -101,7 +101,7 @@ func EnsureAsset(ctx context.Context, parent string, rsrc *a.Asset) error {
 			return err
 		}
 
-		path := rsrc.FingerprintURI(parent)
+		path := rsrc.FingerprintURI(production)
 		if resourceExists(ctx, path) { // do nothing as the asset is present FIXME re-download if --force is set
 			return nil // FIXME verify that the asset is unchanged, otherwise re-import
 		}

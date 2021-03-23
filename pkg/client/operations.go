@@ -31,9 +31,23 @@ const (
 	uploadRoute = "/upload"
 )
 
+// Productions retrieves a list of productions
+func (cl *Client) Productions() (*a.ProductionList, error) {
+	if !cl.IsValid() {
+		return nil, PodopsClientConfigurationErr
+	}
+
+	var resp a.ProductionList
+	_, err := cl.get(cl.ns+listProductionsRoute, &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 // CreateProduction invokes the CreateProductionEndpoint
 func (cl *Client) CreateProduction(name, title, summary string) (*a.Production, error) {
-	if !cl.Valid() {
+	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
 
@@ -57,14 +71,17 @@ func (cl *Client) CreateProduction(name, title, summary string) (*a.Production, 
 	return &resp, nil
 }
 
-// Productions retrieves a list of productions
-func (cl *Client) Productions() (*a.ProductionList, error) {
-	if !cl.Valid() {
+// Resources retrieves a list of resources
+func (cl *Client) Resources(production, kind string) (*a.ResourceList, error) {
+	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
+	if kind == "" {
+		kind = "ALL"
+	}
 
-	var resp a.ProductionList
-	_, err := cl.get(cl.ns+listProductionsRoute, &resp)
+	var resp a.ResourceList
+	_, err := cl.get(cl.ns+fmt.Sprintf(listResourcesRoute, production, kind), &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -72,13 +89,13 @@ func (cl *Client) Productions() (*a.ProductionList, error) {
 }
 
 // CreateResource invokes the ResourceEndpoint
-func (cl *Client) CreateResource(prod, kind, rsrcGUID string, force bool, rsrc interface{}) (int, error) {
-	if !cl.Valid() {
+func (cl *Client) CreateResource(production, kind, guid string, force bool, rsrc interface{}) (int, error) {
+	if !cl.IsValid() {
 		return http.StatusBadRequest, PodopsClientConfigurationErr
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.post(cl.ns+fmt.Sprintf(updateResourceRoute, prod, kind, rsrcGUID, force), rsrc, &resp)
+	status, err := cl.post(cl.ns+fmt.Sprintf(updateResourceRoute, production, kind, guid, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -87,14 +104,14 @@ func (cl *Client) CreateResource(prod, kind, rsrcGUID string, force bool, rsrc i
 }
 
 // GetResource returns a resource file
-func (cl *Client) GetResource(prod, kind, guid string, rsrc interface{}) error {
-	if !cl.Valid() {
+func (cl *Client) GetResource(production, kind, guid string, rsrc interface{}) error {
+	if !cl.IsValid() {
 		return PodopsClientConfigurationErr
 	}
 
-	status, err := cl.get(cl.ns+fmt.Sprintf(getResourceRoute, prod, kind, guid), rsrc)
+	status, err := cl.get(cl.ns+fmt.Sprintf(getResourceRoute, production, kind, guid), rsrc)
 	if status == http.StatusBadRequest {
-		return fmt.Errorf("not found: '%s/%s-%s'", prod, kind, guid)
+		return fmt.Errorf("not found: '%s/%s-%s'", production, kind, guid)
 	}
 	if err != nil {
 		return err
@@ -105,7 +122,7 @@ func (cl *Client) GetResource(prod, kind, guid string, rsrc interface{}) error {
 
 // FindResource returns a resource file
 func (cl *Client) FindResource(guid string, rsrc interface{}) error {
-	if !cl.Valid() {
+	if !cl.IsValid() {
 		return PodopsClientConfigurationErr
 	}
 
@@ -121,13 +138,13 @@ func (cl *Client) FindResource(guid string, rsrc interface{}) error {
 }
 
 // UpdateResource invokes the ResourceEndpoint
-func (cl *Client) UpdateResource(prod, kind, rsrcGUID string, force bool, rsrc interface{}) (int, error) {
-	if !cl.Valid() {
+func (cl *Client) UpdateResource(production, kind, guid string, force bool, rsrc interface{}) (int, error) {
+	if !cl.IsValid() {
 		return http.StatusBadRequest, PodopsClientConfigurationErr
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.put(cl.ns+fmt.Sprintf(updateResourceRoute, prod, kind, rsrcGUID, force), rsrc, &resp)
+	status, err := cl.put(cl.ns+fmt.Sprintf(updateResourceRoute, production, kind, guid, force), rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -135,30 +152,13 @@ func (cl *Client) UpdateResource(prod, kind, rsrcGUID string, force bool, rsrc i
 	return status, nil
 }
 
-// Resources retrieves a list of resources
-func (cl *Client) Resources(prod, kind string) (*a.ResourceList, error) {
-	if !cl.Valid() {
-		return nil, PodopsClientConfigurationErr
-	}
-	if kind == "" {
-		kind = "ALL"
-	}
-
-	var resp a.ResourceList
-	_, err := cl.get(cl.ns+fmt.Sprintf(listResourcesRoute, prod, kind), &resp)
-	if err != nil {
-		return nil, err
-	}
-	return &resp, nil
-}
-
 // DeleteResource deletes a resources
-func (cl *Client) DeleteResource(prod, kind, guid string) (int, error) {
-	if !cl.Valid() {
+func (cl *Client) DeleteResource(production, kind, guid string) (int, error) {
+	if !cl.IsValid() {
 		return http.StatusBadRequest, PodopsClientConfigurationErr
 	}
 
-	status, err := cl.delete(cl.ns+fmt.Sprintf(deleteResourceRoute, prod, kind, guid), nil)
+	status, err := cl.delete(cl.ns+fmt.Sprintf(deleteResourceRoute, production, kind, guid), nil)
 	if err != nil {
 		return status, err
 	}
@@ -166,13 +166,13 @@ func (cl *Client) DeleteResource(prod, kind, guid string) (int, error) {
 }
 
 // Build invokes the BuildEndpoint
-func (cl *Client) Build(prod string) (*a.Build, error) {
-	if !cl.Valid() {
+func (cl *Client) Build(production string) (*a.Build, error) {
+	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
 
 	req := a.Build{
-		GUID: prod,
+		GUID: production,
 	}
 	resp := a.Build{}
 
@@ -185,12 +185,12 @@ func (cl *Client) Build(prod string) (*a.Build, error) {
 }
 
 // Upload invokes the UploadEndpoint
-func (cl *Client) Upload(prod, path string, force bool) error {
-	if !cl.Valid() {
+func (cl *Client) Upload(production, path string, force bool) error {
+	if !cl.IsValid() {
 		return PodopsClientConfigurationErr
 	}
 
-	req, err := cl.fileUploadRequest(cl.opts.APIEndpoint+cl.ns+uploadRoute, prod, path) // FIXME upload should go against the CDN endpoint
+	req, err := cl.fileUploadRequest(cl.opts.APIEndpoint+cl.ns+uploadRoute, production, path) // FIXME upload should go against the CDN endpoint
 	if err != nil {
 		log.Fatal(err)
 	}

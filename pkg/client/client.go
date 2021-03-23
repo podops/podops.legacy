@@ -35,27 +35,14 @@ type (
 	}
 )
 
-func New(ctx context.Context, o *ClientOption) (*Client, error) {
-	if o == nil || !o.Valid() {
-		return nil, PodopsClientConfigurationErr
-	}
-	return &Client{
-		opts:      o,
-		validated: false,
-		valid:     false,
-		ns:        api.NamespacePrefix,
-		realm:     "podops",
-	}, nil
-}
-
-// Valid checks if all configuration parameters are provided
-func (cl *Client) Valid() bool {
+// IsValid checks if all configuration parameters are provided
+func (cl *Client) IsValid() bool {
 	if cl.validated {
 		return cl.valid
 	}
 	cl.validated = true
 	// verify the opts first
-	if !cl.opts.Valid() {
+	if !cl.opts.IsValid() {
 		cl.valid = false
 		return false
 	}
@@ -119,8 +106,21 @@ func (co ClientOption) Merge(opts *ClientOption) *ClientOption {
 	return o
 }
 
-// Valid checks if all configuration parameters are provided
-func (co ClientOption) Valid() bool {
+// IsValid checks if all configuration parameters are provided
+func (co ClientOption) IsValid() bool {
 	return co.APIEndpoint != "" && co.CDNEndpoint != "" && co.PortalEndpoint != ""
 	// we can not validate token and production. There are some API calls that do not need them...
+}
+
+func New(ctx context.Context, o *ClientOption) (*Client, error) {
+	if o == nil || !o.IsValid() {
+		return nil, PodopsClientConfigurationErr
+	}
+	return &Client{
+		opts:      o,
+		validated: false,
+		valid:     false,
+		ns:        api.NamespacePrefix,
+		realm:     "podops",
+	}, nil
 }

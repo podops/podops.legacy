@@ -39,12 +39,12 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 
 	// create a new production
 	id, _ := util.ShortUUID()
-	guid := strings.ToLower(id)
+	production := strings.ToLower(id)
 	now := util.Timestamp()
-	location := fmt.Sprintf("%s/show-%s.yaml", guid, guid)
+	location := fmt.Sprintf("%s/show-%s.yaml", production, production)
 
 	p = &a.Production{
-		GUID:    guid,
+		GUID:    production,
 		Owner:   clientID,
 		Name:    name,
 		Title:   title,
@@ -60,10 +60,10 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 
 	// create a dummy Storage location for this production at production.podops.dev/guid
 
-	show := a.DefaultShow(name, title, summary, guid, a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
+	show := a.DefaultShow(name, title, summary, production, a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
 	err = WriteResourceContent(ctx, location, true, false, &show)
 	if err != nil {
-		platform.DataStore().Delete(ctx, productionKey(guid))
+		platform.DataStore().Delete(ctx, productionKey(production))
 		return nil, err
 	}
 
@@ -72,10 +72,10 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 }
 
 // GetProduction returns a production based on the GUID
-func GetProduction(ctx context.Context, guid string) (*a.Production, error) {
+func GetProduction(ctx context.Context, production string) (*a.Production, error) {
 	var p a.Production
 
-	if err := platform.DataStore().Get(ctx, productionKey(guid), &p); err != nil {
+	if err := platform.DataStore().Get(ctx, productionKey(production), &p); err != nil {
 		if err == datastore.ErrNoSuchEntity {
 			return nil, nil // not found is not an error
 		}
@@ -85,17 +85,17 @@ func GetProduction(ctx context.Context, guid string) (*a.Production, error) {
 }
 
 // ValidateProduction checks the integrity of a production and fixes issues if possible
-func ValidateProduction(ctx context.Context, guid string) error {
+func ValidateProduction(ctx context.Context, production string) error {
 	var p a.Production
 	episodes := 0
 	show := 0
 	assets := 0
 
-	err := platform.DataStore().Get(ctx, productionKey(guid), &p)
+	err := platform.DataStore().Get(ctx, productionKey(production), &p)
 	if err != nil {
 		return err
 	}
-	rsrc, err := ListResources(ctx, guid, a.ResourceALL)
+	rsrc, err := ListResources(ctx, production, a.ResourceALL)
 	if err != nil {
 		return err
 	}
@@ -155,6 +155,6 @@ func FindProductionsByOwner(ctx context.Context, owner string) ([]*a.Production,
 	return p, nil
 }
 
-func productionKey(guid string) *datastore.Key {
-	return datastore.NameKey(DatastoreProductions, guid, nil)
+func productionKey(production string) *datastore.Key {
+	return datastore.NameKey(DatastoreProductions, production, nil)
 }

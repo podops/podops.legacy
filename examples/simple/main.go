@@ -34,7 +34,7 @@ func main() {
 	}
 
 	// This verifies that the token is valid and the client is allowed to access the API endpoint
-	if !client.Valid() {
+	if !client.IsValid() {
 		log.Fatal(err)
 	}
 	fmt.Printf("\n[%d ms] Client authenticated.\n", delta(start))
