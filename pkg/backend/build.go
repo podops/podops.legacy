@@ -26,8 +26,8 @@ func (e EpisodeList) Less(i, j int) bool {
 	return e[i].PublishDateTimestamp() > e[j].PublishDateTimestamp() // sorting direction is descending
 }
 
-// Build gathers all resources and builds the feed
-func Build(ctx context.Context, production string, validateOnly bool) error {
+// BuildFeed gathers all resources and builds the feed
+func BuildFeed(ctx context.Context, production string, validateOnly bool) error {
 
 	var episodes EpisodeList
 

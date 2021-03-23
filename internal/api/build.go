@@ -14,8 +14,8 @@ import (
 	"github.com/podops/podops/pkg/backend"
 )
 
-// BuildEndpoint starts the build of the feed
-func BuildEndpoint(c echo.Context) error {
+// BuildFeedEndpoint starts the build of the feed
+func BuildFeedEndpoint(c echo.Context) error {
 	var req *a.Build = new(a.Build)
 
 	if status, err := auth.Authorized(c, "ROLES"); err != nil {
@@ -37,7 +37,7 @@ func BuildEndpoint(c echo.Context) error {
 	}
 
 	// FIXME make this async, make validateOnly a flag
-	if err := backend.Build(ctx, req.GUID, false); err != nil {
+	if err := backend.BuildFeed(ctx, req.GUID, false); err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("error building feed '%s': %v", req.GUID, err))
 	}
 

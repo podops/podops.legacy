@@ -109,8 +109,8 @@ func UpdateResource(ctx context.Context, name, guid, kind, production, location 
 	return updateResource(ctx, &rsrc)
 }
 
-// UpdateAssetResource updates the resource inventory
-func UpdateAssetResource(ctx context.Context, name, guid, kind, production, location, contentType, original, etag string, size, duration int64) error {
+// UpdateAsset updates the resource inventory
+func UpdateAsset(ctx context.Context, name, guid, kind, production, location, contentType, original, etag string, size, duration int64) error {
 	r, _ := GetResource(ctx, guid)
 
 	_kind, err := NormalizeKind(kind)

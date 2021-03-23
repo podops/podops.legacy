@@ -74,7 +74,7 @@ func ImportResource(ctx context.Context, src, dest, original string) int {
 	name := strings.Split(temp.FingerprintURI(parent), "/")[1]
 	duration := int64(0) // FIXME implement it
 
-	if err := UpdateAssetResource(ctx, name, util.Checksum(src), a.ResourceAsset, parent, dest, meta.ContentType, original, meta.Etag, meta.Size, duration); err != nil {
+	if err := UpdateAsset(ctx, name, util.Checksum(src), a.ResourceAsset, parent, dest, meta.ContentType, original, meta.Etag, meta.Size, duration); err != nil {
 		platform.ReportError(fmt.Errorf("error updating inventory: %v", err))
 		return http.StatusBadRequest
 	}

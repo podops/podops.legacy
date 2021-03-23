@@ -65,7 +65,7 @@ func UploadEndpoint(c echo.Context) error {
 			original := p.FileName()
 
 			// update the inventory
-			backend.UpdateAssetResource(ctx, p.FileName(), util.Checksum(location), a.ResourceAsset, prod, location, attr.ContentType, original, attr.Etag, attr.Size, duration)
+			backend.UpdateAsset(ctx, p.FileName(), util.Checksum(location), a.ResourceAsset, prod, location, attr.ContentType, original, attr.Etag, attr.Size, duration)
 		}
 	}
 

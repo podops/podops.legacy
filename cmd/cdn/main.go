@@ -59,8 +59,8 @@ func setup() *echo.Echo {
 
 	// grapghql
 	gql := e.Group(api.GraphqlNamespacePrefix)
-	gql.POST(api.GraphqlRoute, api.GetGraphqlEndpoint())
-	gql.GET(api.GraphqlPlaygroundRoute, api.GetGraphqlPlaygroundEndpoint())
+	gql.POST(api.GraphqlRoute, api.GraphqlEndpoint())
+	gql.GET(api.GraphqlPlaygroundRoute, api.GraphqlPlaygroundEndpoint())
 
 	// add the routes last
 	e.Static("/", staticFileLocation) // serve static files from e.g. ./public

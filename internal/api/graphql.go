@@ -10,8 +10,8 @@ import (
 	"github.com/podops/podops/pkg/api"
 )
 
-// GetGraphqlEndpoint maps the Graphql handler to gin
-func GetGraphqlEndpoint() echo.HandlerFunc {
+// GraphqlEndpoint maps the Graphql handler to gin
+func GraphqlEndpoint() echo.HandlerFunc {
 	h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: graph.CreateResolver()}))
 
 	return func(e echo.Context) error {
@@ -20,8 +20,8 @@ func GetGraphqlEndpoint() echo.HandlerFunc {
 	}
 }
 
-// GetGraphqlPlaygroundEndpoint maps the Playground handler to gin
-func GetGraphqlPlaygroundEndpoint() echo.HandlerFunc {
+// GraphqlPlaygroundEndpoint maps the Playground handler to gin
+func GraphqlPlaygroundEndpoint() echo.HandlerFunc {
 	h := playground.Handler("GraphQL", api.GraphqlNamespacePrefix+api.GraphqlRoute)
 
 	return func(e echo.Context) error {

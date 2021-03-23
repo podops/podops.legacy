@@ -57,7 +57,7 @@ func setup() *echo.Echo {
 	apiEndpoints.POST(api.UpdateResourceRoute, api.UpdateResourceEndpoint)
 	apiEndpoints.PUT(api.UpdateResourceRoute, api.UpdateResourceEndpoint)
 	apiEndpoints.DELETE(api.DeleteResourceRoute, api.DeleteResourceEndpoint)
-	apiEndpoints.POST(api.BuildRoute, api.BuildEndpoint)
+	apiEndpoints.POST(api.BuildRoute, api.BuildFeedEndpoint)
 	apiEndpoints.POST(api.UploadRoute, api.UploadEndpoint)
 
 	return e
