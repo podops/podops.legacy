@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/podops/podops/pkg/api"
+	"github.com/podops/podops/apiv1"
 )
 
 var (
@@ -120,7 +120,7 @@ func New(ctx context.Context, o *ClientOption) (*Client, error) {
 		opts:      o,
 		validated: false,
 		valid:     false,
-		ns:        api.NamespacePrefix,
+		ns:        apiv1.NamespacePrefix,
 		realm:     "podops",
 	}, nil
 }

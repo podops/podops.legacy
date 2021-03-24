@@ -11,7 +11,7 @@ import (
 	"github.com/fupas/platform/pkg/platform"
 	"github.com/labstack/echo/v4"
 	"github.com/podops/podops/apiv1"
-	"github.com/podops/podops/pkg/api"
+	a "github.com/podops/podops/apiv1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,7 +23,7 @@ const (
 
 // Scenario 1: new account, login, account confirmation, token swap
 func TestLoginScenario1(t *testing.T) {
-	apiv1.DefaultAPIEndpoint = endpoint
+	a.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 	cleaner()
 
@@ -135,7 +135,7 @@ func TestLoginScenario6(t *testing.T) {
 func loginStep1(t *testing.T, status int) {
 
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, api.LoginRequestRoute, strings.NewReader(createAuthRequestJSON(realm, userID, "", "")))
+	req := httptest.NewRequest(http.MethodPost, a.LoginRequestRoute, strings.NewReader(createAuthRequestJSON(realm, userID, "", "")))
 	rec := httptest.NewRecorder()
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
@@ -157,7 +157,7 @@ func loginStep2(t *testing.T, token string, status int, validate bool) {
 
 	e := echo.New()
 	r := e.Router()
-	r.Add(http.MethodGet, api.LoginConfirmationRoute, LoginConfirmationEndpoint)
+	r.Add(http.MethodGet, a.LoginConfirmationRoute, LoginConfirmationEndpoint)
 
 	c := e.NewContext(req, rec)
 	r.Find(http.MethodGet, url, c)
@@ -177,7 +177,7 @@ func loginStep2(t *testing.T, token string, status int, validate bool) {
 func loginStep3(t *testing.T, testRealm, testUser, testClient, testToken string, state, status int, validate bool) {
 
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, api.GetAuthorizationRoute, strings.NewReader(createAuthRequestJSON(testRealm, testUser, "", testToken)))
+	req := httptest.NewRequest(http.MethodPost, a.GetAuthorizationRoute, strings.NewReader(createAuthRequestJSON(testRealm, testUser, "", testToken)))
 	rec := httptest.NewRecorder()
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
@@ -197,7 +197,7 @@ func loginStep3(t *testing.T, testRealm, testUser, testClient, testToken string,
 
 func logoutStep(t *testing.T, testRealm, testUser, testClient, testToken string, status int, validate bool) {
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, api.LogoutRequestRoute, strings.NewReader(createAuthRequestJSON(testRealm, testUser, testClient, "")))
+	req := httptest.NewRequest(http.MethodPost, a.LogoutRequestRoute, strings.NewReader(createAuthRequestJSON(testRealm, testUser, testClient, "")))
 	rec := httptest.NewRecorder()
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	req.Header.Set("Authorization", "Bearer "+testToken)

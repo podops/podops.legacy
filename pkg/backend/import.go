@@ -16,7 +16,6 @@ import (
 
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/platform"
-	"github.com/podops/podops/pkg/api"
 )
 
 type (
@@ -107,7 +106,7 @@ func EnsureAsset(ctx context.Context, production string, rsrc *a.Asset) error {
 		}
 
 		// dispatch a request for background import
-		_, err = platform.CreateTask(ctx, api.ImportTaskWithPrefix, &a.Import{Source: rsrc.URI, Dest: path, Original: rsrc.AssetName()})
+		_, err = platform.CreateTask(ctx, a.ImportTaskWithPrefix, &a.Import{Source: rsrc.URI, Dest: path, Original: rsrc.AssetName()})
 		if err != nil {
 			return err
 		}

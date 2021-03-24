@@ -12,8 +12,8 @@ import (
 	svc "github.com/fupas/platform/pkg/http"
 	gcp "github.com/fupas/platform/provider/google"
 
+	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/api"
-	a "github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/auth"
 )
 
@@ -37,28 +37,28 @@ func setup() *echo.Echo {
 	// TODO: e.Logger.SetLevel(log.INFO)
 
 	// task endpoints
-	tasks := e.Group(api.TaskNamespacePrefix)
+	tasks := e.Group(a.TaskNamespacePrefix)
 	tasks.POST(a.ImportTask, api.ImportTaskEndpoint)
 
 	// admin endpoints
-	admin := e.Group(api.AdminNamespacePrefix)
-	admin.POST(api.LoginRequestRoute, auth.LoginRequestEndpoint)
-	admin.POST(api.LogoutRequestRoute, auth.LogoutRequestEndpoint)
-	admin.GET(api.LoginConfirmationRoute, auth.LoginConfirmationEndpoint)
-	admin.POST(api.GetAuthorizationRoute, auth.GetAuthorizationEndpoint)
+	admin := e.Group(a.AdminNamespacePrefix)
+	admin.POST(a.LoginRequestRoute, auth.LoginRequestEndpoint)
+	admin.POST(a.LogoutRequestRoute, auth.LogoutRequestEndpoint)
+	admin.GET(a.LoginConfirmationRoute, auth.LoginConfirmationEndpoint)
+	admin.POST(a.GetAuthorizationRoute, auth.GetAuthorizationEndpoint)
 
 	// the api endpoints
-	apiEndpoints := e.Group(api.NamespacePrefix)
-	apiEndpoints.GET(api.ListProductionsRoute, api.ListProductionsEndpoint)
-	apiEndpoints.POST(api.ProductionRoute, api.ProductionEndpoint)
-	apiEndpoints.GET(api.FindResourceRoute, api.FindResourceEndpoint)
-	apiEndpoints.GET(api.GetResourceRoute, api.GetResourceEndpoint)
-	apiEndpoints.GET(api.ListResourcesRoute, api.ListResourcesEndpoint)
-	apiEndpoints.POST(api.UpdateResourceRoute, api.UpdateResourceEndpoint)
-	apiEndpoints.PUT(api.UpdateResourceRoute, api.UpdateResourceEndpoint)
-	apiEndpoints.DELETE(api.DeleteResourceRoute, api.DeleteResourceEndpoint)
-	apiEndpoints.POST(api.BuildRoute, api.BuildFeedEndpoint)
-	apiEndpoints.POST(api.UploadRoute, api.UploadEndpoint)
+	apiEndpoints := e.Group(a.NamespacePrefix)
+	apiEndpoints.GET(a.ListProductionsRoute, api.ListProductionsEndpoint)
+	apiEndpoints.POST(a.ProductionRoute, api.ProductionEndpoint)
+	apiEndpoints.GET(a.FindResourceRoute, api.FindResourceEndpoint)
+	apiEndpoints.GET(a.GetResourceRoute, api.GetResourceEndpoint)
+	apiEndpoints.GET(a.ListResourcesRoute, api.ListResourcesEndpoint)
+	apiEndpoints.POST(a.UpdateResourceRoute, api.UpdateResourceEndpoint)
+	apiEndpoints.PUT(a.UpdateResourceRoute, api.UpdateResourceEndpoint)
+	apiEndpoints.DELETE(a.DeleteResourceRoute, api.DeleteResourceEndpoint)
+	apiEndpoints.POST(a.BuildRoute, api.BuildFeedEndpoint)
+	apiEndpoints.POST(a.UploadRoute, api.UploadEndpoint)
 
 	return e
 }
