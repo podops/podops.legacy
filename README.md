@@ -39,13 +39,13 @@ $ po login <your_email_address>
 Podops will send you an email with a confirmation code. Use the confirmation code to exchange it for your API access key. The code is `valid for 15min` and can only be used once. In case you missed this time-window, start over with the login command.
 
 ```shell
-$ po auth <access_code>
+$ po auth <your_email_address> <access_code>
 ```
 
 This will retrieve your current API access code and place it in its default location `$HOME/.po/config`. You can verify that everything is setup correctly by issuing a command that requires authentication e.g.
 
 ```shell
-$ po list
+$ po shows
 ```
 
 **Note:** If you login for the first time, Podops will send you an email to verify your Email-Address first. Confirm by following the link in the Email. The link is `valid for 15min`.

@@ -96,11 +96,11 @@ func BlockAccount(ctx context.Context, realm, clientID string) error {
 // SendAccountChallenge sends a notification to the user promting to confirm the account
 func SendAccountChallenge(ctx context.Context, account *Account) error {
 	// FIXME use templates to send a proper email
+
 	url := fmt.Sprintf("%s/login/%s", apiv1.DefaultAPIEndpoint, account.Ext1)
 
-	err := platform.SendEmail(env.GetString("EMAIL_FROM", "hello@podops.dev"), account.UserID, "Confirm your account", url)
-	if err != nil {
-		return fmt.Errorf("SendLoginChallenge failed")
+	if err := platform.SendEmail(env.GetString("EMAIL_FROM", "hello@podops.dev"), account.UserID, "Confirm your account", url); err != nil {
+		return err
 	}
 	return nil
 }
@@ -109,9 +109,8 @@ func SendAccountChallenge(ctx context.Context, account *Account) error {
 func SendAuthToken(ctx context.Context, account *Account) error {
 	// FIXME this is not done, just a crude implementation
 
-	err := platform.SendEmail(env.GetString("EMAIL_FROM", "hello@podops.dev"), account.UserID, "Your confirmation token", account.Ext2)
-	if err != nil {
-		return fmt.Errorf("SendAuthToken failed")
+	if err := platform.SendEmail(env.GetString("EMAIL_FROM", "hello@podops.dev"), account.UserID, "Your confirmation token", account.Ext2); err != nil {
+		return err
 	}
 	return nil
 
