@@ -11,11 +11,11 @@ import (
 )
 
 func SendEmail(sender, recipient, subject, body string) error {
-	domain := env.GetString("EMAIL_DOMAIN", "m.podops.dev") // FIXME
+	domain := env.GetString("EMAIL_DOMAIN", "") // FIXME
 	if domain == "" {
 		return fmt.Errorf("invalid email configuration")
 	}
-	apiKey := env.GetString("EMAIL_API_KEY", "7424393ba0fbb41e28a4516670af3ddb-203ef6d0-7b16b027") // FIXME
+	apiKey := env.GetString("EMAIL_API_KEY", "") // FIXME
 	if apiKey == "" {
 		return fmt.Errorf("invalid email configuration")
 	}
@@ -27,10 +27,9 @@ func SendEmail(sender, recipient, subject, body string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
-	resp, id, err := mg.Send(ctx, message)
+	_, _, err := mg.Send(ctx, message)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%s,%s\n", resp, id)
 	return nil
 }
