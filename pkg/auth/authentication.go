@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/commons/pkg/util"
 	"github.com/podops/podops/apiv1"
+	"github.com/podops/podops/internal/platform"
 )
 
 // ResetAccountChallenge creates a new confirmation token and resets the timer
@@ -93,10 +95,12 @@ func BlockAccount(ctx context.Context, realm, clientID string) error {
 
 // SendAccountChallenge sends a notification to the user promting to confirm the account
 func SendAccountChallenge(ctx context.Context, account *Account) error {
-	// FIXME send a real notification
+	// FIXME use templates to send a proper email
 	url := fmt.Sprintf("%s/login/%s", apiv1.DefaultAPIEndpoint, account.Ext1)
-	if url == "" {
-		return fmt.Errorf("SendLoginChallenge: not implemented")
+
+	err := platform.SendEmail(env.GetString("EMAIL_FROM", "hello@podops.dev"), account.UserID, "Confirm your account", url)
+	if err != nil {
+		return fmt.Errorf("SendLoginChallenge failed")
 	}
 	return nil
 }
@@ -104,10 +108,13 @@ func SendAccountChallenge(ctx context.Context, account *Account) error {
 // SendAuthToken sends a notification to the user with the current authentication token
 func SendAuthToken(ctx context.Context, account *Account) error {
 	// FIXME this is not done, just a crude implementation
-	if account.Ext2 == "" {
-		return fmt.Errorf("SendAuthToken: not implemented")
+
+	err := platform.SendEmail(env.GetString("EMAIL_FROM", "hello@podops.dev"), account.UserID, "Your confirmation token", account.Ext2)
+	if err != nil {
+		return fmt.Errorf("SendAuthToken failed")
 	}
 	return nil
+
 }
 
 // ConfirmLoginChallenge confirms the account

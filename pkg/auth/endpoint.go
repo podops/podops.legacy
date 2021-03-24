@@ -111,10 +111,14 @@ func LogoutRequestEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	account, err := LookupAccount(ctx, req.Realm, req.ClientID)
+	account, err := LookupAccount(ctx, auth.Realm, auth.ClientID)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
+	if account == nil {
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
+	}
+
 	if account.Status < 0 {
 		return c.NoContent(http.StatusForbidden) // account is blocked or deactivated etc ...
 	}
