@@ -12,6 +12,8 @@ import (
 	"github.com/podops/podops/internal/platform"
 )
 
+// FIXME move this to package /internal/api
+
 // StandardResponse is the default way to respond to API requests
 func StandardResponse(c echo.Context, status int, res interface{}) error {
 	if res == nil {

@@ -8,7 +8,6 @@ import (
 	"cloud.google.com/go/datastore"
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
-	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
 )
 
@@ -27,18 +26,14 @@ const (
 	DefaultAuthenticationExpiration = 10
 	// DefaultAuthorizationExpiration in days
 	DefaultAuthorizationExpiration = 90
-
-	DefaultAPIScope = "api.user"
-
-	DefaultTokenType = "user"
 )
 
 type (
 	// Authorization represents a user, app or bot and its permissions
 	Authorization struct {
-		ClientID  string `json:"client_id" binding:"required"` // UNIQUE
-		Realm     string `json:"realm"`
-		Name      string `json:"name"` // DEPREACTED use real instead
+		ClientID string `json:"client_id" binding:"required"` // UNIQUE
+		Realm    string `json:"realm"`
+		//Name      string `json:"name"` // DEPREACTED use real instead
 		Token     string `json:"token" binding:"required"`
 		TokenType string `json:"token_type" binding:"required"` // user,app,bot
 		UserID    string `json:"user_id"`                       // depends on TokenType. UserID could equal ClientID or BotUSerID in Slack
@@ -47,9 +42,9 @@ type (
 		// internal
 		Revoked bool `json:"-"`
 		// FIXME: add revokation flag to the Authorization
-		AuthType string `json:"-"` // DEPRECATED currently: jwt, slack
-		Created  int64  `json:"-"`
-		Updated  int64  `json:"-"`
+		//AuthType string `json:"-"` // DEPRECATED currently: jwt, slack
+		Created int64 `json:"-"`
+		Updated int64 `json:"-"`
 	}
 
 	// AuthorizationRequest represents a login/authorization request from a user, app, or bot
@@ -76,39 +71,35 @@ func (a *Authorization) IsValid() bool {
 	return true
 }
 
-// Authorized verifies that clientID can access resource kind/GUID
-// FIXME not implemented yet
-func Authorized(c echo.Context, role string) (int, error) {
-	//return fmt.Errorf("Not allowed to access '%s/%s'", kind, guid)
-	return http.StatusOK, nil // FIXME this is just a placeholder
-}
-
 // GetBearerToken extracts the bearer token
-func GetBearerToken(r *http.Request) string {
+func GetBearerToken(r *http.Request) (string, error) {
+
+	// FIXME optimize this !!
 
 	auth := r.Header.Get("Authorization")
 	if len(auth) == 0 {
-		return ""
+		return "", a.ErrNoToken
 	}
 
 	parts := strings.Split(auth, " ")
 	if len(parts) != 2 {
-		return ""
+		return "", a.ErrNoToken
 	}
-
 	if parts[0] == "Bearer" {
-		return parts[1]
+		return parts[1], nil
 	}
 
-	return ""
+	return "", a.ErrNoToken
 }
 
 // GetClientID extracts the ClientID from the token
 func GetClientID(ctx context.Context, r *http.Request) (string, error) {
-	token := GetBearerToken(r)
-	if token == "" {
-		return "", a.ErrNoToken
+	token, err := GetBearerToken(r)
+	if err != nil {
+		return "", err
 	}
+
+	// FIXME optimize this, e.g. implement caching
 
 	auth, err := FindAuthorizationByToken(ctx, token)
 	if err != nil {

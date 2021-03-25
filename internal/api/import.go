@@ -13,7 +13,7 @@ import (
 
 // ImportTaskEndpoint implements async file import
 func ImportTaskEndpoint(c echo.Context) error {
-	var req *a.Import = new(a.Import)
+	var req *a.ImportRequest = new(a.ImportRequest)
 
 	err := c.Bind(req)
 	if err != nil {

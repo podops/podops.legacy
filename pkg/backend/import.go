@@ -106,7 +106,7 @@ func EnsureAsset(ctx context.Context, production string, rsrc *a.Asset) error {
 		}
 
 		// dispatch a request for background import
-		_, err = platform.CreateTask(ctx, a.ImportTaskWithPrefix, &a.Import{Source: rsrc.URI, Dest: path, Original: rsrc.AssetName()})
+		_, err = platform.CreateTask(ctx, a.ImportTaskWithPrefix, &a.ImportRequest{Source: rsrc.URI, Dest: path, Original: rsrc.AssetName()})
 		if err != nil {
 			return err
 		}

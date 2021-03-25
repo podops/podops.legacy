@@ -10,22 +10,23 @@ import (
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
-	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
 )
 
 // FindResourceEndpoint returns a resource
 func FindResourceEndpoint(c echo.Context) error {
-	if status, err := auth.Authorized(c, "ROLES"); err != nil {
-		return api.ErrorResponse(c, status, err)
-	}
+	ctx := api.NewHttpContext(c)
 
 	guid := c.Param("id")
 	if guid == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':id"))
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route"))
 	}
 
-	resource, err := backend.GetResourceContent(api.NewHttpContext(c), guid)
+	if err := AuthorizeAccessResource(ctx, c, scopeResourceRead, guid); err != nil {
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
+	}
+
+	resource, err := backend.GetResourceContent(ctx, guid)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
@@ -44,25 +45,22 @@ func FindResourceEndpoint(c echo.Context) error {
 
 // GetResourceEndpoint returns a resource
 func GetResourceEndpoint(c echo.Context) error {
-	if status, err := auth.Authorized(c, "ROLES"); err != nil {
-		return api.ErrorResponse(c, status, err)
-	}
+	ctx := api.NewHttpContext(c)
 
 	prod := c.Param("prod")
-	if prod == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':prod"))
-	}
 	kind := c.Param("kind")
-	if kind == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':kind"))
-	}
 	guid := c.Param("id")
-	if guid == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':id"))
+
+	if !validateNotEmpty(prod, kind, guid) {
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route"))
+	}
+
+	if err := AuthorizeAccessResource(ctx, c, scopeResourceRead, guid); err != nil {
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	// FIXME prod, kind are ignored, assumption is that guid is globally unique ...
-	resource, err := backend.GetResourceContent(api.NewHttpContext(c), guid)
+	resource, err := backend.GetResourceContent(ctx, guid)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
@@ -79,20 +77,20 @@ func GetResourceEndpoint(c echo.Context) error {
 
 // ListResourcesEndpoint returns a list of resources
 func ListResourcesEndpoint(c echo.Context) error {
-	if status, err := auth.Authorized(c, "ROLES"); err != nil {
-		return api.ErrorResponse(c, status, err)
-	}
+	ctx := api.NewHttpContext(c)
 
 	prod := c.Param("prod")
-	if prod == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':prod"))
-	}
 	kind := c.Param("kind")
-	if kind == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':kind"))
+
+	if !validateNotEmpty(prod, kind) {
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route"))
 	}
 
-	l, err := backend.ListResources(api.NewHttpContext(c), prod, kind)
+	if err := AuthorizeAccessProduction(ctx, c, scopeResourceRead, prod); err != nil {
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
+	}
+
+	l, err := backend.ListResources(ctx, prod, kind)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
@@ -105,21 +103,18 @@ func ListResourcesEndpoint(c echo.Context) error {
 
 // UpdateResourceEndpoint creates or updates a resource
 func UpdateResourceEndpoint(c echo.Context) error {
-	if status, err := auth.Authorized(c, "ROLES"); err != nil {
-		return api.ErrorResponse(c, status, err)
-	}
+	ctx := api.NewHttpContext(c)
 
 	prod := c.Param("prod")
-	if prod == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':prod"))
-	}
 	kind := c.Param("kind")
-	if kind == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':kind"))
-	}
 	guid := c.Param("id")
-	if guid == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':id"))
+
+	if !validateNotEmpty(prod, kind, guid) {
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route"))
+	}
+
+	if err := AuthorizeAccessResource(ctx, c, scopeResourceWrite, guid); err != nil {
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	forceFlag := false
@@ -128,7 +123,6 @@ func UpdateResourceEndpoint(c echo.Context) error {
 	}
 
 	var payload interface{}
-	ctx := api.NewHttpContext(c)
 	location := fmt.Sprintf("%s/%s-%s.yaml", prod, kind, guid)
 
 	if kind == a.ResourceShow {
@@ -213,25 +207,22 @@ func UpdateResourceEndpoint(c echo.Context) error {
 
 // DeleteResourceEndpoint deletes a resource and its .yaml file
 func DeleteResourceEndpoint(c echo.Context) error {
-	if status, err := auth.Authorized(c, "ROLES"); err != nil {
-		return api.ErrorResponse(c, status, err)
-	}
+	ctx := api.NewHttpContext(c)
 
 	prod := c.Param("prod")
-	if prod == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':prod"))
-	}
 	kind := c.Param("kind")
-	if kind == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':kind"))
-	}
 	guid := c.Param("id")
-	if guid == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':id"))
+
+	if !validateNotEmpty(prod, kind, guid) {
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route"))
+	}
+
+	if err := AuthorizeAccessResource(ctx, c, scopeResourceWrite, guid); err != nil {
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	// FIXME prod, kind are ignored, assumption is that guid is globally unique ...
-	if err := backend.DeleteResource(api.NewHttpContext(c), guid); err != nil {
+	if err := backend.DeleteResource(ctx, guid); err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 

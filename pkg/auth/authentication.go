@@ -11,6 +11,11 @@ import (
 	"github.com/podops/podops/internal/platform"
 )
 
+const (
+	DefaultScope     = "production:read,production:write,production:build,resource:read,resource:write"
+	DefaultTokenType = "user"
+)
+
 // ResetAccountChallenge creates a new confirmation token and resets the timer
 func ResetAccountChallenge(ctx context.Context, account *Account) (*Account, error) {
 	// FIXME add a mutex
@@ -173,15 +178,15 @@ func exchangeToken(ctx context.Context, req *AuthorizationRequest, loginFrom str
 	if auth == nil {
 		// FIXME this is hardcoded for podops, make it configurable
 		auth = &Authorization{
-			ClientID:  account.ClientID,
-			Realm:     req.Realm,
-			Name:      "DEPRECATED",
+			ClientID: account.ClientID,
+			Realm:    req.Realm,
+			//Name:      "DEPRECATED",
 			TokenType: DefaultTokenType,
 			UserID:    req.UserID,
-			Scope:     DefaultAPIScope,
-			AuthType:  "DEPRECATED",
-			Revoked:   false,
-			Created:   now,
+			Scope:     DefaultScope,
+			//AuthType:  "DEPRECATED",
+			Revoked: false,
+			Created: now,
 		}
 	}
 

@@ -17,16 +17,16 @@ import (
 // ProductionEndpoint creates an new show and does all the background setup
 func ProductionEndpoint(c echo.Context) error {
 	var req *a.Production = new(a.Production)
+	ctx := api.NewHttpContext(c)
 
-	if status, err := auth.Authorized(c, "ROLES"); err != nil {
-		return api.ErrorResponse(c, status, err)
+	if err := AuthorizeAccess(ctx, c, scopeProductionWrite); err != nil {
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	err := c.Bind(req)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
-	ctx := api.NewHttpContext(c)
 
 	// validate and normalize the name
 	showName := strings.ToLower(strings.TrimSpace(req.Name))
@@ -51,14 +51,14 @@ func ProductionEndpoint(c echo.Context) error {
 	return api.StandardResponse(c, http.StatusCreated, p)
 }
 
-// ListProductionsEndpoint creates an new show and does all the background setup
+// ListProductionsEndpoint list all available shows
 func ListProductionsEndpoint(c echo.Context) error {
+	ctx := api.NewHttpContext(c)
 
-	if status, err := auth.Authorized(c, "ROLES"); err != nil {
-		return api.ErrorResponse(c, status, err)
+	if err := AuthorizeAccess(ctx, c, scopeProductionRead); err != nil {
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
-	ctx := api.NewHttpContext(c)
 	clientID, _ := auth.GetClientID(ctx, c.Request())
 
 	productions, err := backend.FindProductionsByOwner(ctx, clientID)

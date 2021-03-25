@@ -166,15 +166,15 @@ func (cl *Client) DeleteResource(production, kind, guid string) (int, error) {
 }
 
 // Build invokes the BuildEndpoint
-func (cl *Client) Build(production string) (*a.Build, error) {
+func (cl *Client) Build(production string) (*a.BuildRequest, error) {
 	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
 
-	req := a.Build{
+	req := a.BuildRequest{
 		GUID: production,
 	}
-	resp := a.Build{}
+	resp := a.BuildRequest{}
 
 	_, err := cl.post(cl.ns+buildRoute, &req, &resp)
 	if err != nil {

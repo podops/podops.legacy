@@ -48,39 +48,17 @@ type (
 		Resources []*Resource `json:"resources" `
 	}
 
-	// Build initiates the build of the feed
-	Build struct {
+	// BuildRequest initiates the build of the feed
+	BuildRequest struct {
 		GUID         string `json:"guid" binding:"required"`
 		FeedURL      string `json:"feed"`
 		FeedAliasURL string `json:"alias"`
 	}
 
-	// Import is used by the import task
-	Import struct {
+	// ImportRequest is used by the import task
+	ImportRequest struct {
 		Source   string `json:"src" binding:"required"`
 		Dest     string `json:"dest" binding:"required"`
 		Original string `json:"original" binding:"required"`
-	}
-
-	// OldAuthorizationRequest struct is used to request a token
-	// Imported from https://github.com/txsvc/service/blob/main/pkg/auth/types.go
-	// FIXME remove this
-	OldAuthorizationRequest struct {
-		Secret     string `json:"secret" binding:"required"`
-		Realm      string `json:"realm" binding:"required"`
-		ClientID   string `json:"client_id" binding:"required"`
-		ClientType string `json:"client_type" binding:"required"` // user,app,bot
-		UserID     string `json:"user_id" binding:"required"`
-		Scope      string `json:"scope" binding:"required"`
-		Duration   int64  `json:"duration" binding:"required"`
-	}
-
-	// OldAuthorizationResponse provides a valid token
-	// Imported from https://github.com/txsvc/service/blob/main/pkg/auth/types.go
-	// FIXME remove this
-	OldAuthorizationResponse struct {
-		Realm    string `json:"realm" binding:"required"`
-		ClientID string `json:"client_id" binding:"required"`
-		Token    string `json:"token" binding:"required"`
 	}
 )

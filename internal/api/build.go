@@ -10,23 +10,20 @@ import (
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
-	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
 )
 
 // BuildFeedEndpoint starts the build of the feed
 func BuildFeedEndpoint(c echo.Context) error {
-	var req *a.Build = new(a.Build)
-
-	if status, err := auth.Authorized(c, "ROLES"); err != nil {
-		return api.ErrorResponse(c, status, err)
-	}
+	var req *a.BuildRequest = new(a.BuildRequest)
+	ctx := api.NewHttpContext(c)
 
 	if err := c.Bind(req); err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
-
-	ctx := api.NewHttpContext(c)
+	if err := AuthorizeAccessProduction(ctx, c, scopeProductionBuild, req.GUID); err != nil {
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
+	}
 
 	p, err := backend.GetProduction(ctx, req.GUID)
 	if err != nil {
@@ -47,7 +44,7 @@ func BuildFeedEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	resp := a.Build{
+	resp := a.BuildRequest{
 		GUID:         req.GUID,
 		FeedURL:      fmt.Sprintf("%s/c/%s/feed.xml", a.DefaultCDNEndpoint, req.GUID),
 		FeedAliasURL: fmt.Sprintf("%s/s/%s/feed.xml", a.DefaultPortalEndpoint, p.Name),

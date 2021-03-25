@@ -12,27 +12,26 @@ import (
 	a "github.com/podops/podops/apiv1"
 	p "github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
-	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
 )
 
 // UploadEndpoint implements content upload
 func UploadEndpoint(c echo.Context) error {
-	if status, err := auth.Authorized(c, "ROLES"); err != nil {
-		return api.ErrorResponse(c, status, err)
-	}
+	ctx := api.NewHttpContext(c)
 
 	mr, err := c.Request().MultipartReader()
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
-
 	prod := c.Param("prod")
 	if prod == "" {
 		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':prod'"))
 	}
 
-	ctx := api.NewHttpContext(c)
+	if err := AuthorizeAccessProduction(ctx, c, scopeResourceWrite, prod); err != nil {
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
+	}
+
 	for {
 		p, err := mr.NextPart()
 		if err == io.EOF {
