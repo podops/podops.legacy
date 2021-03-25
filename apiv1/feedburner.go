@@ -7,6 +7,8 @@ import (
 	"github.com/podops/podops/internal/rss"
 )
 
+// FIXME move to package pkg/backend
+
 var mediaTypeMap map[string]rss.EnclosureType
 
 func init() {

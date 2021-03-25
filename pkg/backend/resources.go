@@ -239,7 +239,7 @@ func GetResourceContent(ctx context.Context, guid string) (interface{}, error) {
 
 	if r.Kind == a.ResourceAsset {
 		asset := a.Asset{
-			URI:   fmt.Sprintf("%s/%s", a.DefaultCDNEndpoint, r.Location),
+			URI:   r.GetPublicLocation(),
 			Title: r.Extra1,
 			Type:  r.ContentType,
 			Size:  int(r.Size),

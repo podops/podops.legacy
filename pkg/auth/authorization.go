@@ -8,6 +8,7 @@ import (
 	"cloud.google.com/go/datastore"
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
+	"github.com/labstack/echo/v4"
 	a "github.com/podops/podops/apiv1"
 )
 
@@ -31,18 +32,15 @@ const (
 type (
 	// Authorization represents a user, app or bot and its permissions
 	Authorization struct {
-		ClientID string `json:"client_id" binding:"required"` // UNIQUE
-		Realm    string `json:"realm"`
-		//Name      string `json:"name"` // DEPREACTED use real instead
+		ClientID  string `json:"client_id" binding:"required"` // UNIQUE
+		Realm     string `json:"realm"`
 		Token     string `json:"token" binding:"required"`
 		TokenType string `json:"token_type" binding:"required"` // user,app,bot
 		UserID    string `json:"user_id"`                       // depends on TokenType. UserID could equal ClientID or BotUSerID in Slack
 		Scope     string `json:"scope"`                         // a comma separated list of scopes, see below
 		Expires   int64  `json:"expires"`                       // 0 = never
 		// internal
-		Revoked bool `json:"-"`
-		// FIXME: add revokation flag to the Authorization
-		//AuthType string `json:"-"` // DEPRECATED currently: jwt, slack
+		Revoked bool  `json:"-"`
 		Created int64 `json:"-"`
 		Updated int64 `json:"-"`
 	}
@@ -110,6 +108,36 @@ func GetClientID(ctx context.Context, r *http.Request) (string, error) {
 	}
 
 	return auth.ClientID, nil
+}
+
+// CheckAuthorization relies on the presence of a bearer token and validates the
+// matching authorization against a list of requested scopes. If everything checks
+// out, the function returns the authorization or an error otherwise.
+func CheckAuthorization(ctx context.Context, c echo.Context, scope string) (*Authorization, error) {
+	token, err := GetBearerToken(c.Request())
+	if err != nil {
+		return nil, err
+	}
+
+	auth, err := FindAuthorizationByToken(ctx, token)
+	if err != nil || auth == nil {
+		return nil, a.ErrNotAuthorized
+	}
+
+	if !hasScope(auth.Scope, scope) {
+		return nil, a.ErrNotAuthorized
+	}
+
+	return auth, nil
+}
+
+func hasScope(scopes, scope string) bool {
+	if scopes == "" || scope == "" {
+		return false // empty inputs should never evalute to true
+	}
+
+	// FIXME this is a VERY naiv implementation
+	return strings.Contains(scopes, scope)
 }
 
 // LookupAuthorization looks for an authorization

@@ -8,6 +8,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// FIXME is this in the right package ?
+
 type (
 	// ResourceLoaderFunc implements loading of resources
 	ResourceLoaderFunc func(data []byte) (interface{}, string, error)

@@ -22,6 +22,7 @@ func BuildFeedEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	if err := AuthorizeAccessProduction(ctx, c, scopeProductionBuild, req.GUID); err != nil {
+		fmt.Println("BF1")
 		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 

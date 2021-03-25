@@ -18,15 +18,3 @@ func TestValidateNotEmpty(t *testing.T) {
 	assert.True(t, validateNotEmpty(a, b))
 	assert.False(t, validateNotEmpty(a, c, b))
 }
-
-func TestScope(t *testing.T) {
-
-	scope1 := "production:read,production:write,production:build"
-
-	assert.False(t, hasScope("", ""))
-	assert.False(t, hasScope(scope1, ""))
-	assert.False(t, hasScope("", scopeResourceRead))
-
-	assert.True(t, hasScope(scope1, scopeProductionRead))
-	assert.False(t, hasScope(scope1, scopeResourceRead))
-}

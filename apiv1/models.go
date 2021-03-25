@@ -1,5 +1,7 @@
 package apiv1
 
+import "fmt"
+
 type (
 	// Production is the parent struct of all other resources.
 	Production struct {
@@ -62,3 +64,15 @@ type (
 		Original string `json:"original" binding:"required"`
 	}
 )
+
+//
+// helper functions to work with the models
+//
+
+// GetPublicLocation returns the public url of a resource if it exists on the CDN or an empty string otherwise
+func (r *Resource) GetPublicLocation() string {
+	if r.Kind == ResourceAsset {
+		return fmt.Sprintf("%s/c/%s", DefaultCDNEndpoint, r.Location)
+	}
+	return ""
+}
