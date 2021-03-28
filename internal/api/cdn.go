@@ -43,7 +43,7 @@ func init() {
 }
 
 // RewriteShowHandler rewrites requests from /s/:name to /s/_id.html
-func RewriteShowHandler(c echo.Context) error {
+func RewriteShowHandler(c echo.Context) error { // FIXME not needed !
 	if err := c.File(showPagePath); err != nil {
 		c.Logger().Error(err)
 	}
@@ -54,7 +54,7 @@ func RewriteShowHandler(c echo.Context) error {
 }
 
 // RewriteEpisodeHandler rewrites requests from /e/:guid to /e/_id.html
-func RewriteEpisodeHandler(c echo.Context) error {
+func RewriteEpisodeHandler(c echo.Context) error { // FIXME not needed !
 	if err := c.File(episodePagePath); err != nil {
 		c.Logger().Error(err)
 	}
@@ -65,7 +65,7 @@ func RewriteEpisodeHandler(c echo.Context) error {
 }
 
 // FeedEndpoint handles request for feed.xml by redirecting to the public storage bucket
-func FeedEndpoint(c echo.Context) error {
+func FeedEndpoint(c echo.Context) error { // FIXME not needed !
 
 	name := c.Param("name")
 	if name == "" {

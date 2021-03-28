@@ -32,12 +32,6 @@ func setup() *echo.Echo {
 	// Create a new router instance
 	e := echo.New()
 
-	// hack to get get rid of these 404 in the log
-	e.Pre(middleware.Rewrite(map[string]string{
-		"/7c054e6693dc/feed.xml": "/s/wizards-magic-sheep/feed.xml",
-	}))
-	// end hack
-
 	// add and configure the middlewares
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
@@ -49,8 +43,8 @@ func setup() *echo.Echo {
 	// TODO: e.Logger.SetLevel(log.INFO)
 
 	// frontend routes for feed, show & episode
-	e.GET(a.ShowRoute, api.RewriteShowHandler)
-	e.GET(a.EpisodeRoute, api.RewriteEpisodeHandler)
+	//e.GET(a.ShowRoute, api.RewriteShowHandler)
+	//e.GET(a.EpisodeRoute, api.RewriteEpisodeHandler)
 	e.GET(a.FeedRoute, api.FeedEndpoint)
 
 	// cdn enpoints
@@ -64,7 +58,7 @@ func setup() *echo.Echo {
 	gql.GET(a.GraphqlPlaygroundRoute, api.GraphqlPlaygroundEndpoint())
 
 	// add the routes last
-	e.Static("/", staticFileLocation) // serve static files from e.g. ./public
+	//e.Static("/", staticFileLocation) // serve static files from e.g. ./public
 
 	return e
 }
@@ -87,6 +81,7 @@ func init() {
 	}
 	platform.RegisterGlobally(client)
 
+	// FIXME not needed!
 	staticFileLocation = env.GetString("STATIC_FILE_LOCATION", "public")
 }
 

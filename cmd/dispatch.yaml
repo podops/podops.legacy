@@ -8,11 +8,11 @@ dispatch:
   - url: "*/_t/*"
     service: api
 
+# FIXME change to api
   - url: "api.podops.dev/q/*"
     service: default
 
+# FIXME remove this and then only deploy a 'default' service
   - url: "cdn.podops.dev/*"
     service: default
 
-  - url: "podops.dev/"
-    service: default

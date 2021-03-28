@@ -1,5 +1,5 @@
 .PHONY: all
-all: build_test cli web cdn api
+all: build_test cli cdn api
 
 PLATFORM_LINUX = GOARCH=amd64 GOOS=linux
 PLATFORM_MAC = GOARCH=amd64 GOOS=darwin
@@ -19,12 +19,6 @@ test:
 	cd internal/api && go test
 	cd pkg/auth && go test
 	
-.PHONY: web
-web:
-	cd ../podops.dev && gridsome build
-	rm -rf cmd/cdn/public
-	cp -R ../podops.dev/dist cmd/cdn/public
-
 .PHONY: api
 api:
 	cd cmd/api && gcloud app deploy . --quiet
