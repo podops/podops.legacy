@@ -8,7 +8,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/pkg/validator"
+	"github.com/podops/podops/internal/validator"
 )
 
 // FIXME is this in the right package ?

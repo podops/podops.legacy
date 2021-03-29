@@ -3,7 +3,7 @@ package apiv1
 import (
 	"regexp"
 
-	"github.com/podops/podops/pkg/validator"
+	"github.com/podops/podops/internal/validator"
 )
 
 var (

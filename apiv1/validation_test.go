@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/johngb/langreg"
-	"github.com/podops/podops/pkg/validator"
+	"github.com/podops/podops/internal/validator"
 )
 
 func TestISO(t *testing.T) {
