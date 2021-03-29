@@ -28,7 +28,7 @@ func NewClient(ctx context.Context, token string, opts ...*cl.ClientOption) (*cl
 	return cl.New(ctx, co)
 }
 
-// DefaultClientOptions returns a default client configuration bases on ENV variables
+// DefaultClientOptions returns a default configuration bases on ENV variables
 func DefaultClientOptions() *cl.ClientOption {
 	o := &cl.ClientOption{}
 	o.Token = env.GetString("PODOPS_API_TOKEN", "")

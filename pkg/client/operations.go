@@ -32,20 +32,6 @@ const (
 	uploadRoute = "/upload"
 )
 
-// Productions retrieves a list of productions
-func (cl *Client) Productions() (*models.ProductionList, error) {
-	if !cl.IsValid() {
-		return nil, PodopsClientConfigurationErr
-	}
-
-	var resp models.ProductionList
-	_, err := cl.get(cl.ns+listProductionsRoute, &resp)
-	if err != nil {
-		return nil, err
-	}
-	return &resp, nil
-}
-
 // CreateProduction invokes the CreateProductionEndpoint
 func (cl *Client) CreateProduction(name, title, summary string) (*models.Production, error) {
 	if !cl.IsValid() {
@@ -72,17 +58,14 @@ func (cl *Client) CreateProduction(name, title, summary string) (*models.Product
 	return &resp, nil
 }
 
-// Resources retrieves a list of resources
-func (cl *Client) Resources(production, kind string) (*models.ResourceList, error) {
+// Productions retrieves a list of productions
+func (cl *Client) Productions() (*models.ProductionList, error) {
 	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
-	if kind == "" {
-		kind = "ALL"
-	}
 
-	var resp models.ResourceList
-	_, err := cl.get(cl.ns+fmt.Sprintf(listResourcesRoute, production, kind), &resp)
+	var resp models.ProductionList
+	_, err := cl.get(cl.ns+listProductionsRoute, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -136,6 +119,23 @@ func (cl *Client) FindResource(guid string, rsrc interface{}) error {
 	}
 
 	return nil
+}
+
+// Resources retrieves a list of resources
+func (cl *Client) Resources(production, kind string) (*models.ResourceList, error) {
+	if !cl.IsValid() {
+		return nil, PodopsClientConfigurationErr
+	}
+	if kind == "" {
+		kind = "ALL"
+	}
+
+	var resp models.ResourceList
+	_, err := cl.get(cl.ns+fmt.Sprintf(listResourcesRoute, production, kind), &resp)
+	if err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }
 
 // UpdateResource invokes the ResourceEndpoint

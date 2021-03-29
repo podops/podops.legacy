@@ -55,7 +55,7 @@ func main() {
 
 	// Return a fully populated show struct with all defaults.
 	// We can add or change values if needed.
-	show := a.DefaultShow(p.Name, podcastTitle, podcastSummary, p.GUID, client.PortalEndpoint(), client.CDNEndpoint())
+	show := cli.DefaultShow(p.Name, podcastTitle, podcastSummary, p.GUID, client.PortalEndpoint(), client.CDNEndpoint())
 	show.Metadata.Labels[a.LabelLanguage] = "de_DE"
 	show.Description.Author = "PodOps sample code"
 	show.Description.Copyright = "Copyright 2021 - Transformative Services"
@@ -70,7 +70,7 @@ func main() {
 
 	// Each podcast needs at least one episode to be valid. Let's add one ...
 	guid, _ := util.ShortUUID()
-	episode := a.DefaultEpisode("first", show.Metadata.Name, guid, show.GUID(), client.PortalEndpoint(), client.CDNEndpoint())
+	episode := cli.DefaultEpisode("first", show.Metadata.Name, guid, show.GUID(), client.PortalEndpoint(), client.CDNEndpoint())
 	episode.Description.Title = "Drums !"
 	episode.Description.Summary = "A short sample generated from one of Garage Band's default settings"
 	episode.Description.EpisodeText = `This is the real description of the episode's content. Knock yourself out! 

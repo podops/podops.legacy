@@ -42,7 +42,7 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 	id, _ := util.ShortUUID()
 	production := strings.ToLower(id)
 	now := util.Timestamp()
-	location := fmt.Sprintf("%s/show-%s.yaml", production, production)
+	//location := fmt.Sprintf("%s/show-%s.yaml", production, production)
 
 	p = &models.Production{
 		GUID:    production,
@@ -59,14 +59,17 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 		return nil, err
 	}
 
+	// FIXME remove this part, we don't need a "dummy file"
 	// create a dummy Storage location for this production at production.podops.dev/guid
 
-	show := a.DefaultShow(name, title, summary, production, a.DefaultEndpoint, a.DefaultCDNEndpoint)
-	err = WriteResourceContent(ctx, location, true, false, &show)
-	if err != nil {
-		platform.DataStore().Delete(ctx, productionKey(production))
-		return nil, err
-	}
+	/*
+		show := a.DefaultShow(name, title, summary, production, a.DefaultEndpoint, a.DefaultCDNEndpoint)
+		err = WriteResourceContent(ctx, location, true, false, &show)
+		if err != nil {
+			platform.DataStore().Delete(ctx, productionKey(production))
+			return nil, err
+		}
+	*/
 
 	// all done
 	return p, nil

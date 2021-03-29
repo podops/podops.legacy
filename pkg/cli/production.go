@@ -27,7 +27,7 @@ func NewProductionCommand(c *cli.Context) error {
 		return nil
 	}
 
-	show := a.DefaultShow(p.Name, title, summary, p.GUID, a.DefaultEndpoint, a.DefaultCDNEndpoint)
+	show := DefaultShow(p.Name, title, summary, p.GUID, a.DefaultEndpoint, a.DefaultCDNEndpoint)
 	err = dumpResource(fmt.Sprintf("show-%s.yaml", p.GUID), show)
 	if err != nil {
 		printError(c, err)
