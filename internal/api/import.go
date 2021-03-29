@@ -6,7 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/podops/podops/internal/platform"
-	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/backend"
 	"github.com/podops/podops/pkg/backend/models"
 )
@@ -23,6 +22,6 @@ func ImportTaskEndpoint(c echo.Context) error {
 	}
 
 	// FIXME does it make sense to retry? If not, send StatusOK
-	status := backend.ImportResource(api.NewHttpContext(c), req.Source, req.Dest, req.Original)
+	status := backend.ImportResource(platform.NewHttpContext(c), req.Source, req.Dest, req.Original)
 	return c.NoContent(status)
 }

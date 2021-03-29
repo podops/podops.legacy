@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/pkg/api"
+	"github.com/podops/podops/internal/platform"
 )
 
 // LoginRequestEndpoint initiates the login process.
@@ -23,19 +23,19 @@ import (
 // status 403: only logged-out and confirmed users can proceed
 func LoginRequestEndpoint(c echo.Context) error {
 	var req *AuthorizationRequest = new(AuthorizationRequest)
-	ctx := api.NewHttpContext(c)
+	ctx := platform.NewHttpContext(c)
 
 	err := c.Bind(req)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	if req.Realm == "" || req.UserID == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, err)
+		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	account, err := FindAccountByUserID(ctx, req.Realm, req.UserID)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	// new account
@@ -43,12 +43,12 @@ func LoginRequestEndpoint(c echo.Context) error {
 		// #1: create a new account
 		account, err = CreateAccount(ctx, req.Realm, req.UserID)
 		if err != nil {
-			return api.ErrorResponse(c, http.StatusInternalServerError, err)
+			return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 		// #2: send the confirmation link
 		err = SendAccountChallenge(ctx, account)
 		if err != nil {
-			return api.ErrorResponse(c, http.StatusInternalServerError, err)
+			return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 		// status 201: new account
 		return c.NoContent(http.StatusCreated)
@@ -59,29 +59,29 @@ func LoginRequestEndpoint(c echo.Context) error {
 		// #1: update the expiration timestamp
 		account, err = ResetAccountChallenge(ctx, account)
 		if err != nil {
-			return api.ErrorResponse(c, http.StatusInternalServerError, err)
+			return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 		// #2: send the account confirmation link
 		err = SendAccountChallenge(ctx, account)
 		if err != nil {
-			return api.ErrorResponse(c, http.StatusInternalServerError, err)
+			return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 		// status 201: new account
 		return c.NoContent(http.StatusCreated)
 	}
 	if account.Status != 0 {
 		// status 403: only logged-out and confirmed users can proceed, do nothing otherwise
-		return api.ErrorResponse(c, http.StatusForbidden, err)
+		return platform.ErrorResponse(c, http.StatusForbidden, err)
 	}
 
 	// create and send the auth token
 	account, err = ResetAuthToken(ctx, account)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	err = SendAuthToken(ctx, account)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	// status 204: existing account, email with token sent
@@ -94,14 +94,14 @@ func LoginRequestEndpoint(c echo.Context) error {
 
 func LogoutRequestEndpoint(c echo.Context) error {
 	var req *AuthorizationRequest = new(AuthorizationRequest)
-	ctx := api.NewHttpContext(c)
+	ctx := platform.NewHttpContext(c)
 
 	err := c.Bind(req)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	if req.Realm == "" || req.UserID == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, err)
+		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	token, err := GetBearerToken(c.Request())
@@ -110,18 +110,18 @@ func LogoutRequestEndpoint(c echo.Context) error {
 	}
 	auth, err := FindAuthorizationByToken(ctx, token)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusBadRequest, err)
+		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 	if auth.UserID != req.UserID || auth.Realm != req.Realm {
-		return api.ErrorResponse(c, http.StatusBadRequest, err)
+		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	account, err := LookupAccount(ctx, auth.Realm, auth.ClientID)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	if account == nil {
-		return api.ErrorResponse(c, http.StatusBadRequest, err)
+		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	if account.Status < 0 {
@@ -130,7 +130,7 @@ func LogoutRequestEndpoint(c echo.Context) error {
 	// if we made until here, logout shoud be OK
 	account.Status = AccountLoggedOut
 	if err := UpdateAccount(ctx, account); err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -144,26 +144,26 @@ func LogoutRequestEndpoint(c echo.Context) error {
 // status 403: token is expired or has already been used
 // status 404: token was not found
 func LoginConfirmationEndpoint(c echo.Context) error {
-	ctx := api.NewHttpContext(c)
+	ctx := platform.NewHttpContext(c)
 
 	token := c.Param("token")
 	if token == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':token"))
+		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':token"))
 	}
 
 	account, status, err := ConfirmLoginChallenge(ctx, token)
 	if status != http.StatusNoContent {
-		return api.ErrorResponse(c, status, err)
+		return platform.ErrorResponse(c, status, err)
 	}
 
 	account, err = ResetAuthToken(ctx, account)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	err = SendAuthToken(ctx, account)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	// status 204: account is confirmed, email with auth token sent
@@ -178,24 +178,24 @@ func LoginConfirmationEndpoint(c echo.Context) error {
 // status 404: token was not found
 func GetAuthorizationEndpoint(c echo.Context) error {
 	var req *AuthorizationRequest = new(AuthorizationRequest)
-	ctx := api.NewHttpContext(c)
+	ctx := platform.NewHttpContext(c)
 
 	err := c.Bind(req)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	if req.Token == "" || req.Realm == "" || req.UserID == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, err)
+		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	auth, status, err := exchangeToken(ctx, req, c.Request().RemoteAddr)
 	if status != http.StatusOK {
-		return api.ErrorResponse(c, status, err)
+		return platform.ErrorResponse(c, status, err)
 	}
 
 	req.Token = auth.Token
 	req.ClientID = auth.ClientID
 
-	return api.StandardResponse(c, status, req)
+	return platform.StandardResponse(c, status, req)
 }

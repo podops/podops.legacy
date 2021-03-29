@@ -1,4 +1,4 @@
-package api
+package platform
 
 import (
 	"context"
@@ -9,10 +9,7 @@ import (
 	"google.golang.org/appengine"
 
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/internal/platform"
 )
-
-// FIXME move this to package /internal/api
 
 // StandardResponse is the default way to respond to API requests
 func StandardResponse(c echo.Context, status int, res interface{}) error {
@@ -32,7 +29,7 @@ func ErrorResponse(c echo.Context, status int, err error) error {
 	var resp a.StatusObject
 
 	// send the error to Google Error Reporting
-	platform.ReportError(err)
+	ReportError(err)
 
 	if err == nil {
 		resp = a.NewStatus(http.StatusInternalServerError, fmt.Sprintf("status: %d", status))

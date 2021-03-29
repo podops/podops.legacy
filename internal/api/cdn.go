@@ -1,16 +1,5 @@
 package api
 
-/* See the following resourced for reference:
-
-https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
-https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
-
-https://github.com/gin-gonic/gin
-
-https://cloud.google.com/cdn/docs/
-
-*/
-
 import (
 	"fmt"
 	"net/http"
@@ -20,9 +9,9 @@ import (
 
 	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/platform/pkg/platform"
+
 	a "github.com/podops/podops/apiv1"
 	p "github.com/podops/podops/internal/platform"
-	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/backend"
 )
 
@@ -69,16 +58,16 @@ func FeedEndpoint(c echo.Context) error { // FIXME not needed !
 
 	name := c.Param("name")
 	if name == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':name'"))
+		return p.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':name'"))
 	}
 
-	prod, err := backend.FindProductionByName(api.NewHttpContext(c), name)
+	prod, err := backend.FindProductionByName(p.NewHttpContext(c), name)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return p.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	if prod == nil {
-		return api.ErrorResponse(c, http.StatusNotFound, fmt.Errorf("can not find '%s/feed.xml'", name))
+		return p.ErrorResponse(c, http.StatusNotFound, fmt.Errorf("can not find '%s/feed.xml'", name))
 	}
 
 	redirectTo := fmt.Sprintf("%s/%s/feed.xml", a.StorageEndpoint, prod.GUID)
@@ -95,16 +84,16 @@ func RedirectCDNContentEndpoint(c echo.Context) error {
 	// return an error if the request is anything other than GET/HEAD
 	m := c.Request().Method
 	if m != "" && m != "GET" && m != "HEAD" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("received a '%s' request", m))
+		return p.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("received a '%s' request", m))
 	}
 
 	guid := c.Param("guid")
 	if guid == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected '/:guid/:asset'"))
+		return p.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected '/:guid/:asset'"))
 	}
 	asset := c.Param("asset")
 	if asset == "" {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected '/:guid/:asset'"))
+		return p.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected '/:guid/:asset'"))
 	}
 	rsrc := fmt.Sprintf("%s/%s", guid, asset)
 
@@ -112,10 +101,10 @@ func RedirectCDNContentEndpoint(c echo.Context) error {
 	if m == "HEAD" {
 		// get object attributes, can be cached ...
 		obj := bkt.Object(rsrc)
-		attr, err := obj.Attrs(api.NewHttpContext(c)) // FIXME replace this with a generic NewContext function
+		attr, err := obj.Attrs(p.NewHttpContext(c)) // FIXME replace this with a generic NewContext function
 
 		if err == storage.ErrObjectNotExist {
-			return api.ErrorResponse(c, http.StatusNotFound, fmt.Errorf("can not find '%s'", rsrc))
+			return p.ErrorResponse(c, http.StatusNotFound, fmt.Errorf("can not find '%s'", rsrc))
 		}
 
 		c.Response().Header().Set("etag", attr.Etag)

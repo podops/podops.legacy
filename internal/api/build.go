@@ -9,7 +9,6 @@ import (
 
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/platform"
-	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/backend"
 	"github.com/podops/podops/pkg/backend/models"
 )
@@ -17,33 +16,33 @@ import (
 // BuildFeedEndpoint starts the build of the feed
 func BuildFeedEndpoint(c echo.Context) error {
 	var req *models.BuildRequest = new(models.BuildRequest)
-	ctx := api.NewHttpContext(c)
+	ctx := platform.NewHttpContext(c)
 
 	if err := c.Bind(req); err != nil {
-		return api.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	if err := AuthorizeAccessProduction(ctx, c, scopeProductionBuild, req.GUID); err != nil {
 		fmt.Println("BF1")
-		return api.ErrorResponse(c, http.StatusUnauthorized, err)
+		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	p, err := backend.GetProduction(ctx, req.GUID)
 	if err != nil {
-		return api.ErrorResponse(c, http.StatusNotFound, err)
+		return platform.ErrorResponse(c, http.StatusNotFound, err)
 	}
 	if p == nil {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid guid '%s'", req.GUID))
+		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid guid '%s'", req.GUID))
 	}
 
 	// FIXME make this async, make validateOnly a flag
 	if err := backend.BuildFeed(ctx, req.GUID, false); err != nil {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("error building feed '%s': %v", req.GUID, err))
+		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("error building feed '%s': %v", req.GUID, err))
 	}
 
 	// update the PRODUCTION record
 	p.BuildDate = util.Timestamp()
 	if err := backend.UpdateProduction(ctx, p); err != nil {
-		return api.ErrorResponse(c, http.StatusBadRequest, err)
+		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	resp := models.BuildRequest{
@@ -55,5 +54,5 @@ func BuildFeedEndpoint(c echo.Context) error {
 	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", "build", p.GUID, 1)
 
-	return api.StandardResponse(c, http.StatusCreated, &resp)
+	return platform.StandardResponse(c, http.StatusCreated, &resp)
 }
