@@ -1,6 +1,10 @@
 package apiv1
 
-import "regexp"
+import (
+	"regexp"
+
+	"github.com/podops/podops/pkg/validator"
+)
 
 var (
 	nameRegex = regexp.MustCompile(`^[a-z]+[a-z0-9_-]`)
@@ -13,7 +17,7 @@ var (
 //	Metadata    Metadata        `json:"metadata" yaml:"metadata" binding:"required"`       // REQUIRED
 //	Description ShowDescription `json:"description" yaml:"description" binding:"required"` // REQUIRED
 //	Image       Resource        `json:"image" yaml:"image" binding:"required"`             // REQUIRED 'channel.itunes.image'
-func (s *Show) Validate(v *Validator) *Validator {
+func (s *Show) Validate(v *validator.Validator) *validator.Validator {
 	v.AssertStringError(s.APIVersion, Version)
 	v.AssertStringError(s.Kind, ResourceShow)
 
@@ -40,7 +44,7 @@ func (s *Show) Validate(v *Validator) *Validator {
 //	Description EpisodeDescription `json:"description" yaml:"description" binding:"required"` // REQUIRED
 //	Image       Resource           `json:"image" yaml:"image" binding:"required"`             // REQUIRED 'item.itunes.image'
 //	Enclosure   Resource           `json:"enclosure" yaml:"enclosure" binding:"required"`     // REQUIRED
-func (e *Episode) Validate(v *Validator) *Validator {
+func (e *Episode) Validate(v *validator.Validator) *validator.Validator {
 	v.AssertStringError(e.APIVersion, Version)
 	v.AssertStringError(e.Kind, ResourceEpisode)
 
@@ -65,7 +69,7 @@ func (e *Episode) Validate(v *Validator) *Validator {
 //
 //	Name   string            `json:"name" yaml:"name" binding:"required"` // REQUIRED <unique name>
 //	Labels map[string]string `json:"labels" yaml:"labels,omitempty"`      // REQUIRED
-func (m *Metadata) Validate(v *Validator) *Validator {
+func (m *Metadata) Validate(v *validator.Validator) *validator.Validator {
 	v.AssertStringExists(m.Name, "Name")
 	v.AssertNotEmpty(m.Labels, "Labels")
 
@@ -80,7 +84,7 @@ func (m *Metadata) Validate(v *Validator) *Validator {
 //	Rel    string `json:"rel,omitempty" yaml:"rel,omitempty"`       // OPTIONAL
 //	Type   string `json:"type,omitempty" yaml:"type,omitempty"`     // OPTIONAL
 //	Size   int    `json:"size,omitempty" yaml:"size,omitempty"`     // OPTIONAL
-func (r *Asset) Validate(v *Validator) *Validator {
+func (r *Asset) Validate(v *validator.Validator) *validator.Validator {
 	v.AssertStringExists(r.URI, "URI")
 
 	return v
@@ -90,7 +94,7 @@ func (r *Asset) Validate(v *Validator) *Validator {
 //
 //	Name        string   `json:"name" yaml:"name" binding:"required"`      // REQUIRED
 //	SubCategory []string `json:"subcategory" yaml:"subcategory,omitempty"` // OPTIONAL
-func (c *Category) Validate(v *Validator) *Validator {
+func (c *Category) Validate(v *validator.Validator) *validator.Validator {
 	v.AssertStringExists(c.Name, "Name")
 
 	return v
@@ -100,7 +104,7 @@ func (c *Category) Validate(v *Validator) *Validator {
 //
 //	Name  string `json:"name" yaml:"name" binding:"required"`   // REQUIRED
 //	Email string `json:"email" yaml:"email" binding:"required"` // REQUIRED
-func (o *Owner) Validate(v *Validator) *Validator {
+func (o *Owner) Validate(v *validator.Validator) *validator.Validator {
 	v.AssertStringExists(o.Name, "Name")
 	v.AssertStringExists(o.Email, "EMail")
 
@@ -117,7 +121,7 @@ func (o *Owner) Validate(v *Validator) *Validator {
 //	Author    string    `json:"author" yaml:"author"`                           // RECOMMENDED 'channel.itunes.author'
 //	Copyright string    `json:"copyright,omitempty" yaml:"copyright,omitempty"` // OPTIONAL 'channel.copyright'
 //	NewFeed   *Resource `json:"newFeed,omitempty" yaml:"newFeed,omitempty"`     // OPTIONAL channel.itunes.new-feed-url -> move to label
-func (d *ShowDescription) Validate(v *Validator) *Validator {
+func (d *ShowDescription) Validate(v *validator.Validator) *validator.Validator {
 	v.AssertStringExists(d.Title, "Title")
 	v.AssertStringExists(d.Summary, "Summary")
 	v.Validate(&d.Link)
@@ -134,7 +138,7 @@ func (d *ShowDescription) Validate(v *Validator) *Validator {
 //	EpisodeText string   `json:"episodeText,omitempty" yaml:"episodeText,omitempty" binding:"required"` // REQUIRED 'item.itunes.summary'
 //	Link        Resource `json:"link" yaml:"link"`                                                      // RECOMMENDED 'item.link'
 //	Duration    int      `json:"duration" yaml:"duration" binding:"required"`                           // REQUIRED 'item.itunes.duration'
-func (d *EpisodeDescription) Validate(v *Validator) *Validator {
+func (d *EpisodeDescription) Validate(v *validator.Validator) *validator.Validator {
 	v.AssertStringExists(d.Title, "Title")
 	v.AssertStringExists(d.Summary, "Summary")
 	v.AssertStringExists(d.EpisodeText, "EpisodeText")

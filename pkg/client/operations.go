@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	a "github.com/podops/podops/apiv1"
+	"github.com/podops/podops/pkg/backend/models"
 )
 
 const (
@@ -32,12 +33,12 @@ const (
 )
 
 // Productions retrieves a list of productions
-func (cl *Client) Productions() (*a.ProductionList, error) {
+func (cl *Client) Productions() (*models.ProductionList, error) {
 	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
 
-	var resp a.ProductionList
+	var resp models.ProductionList
 	_, err := cl.get(cl.ns+listProductionsRoute, &resp)
 	if err != nil {
 		return nil, err
@@ -46,7 +47,7 @@ func (cl *Client) Productions() (*a.ProductionList, error) {
 }
 
 // CreateProduction invokes the CreateProductionEndpoint
-func (cl *Client) CreateProduction(name, title, summary string) (*a.Production, error) {
+func (cl *Client) CreateProduction(name, title, summary string) (*models.Production, error) {
 	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
@@ -55,13 +56,13 @@ func (cl *Client) CreateProduction(name, title, summary string) (*a.Production, 
 		return nil, fmt.Errorf("name must not be empty") // FIXME replace with const
 	}
 
-	req := a.Production{
+	req := models.Production{
 		Name:    name,
 		Title:   title,
 		Summary: summary,
 	}
 
-	resp := a.Production{}
+	resp := models.Production{}
 	_, err := cl.post(cl.ns+productionRoute, &req, &resp)
 
 	if err != nil {
@@ -72,7 +73,7 @@ func (cl *Client) CreateProduction(name, title, summary string) (*a.Production, 
 }
 
 // Resources retrieves a list of resources
-func (cl *Client) Resources(production, kind string) (*a.ResourceList, error) {
+func (cl *Client) Resources(production, kind string) (*models.ResourceList, error) {
 	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
@@ -80,7 +81,7 @@ func (cl *Client) Resources(production, kind string) (*a.ResourceList, error) {
 		kind = "ALL"
 	}
 
-	var resp a.ResourceList
+	var resp models.ResourceList
 	_, err := cl.get(cl.ns+fmt.Sprintf(listResourcesRoute, production, kind), &resp)
 	if err != nil {
 		return nil, err
@@ -166,15 +167,15 @@ func (cl *Client) DeleteResource(production, kind, guid string) (int, error) {
 }
 
 // Build invokes the BuildEndpoint
-func (cl *Client) Build(production string) (*a.BuildRequest, error) {
+func (cl *Client) Build(production string) (*models.BuildRequest, error) {
 	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
 
-	req := a.BuildRequest{
+	req := models.BuildRequest{
 		GUID: production,
 	}
-	resp := a.BuildRequest{}
+	resp := models.BuildRequest{}
 
 	_, err := cl.post(cl.ns+buildRoute, &req, &resp)
 	if err != nil {

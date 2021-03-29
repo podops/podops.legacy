@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/johngb/langreg"
+	"github.com/podops/podops/pkg/validator"
 )
 
 func TestISO(t *testing.T) {
@@ -20,7 +21,7 @@ func TestISO(t *testing.T) {
 }
 func TestTemplateShow(t *testing.T) {
 	s := DefaultShow("NAME", "TITLE", "SUMMARY", "GUID", "BASE_URL", "PORTAL_URL")
-	v := s.Validate(NewValidator(ResourceShow))
+	v := s.Validate(validator.New(ResourceShow))
 	if !v.IsClean() {
 		t.Errorf(v.AsError().Error())
 	}
@@ -28,7 +29,7 @@ func TestTemplateShow(t *testing.T) {
 
 func TestTemplateEpisode(t *testing.T) {
 	e := DefaultEpisode("NAME", "PARENT_NAME", "GUID", "PARENT_GUID", "BASE_URL", "PORTAL_URL")
-	v := e.Validate(NewValidator(ResourceEpisode))
+	v := e.Validate(validator.New(ResourceEpisode))
 	if !v.IsClean() {
 		t.Errorf(v.AsError().Error())
 	}

@@ -34,6 +34,6 @@ func DefaultClientOptions() *cl.ClientOption {
 	o.Token = env.GetString("PODOPS_API_TOKEN", "")
 	o.APIEndpoint = a.DefaultAPIEndpoint
 	o.CDNEndpoint = a.DefaultCDNEndpoint
-	o.PortalEndpoint = a.DefaultPortalEndpoint
+	o.PortalEndpoint = a.DefaultEndpoint
 	return o
 }

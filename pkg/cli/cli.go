@@ -157,7 +157,7 @@ func loadResource(path string) (interface{}, string, string, error) {
 		return nil, "", "", fmt.Errorf("can not read file '%s': %w", path, err)
 	}
 
-	r, kind, guid, err := a.LoadResource(data)
+	r, kind, guid, err := LoadResource(data)
 	if err != nil {
 		return nil, "", "", err
 	}

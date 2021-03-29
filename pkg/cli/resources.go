@@ -170,14 +170,14 @@ func TemplateCommand(c *cli.Context) error {
 
 	// create the yamls
 	if template == "show" {
-		show := a.DefaultShow(name, "TITLE", "SUMMARY", guid, a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
+		show := a.DefaultShow(name, "TITLE", "SUMMARY", guid, a.DefaultEndpoint, a.DefaultCDNEndpoint)
 		err := dumpResource(fmt.Sprintf("show-%s.yaml", guid), show)
 		if err != nil {
 			printError(c, err)
 			return nil
 		}
 	} else {
-		episode := a.DefaultEpisode(name, parentName, guid, parentGUID, a.DefaultPortalEndpoint, a.DefaultCDNEndpoint)
+		episode := a.DefaultEpisode(name, parentName, guid, parentGUID, a.DefaultEndpoint, a.DefaultCDNEndpoint)
 		err := dumpResource(fmt.Sprintf("episode-%s.yaml", guid), episode)
 		if err != nil {
 			printError(c, err)

@@ -11,6 +11,7 @@ import (
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/backend"
+	"github.com/podops/podops/pkg/backend/models"
 )
 
 // FindResourceEndpoint returns a resource
@@ -98,7 +99,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", "rsrc_list", fmt.Sprintf("%s/%s", prod, kind), 1)
 
-	return api.StandardResponse(c, http.StatusOK, &a.ResourceList{Resources: l})
+	return api.StandardResponse(c, http.StatusOK, &models.ResourceList{Resources: l})
 }
 
 // UpdateResourceEndpoint creates or updates a resource

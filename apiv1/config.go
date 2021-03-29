@@ -8,24 +8,21 @@ const (
 	defaultBucketProduction = "production.podops.dev"
 	defaultBucketCDN        = "cdn.podops.dev"
 
-	defaultPortalEndpoint  = "https://podops.dev"
+	defaultEndpoint        = "https://podops.dev"
 	defaultAPIEndpoint     = "https://api.podops.dev"
 	defaultCDNEndpoint     = "https://cdn.podops.dev"
 	defaultStorageEndpoint = "https://storage.googleapis.com/cdn.podops.dev"
 )
 
 var (
-	// DefaultPortalEndpoint points to the portal
-	DefaultPortalEndpoint string = env.GetString("BASE_URL", defaultPortalEndpoint)
+	// DefaultEndpoint points to the portal
+	DefaultEndpoint string = env.GetString("BASE_URL", defaultEndpoint)
 
 	// DefaultAPIEndpoint points to the API
 	DefaultAPIEndpoint string = env.GetString("API_ENDPOINT", defaultAPIEndpoint)
 
 	// DefaultCDNEndpoint points to the CDN
 	DefaultCDNEndpoint string = env.GetString("CDN_URL", defaultCDNEndpoint)
-
-	// BucketUpload is the canonical name of the upload bucket
-	//BucketUpload string = env.GetString("BUCKET_UPLOAD", defaultBucketUpload)
 
 	// BucketProduction is the canonical name of the production bucket
 	BucketProduction string = env.GetString("BUCKET_PRODUCTION", defaultBucketProduction)

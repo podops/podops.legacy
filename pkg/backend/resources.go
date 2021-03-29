@@ -9,10 +9,13 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
+	"gopkg.in/yaml.v2"
+
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
+
 	a "github.com/podops/podops/apiv1"
-	"gopkg.in/yaml.v2"
+	"github.com/podops/podops/pkg/backend/models"
 )
 
 const (
@@ -44,8 +47,8 @@ func NormalizeKind(kind string) (string, error) {
 }
 
 // GetResource retrieves a resource
-func GetResource(ctx context.Context, guid string) (*a.Resource, error) {
-	var r a.Resource
+func GetResource(ctx context.Context, guid string) (*models.Resource, error) {
+	var r models.Resource
 
 	if err := platform.DataStore().Get(ctx, resourceKey(guid), &r); err != nil {
 		if err == datastore.ErrNoSuchEntity {
@@ -57,8 +60,8 @@ func GetResource(ctx context.Context, guid string) (*a.Resource, error) {
 }
 
 // FindResource looks for a resource 'name' in the context of production 'production'
-func FindResource(ctx context.Context, production, name string) (*a.Resource, error) {
-	var r []*a.Resource
+func FindResource(ctx context.Context, production, name string) (*models.Resource, error) {
+	var r []*models.Resource
 
 	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Filter("Name =", name), &r); err != nil {
 		return nil, err
@@ -97,7 +100,7 @@ func UpdateResource(ctx context.Context, name, guid, kind, production, location 
 
 	// create a new inventory entry
 	now := util.Timestamp()
-	rsrc := a.Resource{
+	rsrc := models.Resource{
 		Name:       name,
 		GUID:       guid,
 		Kind:       _kind,
@@ -138,7 +141,7 @@ func UpdateAsset(ctx context.Context, name, guid, kind, production, location, co
 
 	// create a new inventory entry
 	now := util.Timestamp()
-	rsrc := a.Resource{
+	rsrc := models.Resource{
 		Name:        name,
 		GUID:        guid,
 		Kind:        _kind,
@@ -192,8 +195,8 @@ func DeleteResource(ctx context.Context, guid string) error {
 }
 
 // ListResources returns all resources of type kind belonging to parentID
-func ListResources(ctx context.Context, production, kind string) ([]*a.Resource, error) {
-	var r []*a.Resource
+func ListResources(ctx context.Context, production, kind string) ([]*models.Resource, error) {
+	var r []*models.Resource
 
 	_kind, err := NormalizeKind(kind)
 	if err != nil {
@@ -304,7 +307,7 @@ func ReadResource(ctx context.Context, path string) (interface{}, string, string
 		return nil, "", "", err
 	}
 
-	return a.LoadResource(data)
+	return LoadResource(data)
 }
 
 // RemoveResource removes a resource from Cloud Storage
@@ -356,7 +359,7 @@ func UpdateShow(ctx context.Context, location string, show *a.Show) error {
 
 	// create a new inventory entry
 	now := util.Timestamp()
-	rsrc := a.Resource{
+	rsrc := models.Resource{
 		Name:       show.Metadata.Name,
 		GUID:       show.GUID(),
 		Kind:       a.ResourceShow,
@@ -417,7 +420,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) err
 	now := util.Timestamp()
 	index, _ := strconv.ParseInt(episode.Metadata.Labels[a.LabelEpisode], 10, 64)
 
-	rsrc := a.Resource{
+	rsrc := models.Resource{
 		Name:       episode.Metadata.Name,
 		GUID:       episode.GUID(),
 		Kind:       a.ResourceEpisode,
@@ -438,7 +441,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) err
 }
 
 // updateResource does what the name suggests
-func updateResource(ctx context.Context, r *a.Resource) error {
+func updateResource(ctx context.Context, r *models.Resource) error {
 	if _, err := platform.DataStore().Put(ctx, resourceKey(r.GUID), r); err != nil {
 		return err
 	}

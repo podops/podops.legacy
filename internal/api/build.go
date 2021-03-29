@@ -11,11 +11,12 @@ import (
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/api"
 	"github.com/podops/podops/pkg/backend"
+	"github.com/podops/podops/pkg/backend/models"
 )
 
 // BuildFeedEndpoint starts the build of the feed
 func BuildFeedEndpoint(c echo.Context) error {
-	var req *a.BuildRequest = new(a.BuildRequest)
+	var req *models.BuildRequest = new(models.BuildRequest)
 	ctx := api.NewHttpContext(c)
 
 	if err := c.Bind(req); err != nil {
@@ -45,10 +46,10 @@ func BuildFeedEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	resp := a.BuildRequest{
+	resp := models.BuildRequest{
 		GUID:         req.GUID,
 		FeedURL:      fmt.Sprintf("%s/c/%s/feed.xml", a.DefaultCDNEndpoint, req.GUID),
-		FeedAliasURL: fmt.Sprintf("%s/s/%s/feed.xml", a.DefaultPortalEndpoint, p.Name),
+		FeedAliasURL: fmt.Sprintf("%s/s/%s/feed.xml", a.DefaultEndpoint, p.Name),
 	}
 
 	// track api access for billing etc
