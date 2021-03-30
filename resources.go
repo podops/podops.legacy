@@ -346,3 +346,8 @@ func DefaultEpisode(name, parentName, guid, parent, portal, cdn string) *Episode
 		},
 	}
 }
+
+func CreateGUID() string {
+	guid, _ := util.ShortUUID()
+	return guid
+}

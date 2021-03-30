@@ -192,7 +192,7 @@ func exchangeToken(ctx context.Context, req *AuthorizationRequest, loginFrom str
 		}
 	}
 
-	auth.Token = createSimpleToken(auth)
+	auth.Token = createSimpleToken()
 	auth.Expires = now + (DefaultAuthorizationExpiration * 86400)
 	auth.Updated = now
 
@@ -218,7 +218,7 @@ func exchangeToken(ctx context.Context, req *AuthorizationRequest, loginFrom str
 	return auth, http.StatusOK, nil
 }
 
-func createSimpleToken(auth *Authorization) string {
+func createSimpleToken() string {
 	token, _ := util.UUID()
 	return token
 }
