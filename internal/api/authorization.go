@@ -7,7 +7,7 @@ import (
 
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/auth"
-	"github.com/podops/podops/pkg/backend"
+	"github.com/podops/podops/backend"
 )
 
 const (

@@ -13,10 +13,10 @@ import (
 	ds "github.com/fupas/platform/pkg/platform"
 
 	"github.com/podops/podops"
+	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/gql/graph/generated"
 	"github.com/podops/podops/internal/gql/graph/model"
 	"github.com/podops/podops/internal/platform"
-	"github.com/podops/podops/pkg/backend"
 )
 
 func (r *queryResolver) Show(ctx context.Context, name *string, limit int) (*model.Show, error) {

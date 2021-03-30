@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	"github.com/podops/podops"
+	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/dataloader"
 	"github.com/podops/podops/internal/gql/graph/model"
-	"github.com/podops/podops/pkg/backend"
 )
 
 // This file will not be regenerated automatically.

@@ -11,7 +11,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 
 	"github.com/podops/podops"
-	"github.com/podops/podops/pkg/backend"
+	"github.com/podops/podops/backend"
 )
 
 // GetResourcesCommand list all resource associated with a show

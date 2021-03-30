@@ -9,8 +9,8 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/auth"
+	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/platform"
-	"github.com/podops/podops/pkg/backend"
 )
 
 // ProductionEndpoint creates an new show and does all the background setup

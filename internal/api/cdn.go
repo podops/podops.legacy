@@ -11,8 +11,8 @@ import (
 	"github.com/fupas/platform/pkg/platform"
 
 	"github.com/podops/podops"
+	"github.com/podops/podops/backend"
 	p "github.com/podops/podops/internal/platform"
-	"github.com/podops/podops/pkg/backend"
 )
 
 const (

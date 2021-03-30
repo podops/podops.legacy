@@ -8,8 +8,8 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/podops/podops"
+	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/platform"
-	"github.com/podops/podops/pkg/backend"
 )
 
 // FindResourceEndpoint returns a resource
