@@ -14,6 +14,7 @@ import (
 
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/auth"
+	"github.com/podops/podops/graphql"
 )
 
 // ShutdownDelay is the delay before exiting the process
@@ -29,11 +30,8 @@ func setup() *echo.Echo {
 	e := echo.New()
 
 	// add and configure the middlewares
+	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 	e.Use(middleware.Recover())
-
-	//e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
-	// TODO: add/configure e.Use(middleware.Logger())
-	// TODO: e.Logger.SetLevel(log.INFO)
 
 	// task endpoints
 	tasks := e.Group(apiv1.TaskNamespacePrefix)
@@ -58,6 +56,21 @@ func setup() *echo.Echo {
 	apiEndpoints.DELETE(apiv1.DeleteResourceRoute, apiv1.DeleteResourceEndpoint)
 	apiEndpoints.POST(apiv1.BuildRoute, apiv1.BuildFeedEndpoint)
 	apiEndpoints.POST(apiv1.UploadRoute, apiv1.UploadEndpoint)
+
+	// FIXME this will go away
+
+	// cdn enpoints
+	content := e.Group(apiv1.ContentNamespace)
+	content.GET(apiv1.DefaultCDNRoute, apiv1.RedirectCDNContentEndpoint)
+	content.HEAD(apiv1.DefaultCDNRoute, apiv1.RedirectCDNContentEndpoint)
+
+	// grapghql
+	gql := e.Group(apiv1.GraphqlNamespacePrefix)
+	gql.POST(apiv1.GraphqlRoute, graphql.GraphqlEndpoint())
+	gql.GET(apiv1.GraphqlPlaygroundRoute, graphql.GraphqlPlaygroundEndpoint())
+
+	e.GET(apiv1.FeedRoute, apiv1.FeedEndpoint)
+	// END FIXME
 
 	return e
 }

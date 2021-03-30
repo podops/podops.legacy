@@ -1,5 +1,5 @@
 .PHONY: all
-all: build_test cli cdn api
+all: build_test cli api
 
 TARGET_LINUX = GOARCH=amd64 GOOS=linux
 TARGET_MAC = GOARCH=amd64 GOOS=darwin
@@ -20,10 +20,6 @@ test:
 .PHONY: api
 api:
 	cd cmd/api && gcloud app deploy . --quiet
-
-.PHONY: cdn
-cdn:
-	cd cmd/cdn && gcloud app deploy . --quiet
 
 .PHONY: cli
 cli:
