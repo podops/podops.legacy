@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	a "github.com/podops/podops/apiv1"
+	"github.com/podops/podops/feed"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/backend"
 	"github.com/podops/podops/pkg/backend/models"
@@ -35,7 +36,7 @@ func BuildFeedEndpoint(c echo.Context) error {
 	}
 
 	// FIXME make this async, make validateOnly a flag
-	if err := backend.BuildFeed(ctx, req.GUID, false); err != nil {
+	if err := feed.Build(ctx, req.GUID, false); err != nil {
 		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("error building feed '%s': %v", req.GUID, err))
 	}
 

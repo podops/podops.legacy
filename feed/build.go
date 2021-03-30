@@ -1,4 +1,4 @@
-package backend
+package feed
 
 import (
 	"context"
@@ -14,7 +14,8 @@ import (
 	"github.com/fupas/platform/pkg/platform"
 
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/internal/rss"
+	"github.com/podops/podops/feed/rss"
+	"github.com/podops/podops/pkg/backend"
 )
 
 type (
@@ -41,12 +42,12 @@ func init() {
 	mediaTypeMap["document/x-epub"] = rss.EPUB
 }
 
-// BuildFeed gathers all resources and builds the feed
-func BuildFeed(ctx context.Context, production string, validateOnly bool) error {
+// Build gathers all resources and builds the feed.xml
+func Build(ctx context.Context, production string, validateOnly bool) error {
 
 	var episodes EpisodeList
 
-	p, err := GetProduction(ctx, production)
+	p, err := backend.GetProduction(ctx, production)
 	if err != nil {
 		return err
 	}
@@ -54,13 +55,13 @@ func BuildFeed(ctx context.Context, production string, validateOnly bool) error 
 		return fmt.Errorf("can not find '%s'", production)
 	}
 
-	if err = ValidateProduction(ctx, production); err != nil {
-		p, err := GetProduction(ctx, production)
+	if err = backend.ValidateProduction(ctx, production); err != nil {
+		p, err := backend.GetProduction(ctx, production)
 		if err != nil {
 			return err
 		}
 		p.BuildDate = 0 // FIXME BuildDate is the only flag we currently have to mark a production as VALID
-		UpdateProduction(ctx, p)
+		backend.UpdateProduction(ctx, p)
 
 		return fmt.Errorf("can not build feed")
 	}
@@ -81,7 +82,7 @@ func BuildFeed(ctx context.Context, production string, validateOnly bool) error 
 			return err
 		}
 
-		e, _, _, err := ReadResource(ctx, attr.Name)
+		e, _, _, err := backend.ReadResource(ctx, attr.Name)
 		if err != nil {
 			return err
 		}
@@ -104,7 +105,7 @@ func BuildFeed(ctx context.Context, production string, validateOnly bool) error 
 	sort.Sort(episodes)
 
 	// read the show
-	s, kind, _, err := ReadResource(ctx, fmt.Sprintf("%s/show-%s.yaml", production, production))
+	s, kind, _, err := backend.ReadResource(ctx, fmt.Sprintf("%s/show-%s.yaml", production, production))
 	if err != nil {
 		return err
 	}
