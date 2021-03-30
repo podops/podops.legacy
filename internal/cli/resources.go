@@ -170,14 +170,14 @@ func TemplateCommand(c *cli.Context) error {
 
 	// create the yamls
 	if template == "show" {
-		show := DefaultShow(name, "TITLE", "SUMMARY", guid, podops.DefaultEndpoint, podops.DefaultCDNEndpoint)
+		show := podops.DefaultShow(name, "TITLE", "SUMMARY", guid, podops.DefaultEndpoint, podops.DefaultCDNEndpoint)
 		err := dumpResource(fmt.Sprintf("show-%s.yaml", guid), show)
 		if err != nil {
 			printError(c, err)
 			return nil
 		}
 	} else {
-		episode := DefaultEpisode(name, parentName, guid, parentGUID, podops.DefaultEndpoint, podops.DefaultCDNEndpoint)
+		episode := podops.DefaultEpisode(name, parentName, guid, parentGUID, podops.DefaultEndpoint, podops.DefaultCDNEndpoint)
 		err := dumpResource(fmt.Sprintf("episode-%s.yaml", guid), episode)
 		if err != nil {
 			printError(c, err)

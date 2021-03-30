@@ -26,7 +26,7 @@ func NewProductionCommand(c *cli.Context) error {
 		return nil
 	}
 
-	show := DefaultShow(p.Name, title, summary, p.GUID, podops.DefaultEndpoint, podops.DefaultCDNEndpoint)
+	show := podops.DefaultShow(p.Name, title, summary, p.GUID, podops.DefaultEndpoint, podops.DefaultCDNEndpoint)
 	err = dumpResource(fmt.Sprintf("show-%s.yaml", p.GUID), show)
 	if err != nil {
 		printError(c, err)
