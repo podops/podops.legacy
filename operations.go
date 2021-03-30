@@ -7,8 +7,6 @@ import (
 	"net/http"
 
 	"github.com/podops/podops/apiv1"
-	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/pkg/backend/models"
 )
 
 const (
@@ -31,7 +29,7 @@ const (
 )
 
 // CreateProduction invokes the CreateProductionEndpoint
-func (cl *Client) CreateProduction(name, title, summary string) (*models.Production, error) {
+func (cl *Client) CreateProduction(name, title, summary string) (*Production, error) {
 	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
@@ -40,13 +38,13 @@ func (cl *Client) CreateProduction(name, title, summary string) (*models.Product
 		return nil, fmt.Errorf("name must not be empty") // FIXME replace with const
 	}
 
-	req := models.Production{
+	req := Production{
 		Name:    name,
 		Title:   title,
 		Summary: summary,
 	}
 
-	resp := models.Production{}
+	resp := Production{}
 	_, err := post(cl.opts.APIEndpoint, productionRoute, cl.opts.Token, &req, &resp)
 
 	if err != nil {
@@ -57,12 +55,12 @@ func (cl *Client) CreateProduction(name, title, summary string) (*models.Product
 }
 
 // Productions retrieves a list of productions
-func (cl *Client) Productions() (*models.ProductionList, error) {
+func (cl *Client) Productions() (*ProductionList, error) {
 	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
 
-	var resp models.ProductionList
+	var resp ProductionList
 	_, err := get(cl.opts.APIEndpoint, listProductionsRoute, cl.opts.Token, &resp)
 	if err != nil {
 		return nil, err
@@ -76,7 +74,7 @@ func (cl *Client) CreateResource(production, kind, guid string, force bool, rsrc
 		return http.StatusBadRequest, PodopsClientConfigurationErr
 	}
 
-	resp := a.StatusObject{}
+	resp := StatusObject{}
 	status, err := post(cl.opts.APIEndpoint, fmt.Sprintf(updateResourceRoute, production, kind, guid, force), cl.opts.Token, rsrc, &resp)
 
 	if err != nil {
@@ -120,7 +118,7 @@ func (cl *Client) FindResource(guid string, rsrc interface{}) error {
 }
 
 // Resources retrieves a list of resources
-func (cl *Client) Resources(production, kind string) (*models.ResourceList, error) {
+func (cl *Client) Resources(production, kind string) (*ResourceList, error) {
 	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
@@ -128,7 +126,7 @@ func (cl *Client) Resources(production, kind string) (*models.ResourceList, erro
 		kind = "ALL"
 	}
 
-	var resp models.ResourceList
+	var resp ResourceList
 	_, err := get(cl.opts.APIEndpoint, fmt.Sprintf(listResourcesRoute, production, kind), cl.opts.Token, &resp)
 	if err != nil {
 		return nil, err
@@ -142,7 +140,7 @@ func (cl *Client) UpdateResource(production, kind, guid string, force bool, rsrc
 		return http.StatusBadRequest, PodopsClientConfigurationErr
 	}
 
-	resp := a.StatusObject{}
+	resp := StatusObject{}
 	status, err := put(cl.opts.APIEndpoint, fmt.Sprintf(updateResourceRoute, production, kind, guid, force), cl.opts.Token, rsrc, &resp)
 
 	if err != nil {
@@ -165,15 +163,15 @@ func (cl *Client) DeleteResource(production, kind, guid string) (int, error) {
 }
 
 // Build invokes the BuildEndpoint
-func (cl *Client) Build(production string) (*models.BuildRequest, error) {
+func (cl *Client) Build(production string) (*BuildRequest, error) {
 	if !cl.IsValid() {
 		return nil, PodopsClientConfigurationErr
 	}
 
-	req := models.BuildRequest{
+	req := BuildRequest{
 		GUID: production,
 	}
-	resp := models.BuildRequest{}
+	resp := BuildRequest{}
 
 	_, err := post(cl.opts.APIEndpoint, buildRoute, cl.opts.Token, &req, &resp)
 	if err != nil {
@@ -193,7 +191,7 @@ func (cl *Client) Upload(production, path string, force bool) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Set("User-Agent", a.UserAgentString)
+	req.Header.Set("User-Agent", UserAgentString)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

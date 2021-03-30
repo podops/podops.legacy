@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	a "github.com/podops/podops/apiv1"
+	a "github.com/podops/podops"
 	"github.com/podops/podops/internal/dataloader"
 	"github.com/podops/podops/internal/gql/graph/model"
 	"github.com/podops/podops/pkg/backend"

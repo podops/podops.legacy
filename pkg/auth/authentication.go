@@ -8,7 +8,7 @@ import (
 	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/commons/pkg/util"
 
-	"github.com/podops/podops/apiv1"
+	"github.com/podops/podops"
 	"github.com/podops/podops/internal/platform"
 )
 
@@ -103,7 +103,7 @@ func BlockAccount(ctx context.Context, realm, clientID string) error {
 func SendAccountChallenge(ctx context.Context, account *Account) error {
 	// FIXME use templates to send a proper email
 
-	url := fmt.Sprintf("%s/login/%s", apiv1.DefaultAPIEndpoint, account.Ext1)
+	url := fmt.Sprintf("%s/login/%s", podops.DefaultAPIEndpoint, account.Ext1)
 
 	if err := platform.SendEmail(env.GetString("EMAIL_FROM", "hello@podops.dev"), account.UserID, "Confirm your account", url); err != nil {
 		return err

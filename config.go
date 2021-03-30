@@ -1,4 +1,4 @@
-package apiv1
+package podops
 
 import (
 	"github.com/fupas/commons/pkg/env"

@@ -18,7 +18,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/podops/podops"
-	a "github.com/podops/podops/apiv1"
+	a "github.com/podops/podops"
 	"github.com/podops/podops/internal/cli/netrc"
 )
 

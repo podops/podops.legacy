@@ -5,8 +5,6 @@ import (
 	"fmt"
 
 	"github.com/fupas/commons/pkg/env"
-
-	a "github.com/podops/podops/apiv1"
 )
 
 // Client is a client for interacting with the PodOps service.
@@ -149,9 +147,9 @@ func (co ClientOption) IsValid() bool {
 func DefaultClientOptions() *ClientOption {
 	o := ClientOption{
 		Token:           env.GetString("PODOPS_API_TOKEN", ""),
-		APIEndpoint:     a.DefaultAPIEndpoint,
-		CDNEndpoint:     a.DefaultCDNEndpoint,
-		DefaultEndpoint: a.DefaultEndpoint,
+		APIEndpoint:     DefaultAPIEndpoint,
+		CDNEndpoint:     DefaultCDNEndpoint,
+		DefaultEndpoint: DefaultEndpoint,
 	}
 	return &o
 }

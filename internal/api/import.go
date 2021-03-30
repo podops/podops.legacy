@@ -5,14 +5,14 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"github.com/podops/podops"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/backend"
-	"github.com/podops/podops/pkg/backend/models"
 )
 
 // ImportTaskEndpoint implements async file import
 func ImportTaskEndpoint(c echo.Context) error {
-	var req *models.ImportRequest = new(models.ImportRequest)
+	var req *podops.ImportRequest = new(podops.ImportRequest)
 
 	err := c.Bind(req)
 	if err != nil {

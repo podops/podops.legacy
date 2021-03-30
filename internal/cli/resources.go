@@ -10,7 +10,7 @@ import (
 
 	"github.com/fupas/commons/pkg/util"
 
-	a "github.com/podops/podops/apiv1"
+	a "github.com/podops/podops"
 	"github.com/podops/podops/pkg/backend"
 )
 

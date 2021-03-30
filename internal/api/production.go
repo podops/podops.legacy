@@ -7,16 +7,15 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	a "github.com/podops/podops/apiv1"
+	a "github.com/podops/podops"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/auth"
 	"github.com/podops/podops/pkg/backend"
-	"github.com/podops/podops/pkg/backend/models"
 )
 
 // ProductionEndpoint creates an new show and does all the background setup
 func ProductionEndpoint(c echo.Context) error {
-	var req *models.Production = new(models.Production)
+	var req *a.Production = new(a.Production)
 	ctx := platform.NewHttpContext(c)
 
 	if err := AuthorizeAccess(ctx, c, scopeProductionWrite); err != nil {
@@ -69,5 +68,5 @@ func ListProductionsEndpoint(c echo.Context) error {
 	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", "prod_list", clientID, 1)
 
-	return platform.StandardResponse(c, http.StatusOK, &models.ProductionList{Productions: productions})
+	return platform.StandardResponse(c, http.StatusOK, &a.ProductionList{Productions: productions})
 }

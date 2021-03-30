@@ -10,8 +10,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
 
-	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/pkg/backend/models"
+	a "github.com/podops/podops"
 )
 
 const (
@@ -20,7 +19,7 @@ const (
 )
 
 // CreateProduction initializes a new show and all its metadata
-func CreateProduction(ctx context.Context, name, title, summary, clientID string) (*models.Production, error) {
+func CreateProduction(ctx context.Context, name, title, summary, clientID string) (*a.Production, error) {
 	if name == "" {
 		return nil, fmt.Errorf("name must not be empty")
 	}
@@ -29,12 +28,11 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 	if err != nil {
 		return nil, err
 	}
-	if p != nil && p.Owner != clientID {
-		// do not access someone else's production
-		return nil, fmt.Errorf("name '%s' already exists", name)
-	}
-	if p != nil && p.Owner == clientID {
-		// simply return the existing production
+	if p != nil {
+		if p.Owner != clientID {
+			// do not access someone else's production
+			return nil, fmt.Errorf("name '%s' already exists", name)
+		}
 		return p, nil
 	}
 
@@ -42,9 +40,8 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 	id, _ := util.ShortUUID()
 	production := strings.ToLower(id)
 	now := util.Timestamp()
-	//location := fmt.Sprintf("%s/show-%s.yaml", production, production)
 
-	p = &models.Production{
+	prod := a.Production{
 		GUID:    production,
 		Owner:   clientID,
 		Name:    name,
@@ -54,30 +51,17 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 		Updated: now,
 	}
 
-	err = UpdateProduction(ctx, p)
+	err = UpdateProduction(ctx, &prod)
 	if err != nil {
 		return nil, err
 	}
 
-	// FIXME remove this part, we don't need a "dummy file"
-	// create a dummy Storage location for this production at production.podops.dev/guid
-
-	/*
-		show := a.DefaultShow(name, title, summary, production, a.DefaultEndpoint, a.DefaultCDNEndpoint)
-		err = WriteResourceContent(ctx, location, true, false, &show)
-		if err != nil {
-			platform.DataStore().Delete(ctx, productionKey(production))
-			return nil, err
-		}
-	*/
-
-	// all done
-	return p, nil
+	return &prod, nil
 }
 
 // GetProduction returns a production based on the GUID
-func GetProduction(ctx context.Context, production string) (*models.Production, error) {
-	var p models.Production
+func GetProduction(ctx context.Context, production string) (*a.Production, error) {
+	var p a.Production
 
 	if err := platform.DataStore().Get(ctx, productionKey(production), &p); err != nil {
 		if err == datastore.ErrNoSuchEntity {
@@ -90,7 +74,7 @@ func GetProduction(ctx context.Context, production string) (*models.Production, 
 
 // ValidateProduction checks the integrity of a production and fixes issues if possible
 func ValidateProduction(ctx context.Context, production string) error {
-	var p models.Production
+	var p a.Production
 	episodes := 0
 	show := 0
 	assets := 0
@@ -128,7 +112,7 @@ func ValidateProduction(ctx context.Context, production string) error {
 }
 
 // UpdateProduction does what the name suggests
-func UpdateProduction(ctx context.Context, p *models.Production) error {
+func UpdateProduction(ctx context.Context, p *a.Production) error {
 	if _, err := platform.DataStore().Put(ctx, productionKey(p.GUID), p); err != nil {
 		return err
 	}
@@ -136,8 +120,8 @@ func UpdateProduction(ctx context.Context, p *models.Production) error {
 }
 
 // FindProductionByName does a lookup using the productions name instead of its key
-func FindProductionByName(ctx context.Context, name string) (*models.Production, error) {
-	var p []*models.Production
+func FindProductionByName(ctx context.Context, name string) (*a.Production, error) {
+	var p []*a.Production
 	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreProductions).Filter("Name =", name), &p); err != nil {
 		return nil, err
 	}
@@ -148,8 +132,8 @@ func FindProductionByName(ctx context.Context, name string) (*models.Production,
 }
 
 // FindProductionsByOwner returns all productions belonging to the same owner
-func FindProductionsByOwner(ctx context.Context, owner string) ([]*models.Production, error) {
-	var p []*models.Production
+func FindProductionsByOwner(ctx context.Context, owner string) ([]*a.Production, error) {
+	var p []*a.Production
 	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreProductions).Filter("Owner =", owner), &p); err != nil {
 		return nil, err
 	}

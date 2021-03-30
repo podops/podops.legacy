@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-
-	a "github.com/podops/podops/apiv1"
 )
 
 // Get is used to request data from the API. No payload, only queries!
@@ -85,7 +83,7 @@ func delete(url, cmd, token string, request interface{}) (int, error) {
 func invoke(token string, req *http.Request, response interface{}) (int, error) {
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	req.Header.Set("User-Agent", a.UserAgentString)
+	req.Header.Set("User-Agent", UserAgentString)
 	if token != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
@@ -106,7 +104,7 @@ func invoke(token string, req *http.Request, response interface{}) (int, error) 
 	if resp.StatusCode > http.StatusNoContent {
 		if response != nil {
 			// as we expect a response, there might be a StatusObject
-			status := &a.StatusObject{}
+			status := StatusObject{}
 			err = json.NewDecoder(resp.Body).Decode(&status)
 			if err != nil {
 				return resp.StatusCode, fmt.Errorf("status: %d", resp.StatusCode)

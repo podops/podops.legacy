@@ -7,7 +7,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	a "github.com/podops/podops/apiv1"
+	a "github.com/podops/podops"
 	"github.com/podops/podops/internal/validator"
 )
 

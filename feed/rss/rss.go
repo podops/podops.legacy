@@ -9,7 +9,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	a "github.com/podops/podops/apiv1"
+	a "github.com/podops/podops"
 )
 
 // iTunes Specifications: https://help.apple.com/itc/podcasts_connect/#/itcb54353390

@@ -1,12 +1,21 @@
-package models
+package podops
 
 import (
 	"fmt"
-
-	a "github.com/podops/podops/apiv1"
 )
 
 type (
+
+	// FIXME find a better place for StatusObject
+
+	// StatusObject is used to report operation status and errors in an API request.
+	// The struct can be used as a response object or be treated as an error object
+	StatusObject struct {
+		Status    int    `json:"status" binding:"required"`
+		Message   string `json:"message" binding:"required"`
+		RootError error  `json:"-"`
+	}
+
 	// Production is the parent struct of all other resources.
 	Production struct {
 		Name      string `json:"name" binding:"required"`
@@ -73,10 +82,24 @@ type (
 // helper functions to work with the models
 //
 
+// NewStatus initializes a new StatusObject
+func NewStatus(s int, m string) StatusObject {
+	return StatusObject{Status: s, Message: m}
+}
+
+// NewErrorStatus initializes a new StatusObject from an error
+func NewErrorStatus(s int, e error) StatusObject {
+	return StatusObject{Status: s, Message: e.Error(), RootError: e}
+}
+
+func (so *StatusObject) Error() string {
+	return fmt.Sprintf("%s: %d", so.Message, so.Status)
+}
+
 // GetPublicLocation returns the public url of a resource if it exists on the CDN or an empty string otherwise
 func (r *Resource) GetPublicLocation() string {
-	if r.Kind == a.ResourceAsset {
-		return fmt.Sprintf("%s/c/%s", a.DefaultCDNEndpoint, r.Location)
+	if r.Kind == ResourceAsset {
+		return fmt.Sprintf("%s/c/%s", DefaultCDNEndpoint, r.Location)
 	}
 	return ""
 }

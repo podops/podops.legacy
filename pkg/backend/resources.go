@@ -14,8 +14,8 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
 
-	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/pkg/backend/models"
+	a "github.com/podops/podops"
+	"github.com/podops/podops/apiv1"
 )
 
 const (
@@ -24,6 +24,7 @@ const (
 )
 
 var (
+	// mapping of resource names and aliases
 	resourceMap map[string]string
 )
 
@@ -47,8 +48,8 @@ func NormalizeKind(kind string) (string, error) {
 }
 
 // GetResource retrieves a resource
-func GetResource(ctx context.Context, guid string) (*models.Resource, error) {
-	var r models.Resource
+func GetResource(ctx context.Context, guid string) (*a.Resource, error) {
+	var r a.Resource
 
 	if err := platform.DataStore().Get(ctx, resourceKey(guid), &r); err != nil {
 		if err == datastore.ErrNoSuchEntity {
@@ -60,8 +61,8 @@ func GetResource(ctx context.Context, guid string) (*models.Resource, error) {
 }
 
 // FindResource looks for a resource 'name' in the context of production 'production'
-func FindResource(ctx context.Context, production, name string) (*models.Resource, error) {
-	var r []*models.Resource
+func FindResource(ctx context.Context, production, name string) (*a.Resource, error) {
+	var r []*a.Resource
 
 	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Filter("Name =", name), &r); err != nil {
 		return nil, err
@@ -100,7 +101,7 @@ func UpdateResource(ctx context.Context, name, guid, kind, production, location 
 
 	// create a new inventory entry
 	now := util.Timestamp()
-	rsrc := models.Resource{
+	rsrc := a.Resource{
 		Name:       name,
 		GUID:       guid,
 		Kind:       _kind,
@@ -141,7 +142,7 @@ func UpdateAsset(ctx context.Context, name, guid, kind, production, location, co
 
 	// create a new inventory entry
 	now := util.Timestamp()
-	rsrc := models.Resource{
+	rsrc := a.Resource{
 		Name:        name,
 		GUID:        guid,
 		Kind:        _kind,
@@ -165,7 +166,7 @@ func DeleteResource(ctx context.Context, guid string) error {
 		return err
 	}
 	if r == nil { // not found
-		return a.ErrNoSuchResource
+		return apiv1.ErrNoSuchResource
 	}
 
 	if err := platform.DataStore().Delete(ctx, resourceKey(r.GUID)); err != nil {
@@ -195,8 +196,8 @@ func DeleteResource(ctx context.Context, guid string) error {
 }
 
 // ListResources returns all resources of type kind belonging to parentID
-func ListResources(ctx context.Context, production, kind string) ([]*models.Resource, error) {
-	var r []*models.Resource
+func ListResources(ctx context.Context, production, kind string) ([]*a.Resource, error) {
+	var r []*a.Resource
 
 	_kind, err := NormalizeKind(kind)
 	if err != nil {
@@ -317,7 +318,7 @@ func RemoveResource(ctx context.Context, path string) error {
 	obj := bkt.Object(path)
 	_, err := obj.Attrs(ctx)
 	if err == storage.ErrObjectNotExist {
-		return a.ErrNoSuchResource
+		return apiv1.ErrNoSuchResource
 	}
 
 	return bkt.Object(path).Delete(ctx)
@@ -330,7 +331,7 @@ func RemoveAsset(ctx context.Context, path string) error {
 	obj := bkt.Object(path)
 	_, err := obj.Attrs(ctx)
 	if err == storage.ErrObjectNotExist {
-		return a.ErrNoSuchAsset
+		return apiv1.ErrNoSuchAsset
 	}
 
 	return bkt.Object(path).Delete(ctx)
@@ -359,7 +360,7 @@ func UpdateShow(ctx context.Context, location string, show *a.Show) error {
 
 	// create a new inventory entry
 	now := util.Timestamp()
-	rsrc := models.Resource{
+	rsrc := a.Resource{
 		Name:       show.Metadata.Name,
 		GUID:       show.GUID(),
 		Kind:       a.ResourceShow,
@@ -420,7 +421,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) err
 	now := util.Timestamp()
 	index, _ := strconv.ParseInt(episode.Metadata.Labels[a.LabelEpisode], 10, 64)
 
-	rsrc := models.Resource{
+	rsrc := a.Resource{
 		Name:       episode.Metadata.Name,
 		GUID:       episode.GUID(),
 		Kind:       a.ResourceEpisode,
@@ -441,7 +442,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) err
 }
 
 // updateResource does what the name suggests
-func updateResource(ctx context.Context, r *models.Resource) error {
+func updateResource(ctx context.Context, r *a.Resource) error {
 	if _, err := platform.DataStore().Put(ctx, resourceKey(r.GUID), r); err != nil {
 		return err
 	}

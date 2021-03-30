@@ -12,12 +12,11 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	ds "github.com/fupas/platform/pkg/platform"
 
-	a "github.com/podops/podops/apiv1"
+	a "github.com/podops/podops"
 	"github.com/podops/podops/internal/gql/graph/generated"
 	"github.com/podops/podops/internal/gql/graph/model"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/backend"
-	"github.com/podops/podops/pkg/backend/models"
 )
 
 func (r *queryResolver) Show(ctx context.Context, name *string, limit int) (*model.Show, error) {
@@ -33,7 +32,7 @@ func (r *queryResolver) Show(ctx context.Context, name *string, limit int) (*mod
 	show := data.(*model.Show)
 
 	// list all episodes, excluding future (i.e. unpublished) ones, descending order
-	var er []*models.Resource
+	var er []*a.Resource
 	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", show.GUID).Filter("Kind =", a.ResourceEpisode).Filter("Published <", util.Timestamp()).Order("-Published").Limit(limit), &er); err != nil {
 		platform.ReportError(err)
 		return nil, err
@@ -69,7 +68,7 @@ func (r *queryResolver) Episode(ctx context.Context, guid *string) (*model.Episo
 }
 
 func (r *queryResolver) Recent(ctx context.Context, limit int) ([]*model.Show, error) {
-	var sh []*models.Production
+	var sh []*a.Production
 	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreProductions).Filter("BuildDate >", 0).Order("-BuildDate").Limit(limit), &sh); err != nil {
 		platform.ReportError(err)
 		return nil, err
@@ -92,7 +91,7 @@ func (r *queryResolver) Recent(ctx context.Context, limit int) ([]*model.Show, e
 }
 
 func (r *queryResolver) Popular(ctx context.Context, limit int) ([]*model.Show, error) {
-	var sh []*models.Production
+	var sh []*a.Production
 	// FIXME change this once we have metrics on show subscriptions
 	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreProductions).Filter("BuildDate >", 0).Order("-BuildDate").Limit(limit), &sh); err != nil {
 		platform.ReportError(err)

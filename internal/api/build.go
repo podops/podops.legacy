@@ -7,16 +7,15 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
 
-	a "github.com/podops/podops/apiv1"
+	a "github.com/podops/podops"
 	"github.com/podops/podops/feed"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/backend"
-	"github.com/podops/podops/pkg/backend/models"
 )
 
 // BuildFeedEndpoint starts the build of the feed
 func BuildFeedEndpoint(c echo.Context) error {
-	var req *models.BuildRequest = new(models.BuildRequest)
+	var req *a.BuildRequest = new(a.BuildRequest)
 	ctx := platform.NewHttpContext(c)
 
 	if err := c.Bind(req); err != nil {
@@ -46,7 +45,7 @@ func BuildFeedEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	resp := models.BuildRequest{
+	resp := a.BuildRequest{
 		GUID:         req.GUID,
 		FeedURL:      fmt.Sprintf("%s/c/%s/feed.xml", a.DefaultCDNEndpoint, req.GUID),
 		FeedAliasURL: fmt.Sprintf("%s/s/%s/feed.xml", a.DefaultEndpoint, p.Name),

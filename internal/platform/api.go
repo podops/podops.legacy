@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"google.golang.org/appengine"
 
-	a "github.com/podops/podops/apiv1"
+	a "github.com/podops/podops"
 )
 
 // StandardResponse is the default way to respond to API requests

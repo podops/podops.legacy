@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	a "github.com/podops/podops/apiv1"
+	a "github.com/podops/podops"
 )
 
 // FIXME move this to pkg/cli

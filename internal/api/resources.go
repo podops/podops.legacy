@@ -7,10 +7,9 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
 
-	a "github.com/podops/podops/apiv1"
+	a "github.com/podops/podops"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/backend"
-	"github.com/podops/podops/pkg/backend/models"
 )
 
 // FindResourceEndpoint returns a resource
@@ -98,7 +97,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", "rsrc_list", fmt.Sprintf("%s/%s", prod, kind), 1)
 
-	return platform.StandardResponse(c, http.StatusOK, &models.ResourceList{Resources: l})
+	return platform.StandardResponse(c, http.StatusOK, &a.ResourceList{Resources: l})
 }
 
 // UpdateResourceEndpoint creates or updates a resource
