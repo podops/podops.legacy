@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/podops/podops/pkg/auth"
+	"github.com/podops/podops/auth"
 
 	"github.com/urfave/cli/v2"
 )

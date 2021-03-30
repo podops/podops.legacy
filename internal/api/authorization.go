@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	a "github.com/podops/podops/apiv1"
-	"github.com/podops/podops/pkg/auth"
+	"github.com/podops/podops/auth"
 	"github.com/podops/podops/pkg/backend"
 )
 
