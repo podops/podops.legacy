@@ -14,7 +14,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	ds "github.com/fupas/platform/pkg/platform"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/platform"
 )
@@ -44,7 +44,7 @@ func ImportResource(ctx context.Context, src, dest, original string) int {
 	}
 
 	meta := extractMetadataFromResponse(resp)
-	obj := ds.Storage().Bucket(a.BucketCDN).Object(dest)
+	obj := ds.Storage().Bucket(podops.BucketCDN).Object(dest)
 	writer := obj.NewWriter(ctx)
 	writer.ContentType = meta.ContentType
 	defer writer.Close()
@@ -66,15 +66,15 @@ func ImportResource(ctx context.Context, src, dest, original string) int {
 	// update the inventory
 	parent := strings.Split(dest, "/")[0]
 
-	temp := a.Asset{
+	temp := podops.Asset{
 		URI: src,
-		Rel: a.ResourceTypeImport,
+		Rel: podops.ResourceTypeImport,
 	}
 
 	name := strings.Split(temp.FingerprintURI(parent), "/")[1]
 	duration := int64(0) // FIXME implement it
 
-	if err := UpdateAsset(ctx, name, util.Checksum(src), a.ResourceAsset, parent, dest, meta.ContentType, original, meta.Etag, meta.Size, duration); err != nil {
+	if err := UpdateAsset(ctx, name, util.Checksum(src), podops.ResourceAsset, parent, dest, meta.ContentType, original, meta.Etag, meta.Size, duration); err != nil {
 		platform.ReportError(fmt.Errorf("error updating inventory: %v", err))
 		return http.StatusBadRequest
 	}
@@ -83,19 +83,19 @@ func ImportResource(ctx context.Context, src, dest, original string) int {
 }
 
 // EnsureAsset validates the existence of the asset and imports it if necessary
-func EnsureAsset(ctx context.Context, production string, rsrc *a.Asset) error {
-	if rsrc.Rel == a.ResourceTypeExternal {
+func EnsureAsset(ctx context.Context, production string, rsrc *podops.Asset) error {
+	if rsrc.Rel == podops.ResourceTypeExternal {
 		_, err := pingURL(rsrc.URI)
 		return err
 	}
-	if rsrc.Rel == a.ResourceTypeLocal {
+	if rsrc.Rel == podops.ResourceTypeLocal {
 		path := fmt.Sprintf("%s/%s", production, rsrc.URI)
 		if !resourceExists(ctx, path) {
 			return fmt.Errorf("can not find '%s'", rsrc.URI)
 		}
 		return nil
 	}
-	if rsrc.Rel == a.ResourceTypeImport {
+	if rsrc.Rel == podops.ResourceTypeImport {
 		_, err := pingURL(rsrc.URI) // ping the URL already here to avoid queueing a request that will fail later anyways
 		if err != nil {
 			return err
@@ -107,7 +107,7 @@ func EnsureAsset(ctx context.Context, production string, rsrc *a.Asset) error {
 		}
 
 		// dispatch a request for background import
-		_, err = platform.CreateTask(ctx, apiv1.ImportTaskWithPrefix, &a.ImportRequest{Source: rsrc.URI, Dest: path, Original: rsrc.AssetName()})
+		_, err = platform.CreateTask(ctx, apiv1.ImportTaskWithPrefix, &podops.ImportRequest{Source: rsrc.URI, Dest: path, Original: rsrc.AssetName()})
 		if err != nil {
 			return err
 		}
@@ -122,7 +122,7 @@ func pingURL(url string) (http.Header, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", a.UserAgentString)
+	req.Header.Set("User-Agent", podops.UserAgentString)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -141,7 +141,7 @@ func pingURL(url string) (http.Header, error) {
 
 // resourceExists verifies the resource .yaml exists
 func resourceExists(ctx context.Context, path string) bool {
-	obj := ds.Storage().Bucket(a.BucketCDN).Object(path)
+	obj := ds.Storage().Bucket(podops.BucketCDN).Object(path)
 	_, err := obj.Attrs(ctx)
 	if err == storage.ErrObjectNotExist {
 		return false

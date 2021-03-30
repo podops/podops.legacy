@@ -14,7 +14,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
 )
 
@@ -48,8 +48,8 @@ func NormalizeKind(kind string) (string, error) {
 }
 
 // GetResource retrieves a resource
-func GetResource(ctx context.Context, guid string) (*a.Resource, error) {
-	var r a.Resource
+func GetResource(ctx context.Context, guid string) (*podops.Resource, error) {
+	var r podops.Resource
 
 	if err := platform.DataStore().Get(ctx, resourceKey(guid), &r); err != nil {
 		if err == datastore.ErrNoSuchEntity {
@@ -61,8 +61,8 @@ func GetResource(ctx context.Context, guid string) (*a.Resource, error) {
 }
 
 // FindResource looks for a resource 'name' in the context of production 'production'
-func FindResource(ctx context.Context, production, name string) (*a.Resource, error) {
-	var r []*a.Resource
+func FindResource(ctx context.Context, production, name string) (*podops.Resource, error) {
+	var r []*podops.Resource
 
 	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Filter("Name =", name), &r); err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func UpdateResource(ctx context.Context, name, guid, kind, production, location 
 
 	// create a new inventory entry
 	now := util.Timestamp()
-	rsrc := a.Resource{
+	rsrc := podops.Resource{
 		Name:       name,
 		GUID:       guid,
 		Kind:       _kind,
@@ -142,7 +142,7 @@ func UpdateAsset(ctx context.Context, name, guid, kind, production, location, co
 
 	// create a new inventory entry
 	now := util.Timestamp()
-	rsrc := a.Resource{
+	rsrc := podops.Resource{
 		Name:        name,
 		GUID:        guid,
 		Kind:        _kind,
@@ -175,7 +175,7 @@ func DeleteResource(ctx context.Context, guid string) error {
 
 	// validate the production after deleting a resource
 	prod := ""
-	if r.Kind == a.ResourceShow {
+	if r.Kind == podops.ResourceShow {
 		prod = r.GUID
 	} else {
 		prod = r.ParentGUID
@@ -189,22 +189,22 @@ func DeleteResource(ctx context.Context, guid string) error {
 		UpdateProduction(ctx, p)
 	}
 
-	if r.Kind == a.ResourceAsset {
+	if r.Kind == podops.ResourceAsset {
 		return RemoveAsset(ctx, r.Location)
 	}
 	return RemoveResource(ctx, r.Location)
 }
 
 // ListResources returns all resources of type kind belonging to parentID
-func ListResources(ctx context.Context, production, kind string) ([]*a.Resource, error) {
-	var r []*a.Resource
+func ListResources(ctx context.Context, production, kind string) ([]*podops.Resource, error) {
+	var r []*podops.Resource
 
 	_kind, err := NormalizeKind(kind)
 	if err != nil {
 		return nil, err
 	}
 
-	if _kind == a.ResourceALL {
+	if _kind == podops.ResourceALL {
 		if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Order("-Created"), &r); err != nil {
 			return nil, err
 		}
@@ -213,7 +213,7 @@ func ListResources(ctx context.Context, production, kind string) ([]*a.Resource,
 		if err == nil && show != nil { // SHOW could not be there, no worries ...
 			r = append(r, show)
 		}
-	} else if _kind == a.ResourceShow {
+	} else if _kind == podops.ResourceShow {
 		// there should only be ONE
 		show, err := GetResource(ctx, production)
 		if err == nil && show != nil { // SHOW could not be there, no worries ...
@@ -241,13 +241,13 @@ func GetResourceContent(ctx context.Context, guid string) (interface{}, error) {
 		return nil, nil // not found => not an eror
 	}
 
-	if r.Kind == a.ResourceAsset {
-		asset := a.Asset{
+	if r.Kind == podops.ResourceAsset {
+		asset := podops.Asset{
 			URI:   r.GetPublicLocation(),
 			Title: r.Extra1,
 			Type:  r.ContentType,
 			Size:  int(r.Size),
-			Rel:   a.ResourceTypeLocal,
+			Rel:   podops.ResourceTypeLocal,
 		}
 		return &asset, nil
 	}
@@ -265,7 +265,7 @@ func WriteResourceContent(ctx context.Context, path string, create, force bool, 
 
 	exists := true
 
-	bkt := platform.Storage().Bucket(a.BucketProduction)
+	bkt := platform.Storage().Bucket(podops.BucketProduction)
 	obj := bkt.Object(path)
 
 	_, err := obj.Attrs(ctx)
@@ -298,7 +298,7 @@ func WriteResourceContent(ctx context.Context, path string, create, force bool, 
 // ReadResource reads a resource from Cloud Storage
 func ReadResource(ctx context.Context, path string) (interface{}, string, string, error) {
 
-	bkt := platform.Storage().Bucket(a.BucketProduction)
+	bkt := platform.Storage().Bucket(podops.BucketProduction)
 	reader, err := bkt.Object(path).NewReader(ctx)
 	if err != nil {
 		return nil, "", "", err
@@ -313,7 +313,7 @@ func ReadResource(ctx context.Context, path string) (interface{}, string, string
 
 // RemoveResource removes a resource from Cloud Storage
 func RemoveResource(ctx context.Context, path string) error {
-	bkt := platform.Storage().Bucket(a.BucketProduction)
+	bkt := platform.Storage().Bucket(podops.BucketProduction)
 
 	obj := bkt.Object(path)
 	_, err := obj.Attrs(ctx)
@@ -326,7 +326,7 @@ func RemoveResource(ctx context.Context, path string) error {
 
 // RemoveAsset removes a asset from Cloud Storage
 func RemoveAsset(ctx context.Context, path string) error {
-	bkt := platform.Storage().Bucket(a.BucketCDN)
+	bkt := platform.Storage().Bucket(podops.BucketCDN)
 
 	obj := bkt.Object(path)
 	_, err := obj.Attrs(ctx)
@@ -338,7 +338,7 @@ func RemoveAsset(ctx context.Context, path string) error {
 }
 
 // UpdateShow is a helper function to update a show resource
-func UpdateShow(ctx context.Context, location string, show *a.Show) error {
+func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 	r, _ := GetResource(ctx, show.GUID())
 
 	if r != nil {
@@ -347,12 +347,12 @@ func UpdateShow(ctx context.Context, location string, show *a.Show) error {
 			return fmt.Errorf("can not modify resource: expected '%s', received '%s'", r.Kind, show.Kind)
 		}
 		r.Name = show.Metadata.Name
-		r.ParentGUID = show.Metadata.Labels[a.LabelParentGUID]
+		r.ParentGUID = show.Metadata.Labels[podops.LabelParentGUID]
 		r.Location = location
 		r.Title = show.Description.Title
 		r.Summary = show.Description.Summary
-		// FIXME: r.Image = show.Image.ResolveURI(a.DefaultCDNEndpoint, show.GUID())
-		r.Image = show.Image.ResolveURI(a.StorageEndpoint, show.GUID())
+		// FIXME: r.Image = show.Image.ResolveURI(podops.DefaultCDNEndpoint, show.GUID())
+		r.Image = show.Image.ResolveURI(podops.StorageEndpoint, show.GUID())
 		r.Updated = util.Timestamp()
 
 		return updateResource(ctx, r)
@@ -360,16 +360,16 @@ func UpdateShow(ctx context.Context, location string, show *a.Show) error {
 
 	// create a new inventory entry
 	now := util.Timestamp()
-	rsrc := a.Resource{
+	rsrc := podops.Resource{
 		Name:       show.Metadata.Name,
 		GUID:       show.GUID(),
-		Kind:       a.ResourceShow,
-		ParentGUID: show.Metadata.Labels[a.LabelParentGUID],
+		Kind:       podops.ResourceShow,
+		ParentGUID: show.Metadata.Labels[podops.LabelParentGUID],
 		Location:   location,
 		Title:      show.Description.Title,
 		Summary:    show.Description.Summary,
-		// FIXME: Image:      show.Image.ResolveURI(a.DefaultCDNEndpoint, show.GUID()),
-		Image:   show.Image.ResolveURI(a.StorageEndpoint, show.GUID()),
+		// FIXME: Image:      show.Image.ResolveURI(podops.DefaultCDNEndpoint, show.GUID()),
+		Image:   show.Image.ResolveURI(podops.StorageEndpoint, show.GUID()),
 		Created: now,
 		Updated: now,
 	}
@@ -377,7 +377,7 @@ func UpdateShow(ctx context.Context, location string, show *a.Show) error {
 }
 
 // UpdateEpisode is a helper function to update a episode resource
-func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) error {
+func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode) error {
 	// check if resource with same name already exists for the parent production
 	rn, err := FindResource(ctx, episode.Parent(), episode.Metadata.Name)
 	if err != nil {
@@ -399,17 +399,17 @@ func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) err
 		if r.Kind != episode.Kind {
 			return fmt.Errorf("can not modify resource: expected '%s', received '%s'", r.Kind, episode.Kind)
 		}
-		index, _ := strconv.ParseInt(episode.Metadata.Labels[a.LabelEpisode], 10, 64)
+		index, _ := strconv.ParseInt(episode.Metadata.Labels[podops.LabelEpisode], 10, 64)
 
 		r.Name = episode.Metadata.Name
-		r.ParentGUID = episode.Metadata.Labels[a.LabelParentGUID]
+		r.ParentGUID = episode.Metadata.Labels[podops.LabelParentGUID]
 		r.Location = location
 		r.Title = episode.Description.Title
 		r.Summary = episode.Description.Summary
 		r.Published = episode.PublishDateTimestamp()
 		r.Index = int(index) // episode number
-		r.Image = episode.Image.ResolveURI(a.StorageEndpoint, episode.Parent())
-		r.Extra1 = episode.Enclosure.ResolveURI(a.DefaultCDNEndpoint+"/c", episode.Parent())
+		r.Image = episode.Image.ResolveURI(podops.StorageEndpoint, episode.Parent())
+		r.Extra1 = episode.Enclosure.ResolveURI(podops.DefaultCDNEndpoint+"/c", episode.Parent())
 		r.Size = int64(episode.Enclosure.Size)
 		r.Duration = int64(episode.Description.Duration)
 		r.Updated = util.Timestamp()
@@ -419,20 +419,20 @@ func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) err
 
 	// create a new inventory entry
 	now := util.Timestamp()
-	index, _ := strconv.ParseInt(episode.Metadata.Labels[a.LabelEpisode], 10, 64)
+	index, _ := strconv.ParseInt(episode.Metadata.Labels[podops.LabelEpisode], 10, 64)
 
-	rsrc := a.Resource{
+	rsrc := podops.Resource{
 		Name:       episode.Metadata.Name,
 		GUID:       episode.GUID(),
-		Kind:       a.ResourceEpisode,
-		ParentGUID: episode.Metadata.Labels[a.LabelParentGUID],
+		Kind:       podops.ResourceEpisode,
+		ParentGUID: episode.Metadata.Labels[podops.LabelParentGUID],
 		Location:   location,
 		Title:      episode.Description.Title,
 		Summary:    episode.Description.Summary,
 		Published:  episode.PublishDateTimestamp(),
 		Index:      int(index), // episode number
-		Image:      episode.Image.ResolveURI(a.StorageEndpoint, episode.Parent()),
-		Extra1:     episode.Enclosure.ResolveURI(a.DefaultCDNEndpoint+"/c", episode.Parent()),
+		Image:      episode.Image.ResolveURI(podops.StorageEndpoint, episode.Parent()),
+		Extra1:     episode.Enclosure.ResolveURI(podops.DefaultCDNEndpoint+"/c", episode.Parent()),
 		Size:       int64(episode.Enclosure.Size),
 		Duration:   int64(episode.Description.Duration),
 		Created:    now,
@@ -442,7 +442,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *a.Episode) err
 }
 
 // updateResource does what the name suggests
-func updateResource(ctx context.Context, r *a.Resource) error {
+func updateResource(ctx context.Context, r *podops.Resource) error {
 	if _, err := platform.DataStore().Put(ctx, resourceKey(r.GUID), r); err != nil {
 		return err
 	}

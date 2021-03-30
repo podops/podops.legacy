@@ -10,13 +10,13 @@ import (
 
 	"github.com/fupas/commons/pkg/util"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	"github.com/podops/podops/pkg/backend"
 )
 
 // GetResourcesCommand list all resource associated with a show
 func GetResourcesCommand(c *cli.Context) error {
-	kind := a.ResourceALL
+	kind := podops.ResourceALL
 	prod := getProduction(c)
 
 	if c.NArg() == 1 {
@@ -31,7 +31,7 @@ func GetResourcesCommand(c *cli.Context) error {
 	if kind != "" {
 		// get a list of resources
 		if kind == "" {
-			kind = a.ResourceALL
+			kind = podops.ResourceALL
 		}
 
 		l, err := client.Resources(prod, kind)
@@ -45,7 +45,7 @@ func GetResourcesCommand(c *cli.Context) error {
 		} else {
 			fmt.Println(assetListing("ID", "NAME", "KIND"))
 			for _, details := range l.Resources {
-				if details.Kind == a.ResourceAsset {
+				if details.Kind == podops.ResourceAsset {
 					fmt.Println(assetListing(details.GUID, details.Extra1, details.Kind))
 				} else {
 					fmt.Println(assetListing(details.GUID, details.Name, details.Kind))
@@ -148,7 +148,7 @@ func DeleteResourcesCommand(c *cli.Context) error {
 // TemplateCommand creates a resource template with all default values
 func TemplateCommand(c *cli.Context) error {
 	template := c.Args().First()
-	if template != a.ResourceShow && template != a.ResourceEpisode {
+	if template != podops.ResourceShow && template != podops.ResourceEpisode {
 		fmt.Println(fmt.Sprintf("\nDon't know how to create '%s'", template))
 		return nil
 	}
@@ -170,14 +170,14 @@ func TemplateCommand(c *cli.Context) error {
 
 	// create the yamls
 	if template == "show" {
-		show := DefaultShow(name, "TITLE", "SUMMARY", guid, a.DefaultEndpoint, a.DefaultCDNEndpoint)
+		show := DefaultShow(name, "TITLE", "SUMMARY", guid, podops.DefaultEndpoint, podops.DefaultCDNEndpoint)
 		err := dumpResource(fmt.Sprintf("show-%s.yaml", guid), show)
 		if err != nil {
 			printError(c, err)
 			return nil
 		}
 	} else {
-		episode := DefaultEpisode(name, parentName, guid, parentGUID, a.DefaultEndpoint, a.DefaultCDNEndpoint)
+		episode := DefaultEpisode(name, parentName, guid, parentGUID, podops.DefaultEndpoint, podops.DefaultCDNEndpoint)
 		err := dumpResource(fmt.Sprintf("episode-%s.yaml", guid), episode)
 		if err != nil {
 			printError(c, err)

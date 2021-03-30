@@ -8,7 +8,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	cmd "github.com/podops/podops/internal/cli"
 )
 
@@ -30,8 +30,8 @@ func main() {
 	// initialize CLI
 	app := &cli.App{
 		Name:    cmdLineName,
-		Version: a.VersionString,
-		Usage:   fmt.Sprintf("PodOps: Podcast Operations CLI (%s)", a.Version),
+		Version: podops.VersionString,
+		Usage:   fmt.Sprintf("PodOps: Podcast Operations CLI (%s)", podops.Version),
 		Action: func(c *cli.Context) error {
 			fmt.Println(globalHelpText)
 			return nil

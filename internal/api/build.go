@@ -7,7 +7,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	"github.com/podops/podops/feed"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/backend"
@@ -15,7 +15,7 @@ import (
 
 // BuildFeedEndpoint starts the build of the feed
 func BuildFeedEndpoint(c echo.Context) error {
-	var req *a.BuildRequest = new(a.BuildRequest)
+	var req *podops.BuildRequest = new(podops.BuildRequest)
 	ctx := platform.NewHttpContext(c)
 
 	if err := c.Bind(req); err != nil {
@@ -45,10 +45,10 @@ func BuildFeedEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	resp := a.BuildRequest{
+	resp := podops.BuildRequest{
 		GUID:         req.GUID,
-		FeedURL:      fmt.Sprintf("%s/c/%s/feed.xml", a.DefaultCDNEndpoint, req.GUID),
-		FeedAliasURL: fmt.Sprintf("%s/s/%s/feed.xml", a.DefaultEndpoint, p.Name),
+		FeedURL:      fmt.Sprintf("%s/c/%s/feed.xml", podops.DefaultCDNEndpoint, req.GUID),
+		FeedAliasURL: fmt.Sprintf("%s/s/%s/feed.xml", podops.DefaultEndpoint, p.Name),
 	}
 
 	// track api access for billing etc

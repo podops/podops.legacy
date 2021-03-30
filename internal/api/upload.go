@@ -10,7 +10,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	p "github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/backend"
 )
@@ -44,7 +44,7 @@ func UploadEndpoint(c echo.Context) error {
 		if part.FormName() == "asset" {
 			location := fmt.Sprintf("%s/%s", prod, part.FileName())
 
-			bkt := platform.Storage().Bucket(a.BucketCDN)
+			bkt := platform.Storage().Bucket(podops.BucketCDN)
 			obj := bkt.Object(location)
 			writer := obj.NewWriter(ctx)
 			defer writer.Close() // just to be sure we really close the writer
@@ -64,7 +64,7 @@ func UploadEndpoint(c echo.Context) error {
 			original := part.FileName()
 
 			// update the inventory
-			backend.UpdateAsset(ctx, part.FileName(), util.Checksum(location), a.ResourceAsset, prod, location, attr.ContentType, original, attr.Etag, attr.Size, duration)
+			backend.UpdateAsset(ctx, part.FileName(), util.Checksum(location), podops.ResourceAsset, prod, location, attr.ContentType, original, attr.Etag, attr.Size, duration)
 		}
 	}
 

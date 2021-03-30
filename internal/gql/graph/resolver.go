@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	"github.com/podops/podops/internal/dataloader"
 	"github.com/podops/podops/internal/gql/graph/model"
 	"github.com/podops/podops/pkg/backend"
@@ -43,7 +43,7 @@ func LoadShow(ctx context.Context, key string) (interface{}, error) {
 	if s == nil {
 		return nil, fmt.Errorf("show '%s': no content", key)
 	}
-	show := s.(*a.Show)
+	show := s.(*podops.Show)
 
 	category := make([]*model.Category, 1)
 	category[0] = &model.Category{
@@ -52,11 +52,11 @@ func LoadShow(ctx context.Context, key string) (interface{}, error) {
 	}
 
 	labels := &model.Labels{
-		Block:    show.Metadata.Labels[a.LabelBlock],
-		Explicit: show.Metadata.Labels[a.LabelExplicit],
-		Type:     show.Metadata.Labels[a.LabelType],
-		Complete: show.Metadata.Labels[a.LabelComplete],
-		Language: show.Metadata.Labels[a.LabelLanguage],
+		Block:    show.Metadata.Labels[podops.LabelBlock],
+		Explicit: show.Metadata.Labels[podops.LabelExplicit],
+		Type:     show.Metadata.Labels[podops.LabelType],
+		Complete: show.Metadata.Labels[podops.LabelComplete],
+		Language: show.Metadata.Labels[podops.LabelLanguage],
 		//Episode: NOT USED
 		//Season: NOT USED
 	}
@@ -98,20 +98,20 @@ func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	episode := e.(*a.Episode)
+	episode := e.(*podops.Episode)
 
 	p, err := backend.GetProduction(ctx, r.ParentGUID)
 	if err != nil {
 		return nil, err
 	}
 
-	n, _ := strconv.ParseInt(episode.Metadata.Labels[a.LabelEpisode], 10, 64)
-	season, _ := strconv.ParseInt(episode.Metadata.Labels[a.LabelSeason], 10, 64)
+	n, _ := strconv.ParseInt(episode.Metadata.Labels[podops.LabelEpisode], 10, 64)
+	season, _ := strconv.ParseInt(episode.Metadata.Labels[podops.LabelSeason], 10, 64)
 	labels := &model.Labels{
-		Block:    episode.Metadata.Labels[a.LabelBlock],
-		Explicit: episode.Metadata.Labels[a.LabelExplicit],
-		Type:     episode.Metadata.Labels[a.LabelType],
-		Complete: episode.Metadata.Labels[a.LabelComplete],
+		Block:    episode.Metadata.Labels[podops.LabelBlock],
+		Explicit: episode.Metadata.Labels[podops.LabelExplicit],
+		Type:     episode.Metadata.Labels[podops.LabelType],
+		Complete: episode.Metadata.Labels[podops.LabelComplete],
 		//Language: NOT USED
 		Episode: int(n),
 		Season:  int(season),

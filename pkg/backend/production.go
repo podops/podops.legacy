@@ -9,8 +9,7 @@ import (
 
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
-
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 )
 
 const (
@@ -19,7 +18,7 @@ const (
 )
 
 // CreateProduction initializes a new show and all its metadata
-func CreateProduction(ctx context.Context, name, title, summary, clientID string) (*a.Production, error) {
+func CreateProduction(ctx context.Context, name, title, summary, clientID string) (*podops.Production, error) {
 	if name == "" {
 		return nil, fmt.Errorf("name must not be empty")
 	}
@@ -41,7 +40,7 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 	production := strings.ToLower(id)
 	now := util.Timestamp()
 
-	prod := a.Production{
+	prod := podops.Production{
 		GUID:    production,
 		Owner:   clientID,
 		Name:    name,
@@ -60,8 +59,8 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 }
 
 // GetProduction returns a production based on the GUID
-func GetProduction(ctx context.Context, production string) (*a.Production, error) {
-	var p a.Production
+func GetProduction(ctx context.Context, production string) (*podops.Production, error) {
+	var p podops.Production
 
 	if err := platform.DataStore().Get(ctx, productionKey(production), &p); err != nil {
 		if err == datastore.ErrNoSuchEntity {
@@ -74,7 +73,7 @@ func GetProduction(ctx context.Context, production string) (*a.Production, error
 
 // ValidateProduction checks the integrity of a production and fixes issues if possible
 func ValidateProduction(ctx context.Context, production string) error {
-	var p a.Production
+	var p podops.Production
 	episodes := 0
 	show := 0
 	assets := 0
@@ -83,7 +82,7 @@ func ValidateProduction(ctx context.Context, production string) error {
 	if err != nil {
 		return err
 	}
-	rsrc, err := ListResources(ctx, production, a.ResourceALL)
+	rsrc, err := ListResources(ctx, production, podops.ResourceALL)
 	if err != nil {
 		return err
 	}
@@ -92,11 +91,11 @@ func ValidateProduction(ctx context.Context, production string) error {
 	}
 
 	for _, r := range rsrc {
-		if r.Kind == a.ResourceShow {
+		if r.Kind == podops.ResourceShow {
 			show++
-		} else if r.Kind == a.ResourceEpisode {
+		} else if r.Kind == podops.ResourceEpisode {
 			episodes++
-		} else if r.Kind == a.ResourceAsset {
+		} else if r.Kind == podops.ResourceAsset {
 			assets++
 		}
 	}
@@ -112,7 +111,7 @@ func ValidateProduction(ctx context.Context, production string) error {
 }
 
 // UpdateProduction does what the name suggests
-func UpdateProduction(ctx context.Context, p *a.Production) error {
+func UpdateProduction(ctx context.Context, p *podops.Production) error {
 	if _, err := platform.DataStore().Put(ctx, productionKey(p.GUID), p); err != nil {
 		return err
 	}
@@ -120,8 +119,8 @@ func UpdateProduction(ctx context.Context, p *a.Production) error {
 }
 
 // FindProductionByName does a lookup using the productions name instead of its key
-func FindProductionByName(ctx context.Context, name string) (*a.Production, error) {
-	var p []*a.Production
+func FindProductionByName(ctx context.Context, name string) (*podops.Production, error) {
+	var p []*podops.Production
 	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreProductions).Filter("Name =", name), &p); err != nil {
 		return nil, err
 	}
@@ -132,8 +131,8 @@ func FindProductionByName(ctx context.Context, name string) (*a.Production, erro
 }
 
 // FindProductionsByOwner returns all productions belonging to the same owner
-func FindProductionsByOwner(ctx context.Context, owner string) ([]*a.Production, error) {
-	var p []*a.Production
+func FindProductionsByOwner(ctx context.Context, owner string) ([]*podops.Production, error) {
+	var p []*podops.Production
 	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreProductions).Filter("Owner =", owner), &p); err != nil {
 		return nil, err
 	}

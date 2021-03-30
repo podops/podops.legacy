@@ -3,9 +3,8 @@ package cli
 import (
 	"fmt"
 
+	"github.com/podops/podops"
 	"github.com/urfave/cli/v2"
-
-	a "github.com/podops/podops"
 )
 
 // NewProductionCommand creates a new podcast
@@ -27,7 +26,7 @@ func NewProductionCommand(c *cli.Context) error {
 		return nil
 	}
 
-	show := DefaultShow(p.Name, title, summary, p.GUID, a.DefaultEndpoint, a.DefaultCDNEndpoint)
+	show := DefaultShow(p.Name, title, summary, p.GUID, podops.DefaultEndpoint, podops.DefaultCDNEndpoint)
 	err = dumpResource(fmt.Sprintf("show-%s.yaml", p.GUID), show)
 	if err != nil {
 		printError(c, err)

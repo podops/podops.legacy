@@ -7,7 +7,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	"github.com/podops/podops/auth"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/backend"
@@ -15,7 +15,7 @@ import (
 
 // ProductionEndpoint creates an new show and does all the background setup
 func ProductionEndpoint(c echo.Context) error {
-	var req *a.Production = new(a.Production)
+	var req *podops.Production = new(podops.Production)
 	ctx := platform.NewHttpContext(c)
 
 	if err := AuthorizeAccess(ctx, c, scopeProductionWrite); err != nil {
@@ -29,7 +29,7 @@ func ProductionEndpoint(c echo.Context) error {
 
 	// validate and normalize the name
 	showName := strings.ToLower(strings.TrimSpace(req.Name))
-	if !a.ValidResourceName(showName) {
+	if !podops.ValidResourceName(showName) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid name '%s'", showName))
 	}
 	// create a new production
@@ -40,7 +40,7 @@ func ProductionEndpoint(c echo.Context) error {
 	}
 
 	location := fmt.Sprintf("%s/show-%s.yaml", p.GUID, p.GUID)
-	if err := backend.UpdateResource(ctx, p.Name, p.GUID, a.ResourceShow, p.GUID, location); err != nil {
+	if err := backend.UpdateResource(ctx, p.Name, p.GUID, podops.ResourceShow, p.GUID, location); err != nil {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
@@ -68,5 +68,5 @@ func ListProductionsEndpoint(c echo.Context) error {
 	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", "prod_list", clientID, 1)
 
-	return platform.StandardResponse(c, http.StatusOK, &a.ProductionList{Productions: productions})
+	return platform.StandardResponse(c, http.StatusOK, &podops.ProductionList{Productions: productions})
 }

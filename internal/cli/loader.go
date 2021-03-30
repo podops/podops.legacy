@@ -7,7 +7,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	"github.com/podops/podops/internal/validator"
 )
 
@@ -22,8 +22,8 @@ var (
 
 func init() {
 	resourceLoaders = make(map[string]ResourceLoaderFunc)
-	resourceLoaders[a.ResourceShow] = loadShowResource
-	resourceLoaders[a.ResourceEpisode] = loadEpisodeResource
+	resourceLoaders[podops.ResourceShow] = loadShowResource
+	resourceLoaders[podops.ResourceEpisode] = loadEpisodeResource
 }
 
 // LoadResource takes a byte array and determines its kind before unmarshalling it into its struct form
@@ -43,8 +43,8 @@ func LoadResource(data []byte) (interface{}, string, string, error) {
 }
 
 // LoadResourceMetadata reads only the metadata of a resource
-func LoadResourceMetadata(data []byte) (*a.ResourceMetadata, error) {
-	var r a.ResourceMetadata
+func LoadResourceMetadata(data []byte) (*podops.ResourceMetadata, error) {
+	var r podops.ResourceMetadata
 
 	err := yaml.Unmarshal([]byte(data), &r)
 	if err != nil {
@@ -54,13 +54,13 @@ func LoadResourceMetadata(data []byte) (*a.ResourceMetadata, error) {
 }
 
 func loadShowResource(data []byte) (interface{}, string, error) {
-	var r a.Show
+	var r podops.Show
 
 	err := yaml.Unmarshal([]byte(data), &r)
 	if err != nil {
 		return nil, "", fmt.Errorf("can not parse resource: %w", err)
 	}
-	v := r.Validate(validator.New(a.ResourceShow))
+	v := r.Validate(validator.New(podops.ResourceShow))
 	if !v.IsValid() {
 		return nil, "", fmt.Errorf(v.Error())
 	}
@@ -69,13 +69,13 @@ func loadShowResource(data []byte) (interface{}, string, error) {
 }
 
 func loadEpisodeResource(data []byte) (interface{}, string, error) {
-	var r a.Episode
+	var r podops.Episode
 
 	err := yaml.Unmarshal([]byte(data), &r)
 	if err != nil {
 		return nil, "", fmt.Errorf("can not parse resource: %w", err)
 	}
-	v := r.Validate(validator.New(a.ResourceEpisode))
+	v := r.Validate(validator.New(podops.ResourceEpisode))
 	if !v.IsValid() {
 		return nil, "", fmt.Errorf(v.Error())
 	}

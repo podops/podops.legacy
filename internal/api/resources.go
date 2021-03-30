@@ -7,7 +7,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	"github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/backend"
 )
@@ -97,7 +97,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", "rsrc_list", fmt.Sprintf("%s/%s", prod, kind), 1)
 
-	return platform.StandardResponse(c, http.StatusOK, &a.ResourceList{Resources: l})
+	return platform.StandardResponse(c, http.StatusOK, &podops.ResourceList{Resources: l})
 }
 
 // UpdateResourceEndpoint creates or updates a resource
@@ -124,8 +124,8 @@ func UpdateResourceEndpoint(c echo.Context) error {
 	var payload interface{}
 	location := fmt.Sprintf("%s/%s-%s.yaml", prod, kind, guid)
 
-	if kind == a.ResourceShow {
-		var show *a.Show = new(a.Show)
+	if kind == podops.ResourceShow {
+		var show *podops.Show = new(podops.Show)
 
 		if err := c.Bind(show); err != nil {
 			return platform.ErrorResponse(c, http.StatusInternalServerError, err)
@@ -159,8 +159,8 @@ func UpdateResourceEndpoint(c echo.Context) error {
 			return platform.ErrorResponse(c, http.StatusBadRequest, err)
 		}
 
-	} else if kind == a.ResourceEpisode {
-		var episode *a.Episode = new(a.Episode)
+	} else if kind == podops.ResourceEpisode {
+		var episode *podops.Episode = new(podops.Episode)
 
 		if err := c.Bind(episode); err != nil {
 			return platform.ErrorResponse(c, http.StatusInternalServerError, err)

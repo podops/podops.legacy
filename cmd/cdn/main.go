@@ -14,7 +14,7 @@ import (
 	svc "github.com/fupas/platform/pkg/http"
 	gcp "github.com/fupas/platform/provider/google"
 
-	a "github.com/podops/podops/apiv1"
+	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/api"
 	p "github.com/podops/podops/internal/platform"
 )
@@ -43,19 +43,19 @@ func setup() *echo.Echo {
 	// TODO: e.Logger.SetLevel(log.INFO)
 
 	// frontend routes for feed, show & episode
-	//e.GET(a.ShowRoute, api.RewriteShowHandler)
-	//e.GET(a.EpisodeRoute, api.RewriteEpisodeHandler)
-	e.GET(a.FeedRoute, api.FeedEndpoint)
+	//e.GET(apiv1.ShowRoute, api.RewriteShowHandler)
+	//e.GET(apiv1.EpisodeRoute, api.RewriteEpisodeHandler)
+	e.GET(apiv1.FeedRoute, api.FeedEndpoint)
 
 	// cdn enpoints
-	content := e.Group(a.ContentNamespace)
-	content.GET(a.DefaultCDNRoute, api.RedirectCDNContentEndpoint)
-	content.HEAD(a.DefaultCDNRoute, api.RedirectCDNContentEndpoint)
+	content := e.Group(apiv1.ContentNamespace)
+	content.GET(apiv1.DefaultCDNRoute, api.RedirectCDNContentEndpoint)
+	content.HEAD(apiv1.DefaultCDNRoute, api.RedirectCDNContentEndpoint)
 
 	// grapghql
-	gql := e.Group(a.GraphqlNamespacePrefix)
-	gql.POST(a.GraphqlRoute, api.GraphqlEndpoint())
-	gql.GET(a.GraphqlPlaygroundRoute, api.GraphqlPlaygroundEndpoint())
+	gql := e.Group(apiv1.GraphqlNamespacePrefix)
+	gql.POST(apiv1.GraphqlRoute, api.GraphqlEndpoint())
+	gql.GET(apiv1.GraphqlPlaygroundRoute, api.GraphqlPlaygroundEndpoint())
 
 	// add the routes last
 	//e.Static("/", staticFileLocation) // serve static files from e.g. ./public

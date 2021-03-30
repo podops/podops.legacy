@@ -6,15 +6,14 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/podops/podops"
 	"google.golang.org/appengine"
-
-	a "github.com/podops/podops"
 )
 
 // StandardResponse is the default way to respond to API requests
 func StandardResponse(c echo.Context, status int, res interface{}) error {
 	if res == nil {
-		resp := a.StatusObject{
+		resp := podops.StatusObject{
 			Status:  status,
 			Message: fmt.Sprintf("status: %d", status),
 		}
@@ -26,15 +25,15 @@ func StandardResponse(c echo.Context, status int, res interface{}) error {
 
 // ErrorResponse reports the error and responds with an ErrorObject
 func ErrorResponse(c echo.Context, status int, err error) error {
-	var resp a.StatusObject
+	var resp podops.StatusObject
 
 	// send the error to Google Error Reporting
 	ReportError(err)
 
 	if err == nil {
-		resp = a.NewStatus(http.StatusInternalServerError, fmt.Sprintf("status: %d", status))
+		resp = podops.NewStatus(http.StatusInternalServerError, fmt.Sprintf("status: %d", status))
 	} else {
-		resp = a.NewErrorStatus(status, err)
+		resp = podops.NewErrorStatus(status, err)
 	}
 	return c.JSON(status, &resp)
 }

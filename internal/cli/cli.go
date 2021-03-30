@@ -18,7 +18,6 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/podops/podops"
-	a "github.com/podops/podops"
 	"github.com/podops/podops/internal/cli/netrc"
 )
 
@@ -80,7 +79,7 @@ func post(url string, request, response interface{}) (int, error) {
 func invoke(req *http.Request, response interface{}) (int, error) {
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	req.Header.Set("User-Agent", a.UserAgentString)
+	req.Header.Set("User-Agent", podops.UserAgentString)
 	if client.Token() != "" {
 		req.Header.Set("Authorization", "Bearer "+client.Token())
 	}

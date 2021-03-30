@@ -10,7 +10,7 @@ import (
 	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/platform/pkg/platform"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	p "github.com/podops/podops/internal/platform"
 	"github.com/podops/podops/pkg/backend"
 )
@@ -28,7 +28,7 @@ var (
 
 func init() {
 	staticFileLocation = env.GetString("STATIC_FILE_LOCATION", "./public")
-	bkt = platform.Storage().Bucket(a.BucketCDN)
+	bkt = platform.Storage().Bucket(podops.BucketCDN)
 }
 
 // RewriteShowHandler rewrites requests from /s/:name to /s/_id.html
@@ -70,7 +70,7 @@ func FeedEndpoint(c echo.Context) error { // FIXME not needed !
 		return p.ErrorResponse(c, http.StatusNotFound, fmt.Errorf("can not find '%s/feed.xml'", name))
 	}
 
-	redirectTo := fmt.Sprintf("%s/%s/feed.xml", a.StorageEndpoint, prod.GUID)
+	redirectTo := fmt.Sprintf("%s/%s/feed.xml", podops.StorageEndpoint, prod.GUID)
 
 	// track the event
 	p.TrackEvent(c.Request(), "cdn", "feed", prod.GUID, 1)
@@ -124,6 +124,6 @@ func RedirectCDNContentEndpoint(c echo.Context) error {
 	p.TrackEvent(c.Request(), "cdn", "asset", rsrc, 1)
 
 	// let the storage cdn handle the request
-	redirectTo := fmt.Sprintf("%s/%s", a.StorageEndpoint, rsrc)
+	redirectTo := fmt.Sprintf("%s/%s", podops.StorageEndpoint, rsrc)
 	return c.Redirect(http.StatusTemporaryRedirect, redirectTo)
 }

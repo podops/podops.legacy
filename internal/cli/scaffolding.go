@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 )
 
 // FIXME move this to pkg/cli
@@ -19,12 +19,12 @@ import (
 func DefaultShowMetadata(guid string) map[string]string {
 	l := make(map[string]string)
 
-	l[a.LabelLanguage] = "en_US"
-	l[a.LabelExplicit] = "no"
-	l[a.LabelType] = a.ShowTypeEpisodic
-	l[a.LabelBlock] = "no"
-	l[a.LabelComplete] = "no"
-	l[a.LabelGUID] = guid
+	l[podops.LabelLanguage] = "en_US"
+	l[podops.LabelExplicit] = "no"
+	l[podops.LabelType] = podops.ShowTypeEpisodic
+	l[podops.LabelBlock] = "no"
+	l[podops.LabelComplete] = "no"
+	l[podops.LabelGUID] = guid
 
 	return l
 }
@@ -40,47 +40,47 @@ func DefaultShowMetadata(guid string) map[string]string {
 func DefaultEpisodeMetadata(guid, parent string) map[string]string {
 	l := make(map[string]string)
 
-	l[a.LabelGUID] = guid
-	l[a.LabelParentGUID] = parent
-	l[a.LabelDate] = time.Now().UTC().Format(time.RFC1123Z)
-	l[a.LabelSeason] = "1"
-	l[a.LabelEpisode] = "1"
-	l[a.LabelExplicit] = "no"
-	l[a.LabelType] = a.EpisodeTypeFull
-	l[a.LabelBlock] = "no"
+	l[podops.LabelGUID] = guid
+	l[podops.LabelParentGUID] = parent
+	l[podops.LabelDate] = time.Now().UTC().Format(time.RFC1123Z)
+	l[podops.LabelSeason] = "1"
+	l[podops.LabelEpisode] = "1"
+	l[podops.LabelExplicit] = "no"
+	l[podops.LabelType] = podops.EpisodeTypeFull
+	l[podops.LabelBlock] = "no"
 
 	return l
 }
 
 // DefaultShow creates a default show struc
-func DefaultShow(name, title, summary, guid, portal, cdn string) *a.Show {
-	return &a.Show{
-		APIVersion: a.Version,
-		Kind:       a.ResourceShow,
-		Metadata: a.Metadata{
+func DefaultShow(name, title, summary, guid, portal, cdn string) *podops.Show {
+	return &podops.Show{
+		APIVersion: podops.Version,
+		Kind:       podops.ResourceShow,
+		Metadata: podops.Metadata{
 			Name:   name,
 			Labels: DefaultShowMetadata(guid),
 		},
-		Description: a.ShowDescription{
+		Description: podops.ShowDescription{
 			Title:   title,
 			Summary: summary,
-			Link: a.Asset{
+			Link: podops.Asset{
 				URI: fmt.Sprintf("%s/s/%s", portal, name),
 			},
-			Category: a.Category{
+			Category: podops.Category{
 				Name: "Technology",
 				SubCategory: []string{
 					"Podcasting",
 				},
 			},
-			Owner: a.Owner{
+			Owner: podops.Owner{
 				Name:  fmt.Sprintf("%s owner", name),
 				Email: fmt.Sprintf("hello@%s.me", name),
 			},
 			Author:    fmt.Sprintf("%s author", name),
 			Copyright: fmt.Sprintf("%s copyright", name),
 		},
-		Image: a.Asset{
+		Image: podops.Asset{
 			URI: fmt.Sprintf("%s/c/default/cover.png", cdn), // FIXME create a real resource entry to be consistent
 			Rel: "external",
 		},
@@ -88,28 +88,28 @@ func DefaultShow(name, title, summary, guid, portal, cdn string) *a.Show {
 }
 
 // DefaultEpisode creates a default episode struc
-func DefaultEpisode(name, parentName, guid, parent, portal, cdn string) *a.Episode {
-	return &a.Episode{
-		APIVersion: a.Version,
-		Kind:       a.ResourceEpisode,
-		Metadata: a.Metadata{
+func DefaultEpisode(name, parentName, guid, parent, portal, cdn string) *podops.Episode {
+	return &podops.Episode{
+		APIVersion: podops.Version,
+		Kind:       podops.ResourceEpisode,
+		Metadata: podops.Metadata{
 			Name:   name,
 			Labels: DefaultEpisodeMetadata(guid, parent),
 		},
-		Description: a.EpisodeDescription{
+		Description: podops.EpisodeDescription{
 			Title:       fmt.Sprintf("%s - Episode Title", name),
 			Summary:     fmt.Sprintf("%s - Episode Subtitle or short summary", name),
 			EpisodeText: "A long-form description of the episode with notes etc.",
-			Link: a.Asset{
+			Link: podops.Asset{
 				URI: fmt.Sprintf("%s/s/%s/%s", portal, parentName, name),
 			},
 			Duration: 1, // Seconds. Must not be 0, otherwise a validation error occurs.
 		},
-		Image: a.Asset{
+		Image: podops.Asset{
 			URI: fmt.Sprintf("%s/c/default/episode.png", cdn), // FIXME create a real resource entry to be consistent
 			Rel: "external",
 		},
-		Enclosure: a.Asset{
+		Enclosure: podops.Asset{
 			URI:  fmt.Sprintf("%s/%s.mp3", parent, name),
 			Type: "audio/mpeg",
 			Rel:  "local",
