@@ -3,8 +3,6 @@ package podops
 import (
 	"context"
 	"fmt"
-
-	"github.com/fupas/commons/pkg/env"
 )
 
 // Client is a client for interacting with the PodOps service.
@@ -141,15 +139,4 @@ func (co ClientOption) Merge(opts *ClientOption) *ClientOption {
 func (co ClientOption) IsValid() bool {
 	return co.APIEndpoint != "" && co.CDNEndpoint != "" && co.DefaultEndpoint != ""
 	// FIXME we can not validate token and production. There are some API calls that do not need them...
-}
-
-// DefaultClientOptions returns a default configuration bases on ENV variables
-func DefaultClientOptions() *ClientOption {
-	o := ClientOption{
-		Token:           env.GetString("PODOPS_API_TOKEN", ""),
-		APIEndpoint:     DefaultAPIEndpoint,
-		CDNEndpoint:     DefaultCDNEndpoint,
-		DefaultEndpoint: DefaultEndpoint,
-	}
-	return &o
 }

@@ -8,13 +8,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os/user"
-	"path/filepath"
 	"strings"
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/fupas/commons/pkg/env"
 	"github.com/urfave/cli/v2"
 
 	"github.com/podops/podops"
@@ -30,7 +27,7 @@ var (
 )
 
 func init() {
-	opts := LoadConfiguration()
+	opts := podops.LoadConfiguration()
 
 	c, err := podops.NewClient(context.TODO(), opts.Token, opts)
 	if err != nil {
@@ -45,20 +42,6 @@ func init() {
 // NoOpCommand is just a placeholder
 func NoOpCommand(c *cli.Context) error {
 	return cli.Exit(fmt.Sprintf("Command '%s' is not implemented", c.Command.Name), 0)
-}
-
-func LoadConfiguration() *podops.ClientOption {
-	opts := podops.DefaultClientOptions()
-
-	nrc := loadNetrc()
-	m := nrc.FindMachine(machineEntry)
-	if m != nil {
-		opts.Token = m.Password
-		if m.Account != "" {
-			opts.Production = m.Account
-		}
-	}
-	return opts
 }
 
 // Post is used to invoke an API method using http POST
@@ -106,17 +89,8 @@ func invoke(req *http.Request, response interface{}) (int, error) {
 	return resp.StatusCode, nil
 }
 
-func netrcPath() string {
-	path := env.GetString("PODOPS_CREDENTIALS", "")
-	if path == "" {
-		usr, _ := user.Current()
-		path = filepath.Join(usr.HomeDir, ".netrc")
-	}
-	return path
-}
-
 func loadNetrc() *netrc.Netrc {
-	nrc, _ := netrc.ParseFile(netrcPath()) // FIXME test this, can we ignore err?
+	nrc, _ := netrc.ParseFile(podops.DefaultConfigPath()) // FIXME test this, can we ignore err?
 	if nrc == nil {
 		nrc = &netrc.Netrc{}
 	}
@@ -133,7 +107,7 @@ func storeLogin(userID, token string) error {
 		m.UpdatePassword(token)
 	}
 	data, _ := nrc.MarshalText()
-	return ioutil.WriteFile(netrcPath(), data, 0644)
+	return ioutil.WriteFile(podops.DefaultConfigPath(), data, 0644)
 }
 
 func storeDefaultProduction(production string) error {
@@ -145,7 +119,7 @@ func storeDefaultProduction(production string) error {
 		m.UpdateAccount(production)
 	}
 	data, _ := nrc.MarshalText()
-	return ioutil.WriteFile(netrcPath(), data, 0644)
+	return ioutil.WriteFile(podops.DefaultConfigPath(), data, 0644)
 }
 
 func loadResource(path string) (interface{}, string, string, error) {
