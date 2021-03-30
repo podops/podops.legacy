@@ -10,6 +10,8 @@ import (
 	"github.com/podops/podops/internal/platform"
 )
 
+// FIXME validate if this is needed once the CDN is refactored
+
 // ImportTaskEndpoint implements async file import
 func ImportTaskEndpoint(c echo.Context) error {
 	var req *podops.ImportRequest = new(podops.ImportRequest)

@@ -15,6 +15,8 @@ import (
 	p "github.com/podops/podops/internal/platform"
 )
 
+// FIXME validate this file, what is needed, what is obsolete
+
 const (
 	cacheControl = "public, max-age=1800"
 )

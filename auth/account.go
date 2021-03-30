@@ -49,6 +49,30 @@ type (
 	}
 )
 
+// CreateAccount creates an new account within a given realm
+func CreateAccount(ctx context.Context, realm, userID string) (*Account, error) {
+	now := util.Timestamp()
+	token, _ := util.ShortUUID()
+	uid, _ := util.ShortUUID() // FIXME verify that uid is unique
+
+	account := Account{
+		Realm:     realm,
+		UserID:    userID,
+		ClientID:  uid,
+		Status:    AccountUnconfirmed,
+		Ext1:      token,
+		Expires:   util.IncT(util.Timestamp(), DefaultAuthenticationExpiration),
+		Confirmed: 0,
+		Created:   now,
+		Updated:   now,
+	}
+
+	if err := UpdateAccount(ctx, &account); err != nil {
+		return nil, err
+	}
+	return &account, nil
+}
+
 // LookupAccount retrieves an account within a given realm
 func LookupAccount(ctx context.Context, realm, clientID string) (*Account, error) {
 	var account Account
@@ -86,30 +110,6 @@ func FindAccountByToken(ctx context.Context, token string) (*Account, error) {
 		return nil, nil
 	}
 	return accounts[0], nil
-}
-
-// CreateAccount creates an new account within a given realm
-func CreateAccount(ctx context.Context, realm, userID string) (*Account, error) {
-	now := util.Timestamp()
-	token, _ := util.ShortUUID()
-	uid, _ := util.ShortUUID() // FIXME verify that uid is unique
-
-	account := &Account{
-		Realm:     realm,
-		UserID:    userID,
-		ClientID:  uid,
-		Status:    AccountUnconfirmed,
-		Ext1:      token,
-		Expires:   util.IncT(util.Timestamp(), DefaultAuthenticationExpiration),
-		Confirmed: 0,
-		Created:   now,
-		Updated:   now,
-	}
-
-	if err := UpdateAccount(ctx, account); err != nil {
-		return nil, err
-	}
-	return account, nil
 }
 
 func UpdateAccount(ctx context.Context, account *Account) error {

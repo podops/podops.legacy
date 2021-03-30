@@ -8,6 +8,8 @@ var (
 	// ErrNoToken indicates that no bearer token was provided
 	ErrNoToken = errors.New("api: no token provided")
 
+	// ErrInvalidRoute indicates that parameters as part of a route are not valid
+	ErrInvalidRoute = errors.New("api: invalid route")
 	// ErrInvalidParameters indicates that parameters used in an API call are not valid
 	ErrInvalidParameters = errors.New("api: invalid parameters")
 	// ErrValidationFailed indicates that a resource validation failed

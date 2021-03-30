@@ -44,9 +44,7 @@ func ProductionEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", "prod_create", p.GUID, 1)
-
 	return platform.StandardResponse(c, http.StatusCreated, p)
 }
 
@@ -65,8 +63,6 @@ func ListProductionsEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", "prod_list", clientID, 1)
-
 	return platform.StandardResponse(c, http.StatusOK, &podops.ProductionList{Productions: productions})
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
+	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/platform"
 )
 
@@ -18,7 +19,7 @@ func FindResourceEndpoint(c echo.Context) error {
 
 	guid := c.Param("id")
 	if guid == "" {
-		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route"))
+		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
 	if err := AuthorizeAccessResource(ctx, c, scopeResourceRead, guid); err != nil {
@@ -29,17 +30,12 @@ func FindResourceEndpoint(c echo.Context) error {
 	if err != nil {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
-
-	// FIXME verify that we actually are the owner !!!
-
-	// track api access for billing etc
-	platform.TrackEvent(c.Request(), "api", "rsrc_find", guid, 1)
-
 	if resource == nil {
 		return platform.StandardResponse(c, http.StatusNotFound, nil)
 	}
-	return platform.StandardResponse(c, http.StatusOK, resource)
 
+	platform.TrackEvent(c.Request(), "api", "rsrc_find", guid, 1)
+	return platform.StandardResponse(c, http.StatusOK, resource)
 }
 
 // GetResourceEndpoint returns a resource
@@ -51,7 +47,7 @@ func GetResourceEndpoint(c echo.Context) error {
 	guid := c.Param("id")
 
 	if !validateNotEmpty(prod, kind, guid) {
-		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route"))
+		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
 	if err := AuthorizeAccessResource(ctx, c, scopeResourceRead, guid); err != nil {
@@ -64,14 +60,12 @@ func GetResourceEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	// track api access for billing etc
-	platform.TrackEvent(c.Request(), "api", "rsrc_get", fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
-
 	if resource == nil {
 		return platform.StandardResponse(c, http.StatusNotFound, nil)
 	}
-	return platform.StandardResponse(c, http.StatusOK, resource)
 
+	platform.TrackEvent(c.Request(), "api", "rsrc_get", fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
+	return platform.StandardResponse(c, http.StatusOK, resource)
 }
 
 // ListResourcesEndpoint returns a list of resources
@@ -82,7 +76,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 	kind := c.Param("kind")
 
 	if !validateNotEmpty(prod, kind) {
-		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route"))
+		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
 	if err := AuthorizeAccessProduction(ctx, c, scopeResourceRead, prod); err != nil {
@@ -94,9 +88,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", "rsrc_list", fmt.Sprintf("%s/%s", prod, kind), 1)
-
 	return platform.StandardResponse(c, http.StatusOK, &podops.ResourceList{Resources: l})
 }
 
@@ -109,7 +101,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 	guid := c.Param("id")
 
 	if !validateNotEmpty(prod, kind, guid) {
-		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route"))
+		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
 	if err := AuthorizeAccessResource(ctx, c, scopeResourceWrite, guid); err != nil {
@@ -198,9 +190,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", action, fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
-
 	return platform.StandardResponse(c, http.StatusCreated, nil)
 }
 
@@ -213,7 +203,7 @@ func DeleteResourceEndpoint(c echo.Context) error {
 	guid := c.Param("id")
 
 	if !validateNotEmpty(prod, kind, guid) {
-		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route"))
+		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
 	if err := AuthorizeAccessResource(ctx, c, scopeResourceWrite, guid); err != nil {
@@ -225,8 +215,6 @@ func DeleteResourceEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", "rsrc_delete", fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
-
 	return c.NoContent(http.StatusNoContent)
 }

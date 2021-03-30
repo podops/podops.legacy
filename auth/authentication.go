@@ -21,6 +21,7 @@ const (
 func ResetAccountChallenge(ctx context.Context, account *Account) (*Account, error) {
 	// FIXME add a mutex
 	// FIXME this is crude!
+	// FIXME deep-copy, no side effects!
 	token, _ := util.ShortUUID()
 	account.Expires = util.IncT(util.Timestamp(), DefaultAuthenticationExpiration)
 	account.Ext1 = token
@@ -36,6 +37,7 @@ func ResetAccountChallenge(ctx context.Context, account *Account) (*Account, err
 func ResetAuthToken(ctx context.Context, account *Account) (*Account, error) {
 	// FIXME add a mutex
 	// FIXME this is crude!
+	// FIXME deep-copy, no side effects!
 	token, _ := util.ShortUUID()
 	account.Expires = util.IncT(util.Timestamp(), DefaultAuthenticationExpiration)
 	account.Ext2 = token
@@ -125,6 +127,7 @@ func SendAuthToken(ctx context.Context, account *Account) error {
 // ConfirmLoginChallenge confirms the account
 func ConfirmLoginChallenge(ctx context.Context, token string) (*Account, int, error) {
 	// FIXME add a mutex
+
 	if token == "" {
 		return nil, http.StatusUnauthorized, fmt.Errorf("Invalid token")
 	}
@@ -179,15 +182,13 @@ func exchangeToken(ctx context.Context, req *AuthorizationRequest, loginFrom str
 	if auth == nil {
 		// FIXME this is hardcoded for podops, make it configurable
 		auth = &Authorization{
-			ClientID: account.ClientID,
-			Realm:    req.Realm,
-			//Name:      "DEPRECATED",
+			ClientID:  account.ClientID,
+			Realm:     req.Realm,
 			TokenType: DefaultTokenType,
 			UserID:    req.UserID,
 			Scope:     DefaultScope,
-			//AuthType:  "DEPRECATED",
-			Revoked: false,
-			Created: now,
+			Revoked:   false,
+			Created:   now,
 		}
 	}
 
