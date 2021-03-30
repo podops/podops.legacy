@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	a "github.com/podops/podops/apiv1"
+	"github.com/podops/podops"
 	"github.com/podops/podops/auth"
 	"github.com/podops/podops/backend"
 )
@@ -39,11 +39,11 @@ func AuthorizeAccessProduction(ctx context.Context, c echo.Context, scope, claim
 	p, err := backend.GetProduction(ctx, claim)
 	if err != nil {
 
-		return a.ErrNoSuchProduction
+		return podops.ErrNoSuchProduction
 	}
 	if p.Owner != auth.ClientID {
 
-		return a.ErrNotAuthorized
+		return podops.ErrNotAuthorized
 	}
 
 	return nil
@@ -59,14 +59,14 @@ func AuthorizeAccessResource(ctx context.Context, c echo.Context, scope, claim s
 
 	r, err := backend.GetResource(ctx, claim)
 	if err != nil {
-		return a.ErrNoSuchResource
+		return podops.ErrNoSuchResource
 	}
 	p, err := backend.GetProduction(ctx, r.ParentGUID)
 	if err != nil {
-		return a.ErrNoSuchProduction
+		return podops.ErrNoSuchProduction
 	}
 	if p.Owner != auth.ClientID {
-		return a.ErrNotAuthorized
+		return podops.ErrNotAuthorized
 	}
 
 	return nil

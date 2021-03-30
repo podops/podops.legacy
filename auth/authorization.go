@@ -11,7 +11,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
 
-	a "github.com/podops/podops/apiv1"
+	"github.com/podops/podops"
 )
 
 const (
@@ -78,18 +78,18 @@ func GetBearerToken(r *http.Request) (string, error) {
 
 	auth := r.Header.Get("Authorization")
 	if len(auth) == 0 {
-		return "", a.ErrNoToken
+		return "", podops.ErrNoToken
 	}
 
 	parts := strings.Split(auth, " ")
 	if len(parts) != 2 {
-		return "", a.ErrNoToken
+		return "", podops.ErrNoToken
 	}
 	if parts[0] == "Bearer" {
 		return parts[1], nil
 	}
 
-	return "", a.ErrNoToken
+	return "", podops.ErrNoToken
 }
 
 // GetClientID extracts the ClientID from the token
@@ -106,7 +106,7 @@ func GetClientID(ctx context.Context, r *http.Request) (string, error) {
 		return "", err
 	}
 	if auth == nil {
-		return "", a.ErrNotAuthorized
+		return "", podops.ErrNotAuthorized
 	}
 
 	return auth.ClientID, nil
@@ -123,11 +123,11 @@ func CheckAuthorization(ctx context.Context, c echo.Context, scope string) (*Aut
 
 	auth, err := FindAuthorizationByToken(ctx, token)
 	if err != nil || auth == nil {
-		return nil, a.ErrNotAuthorized
+		return nil, podops.ErrNotAuthorized
 	}
 
 	if !hasScope(auth.Scope, scope) {
-		return nil, a.ErrNotAuthorized
+		return nil, podops.ErrNotAuthorized
 	}
 
 	return auth, nil

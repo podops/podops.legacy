@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	a "github.com/podops/podops/apiv1"
+	"github.com/podops/podops"
 	"github.com/podops/podops/internal/platform"
 )
 
@@ -106,7 +106,7 @@ func LogoutRequestEndpoint(c echo.Context) error {
 
 	token, err := GetBearerToken(c.Request())
 	if err != nil {
-		return a.ErrNoToken
+		return podops.ErrNoToken
 	}
 	auth, err := FindAuthorizationByToken(ctx, token)
 	if err != nil {

@@ -15,7 +15,6 @@ import (
 	"github.com/fupas/platform/pkg/platform"
 
 	"github.com/podops/podops"
-	"github.com/podops/podops/apiv1"
 )
 
 const (
@@ -166,7 +165,7 @@ func DeleteResource(ctx context.Context, guid string) error {
 		return err
 	}
 	if r == nil { // not found
-		return apiv1.ErrNoSuchResource
+		return podops.ErrNoSuchResource
 	}
 
 	if err := platform.DataStore().Delete(ctx, resourceKey(r.GUID)); err != nil {
@@ -318,7 +317,7 @@ func RemoveResource(ctx context.Context, path string) error {
 	obj := bkt.Object(path)
 	_, err := obj.Attrs(ctx)
 	if err == storage.ErrObjectNotExist {
-		return apiv1.ErrNoSuchResource
+		return podops.ErrNoSuchResource
 	}
 
 	return bkt.Object(path).Delete(ctx)
@@ -331,7 +330,7 @@ func RemoveAsset(ctx context.Context, path string) error {
 	obj := bkt.Object(path)
 	_, err := obj.Attrs(ctx)
 	if err == storage.ErrObjectNotExist {
-		return apiv1.ErrNoSuchAsset
+		return podops.ErrNoSuchAsset
 	}
 
 	return bkt.Object(path).Delete(ctx)
