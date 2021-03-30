@@ -1,9 +1,9 @@
 .PHONY: all
 all: build_test cli cdn api
 
-PLATFORM_LINUX = GOARCH=amd64 GOOS=linux
-PLATFORM_MAC = GOARCH=amd64 GOOS=darwin
-PLATFORM_WINDOWS = GOARCH=amd64 GOOS=windows
+TARGET_LINUX = GOARCH=amd64 GOOS=linux
+TARGET_MAC = GOARCH=amd64 GOOS=darwin
+TARGET_WINDOWS = GOARCH=amd64 GOOS=windows
 
 .PHONY: build_test
 build_test:
@@ -14,8 +14,8 @@ build_test:
 .PHONY: test
 test:
 	go test
-	cd internal/api && go test
-	cd pkg/auth && go test
+	cd apiv1 && go test
+	cd auth && go test
 	
 .PHONY: api
 api:
