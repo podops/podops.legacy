@@ -37,12 +37,10 @@ func AuthorizeAccessProduction(ctx context.Context, c echo.Context, scope, claim
 	}
 
 	p, err := backend.GetProduction(ctx, claim)
-	if err != nil {
-
+	if err != nil || p == nil {
 		return errordef.ErrNoSuchProduction
 	}
 	if p.Owner != auth.ClientID {
-
 		return errordef.ErrNotAuthorized
 	}
 
@@ -58,11 +56,12 @@ func AuthorizeAccessResource(ctx context.Context, c echo.Context, scope, claim s
 	}
 
 	r, err := backend.GetResource(ctx, claim)
-	if err != nil {
+	if err != nil || r == nil {
 		return errordef.ErrNoSuchResource
 	}
+
 	p, err := backend.GetProduction(ctx, r.ParentGUID)
-	if err != nil {
+	if err != nil || p == nil {
 		return errordef.ErrNoSuchProduction
 	}
 	if p.Owner != auth.ClientID {

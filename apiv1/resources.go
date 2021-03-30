@@ -99,18 +99,25 @@ func UpdateResourceEndpoint(c echo.Context) error {
 	prod := c.Param("prod")
 	kind := c.Param("kind")
 	guid := c.Param("id")
+	forceFlag := false
+	if c.QueryParam("f") == "true" {
+		forceFlag = true
+	}
 
 	if !validateNotEmpty(prod, kind, guid) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
-	if err := AuthorizeAccessResource(ctx, c, scopeResourceWrite, guid); err != nil {
-		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
-	}
-
-	forceFlag := false
-	if c.QueryParam("f") == "true" {
-		forceFlag = true
+	if forceFlag {
+		// this assumes that the resource does not exist i.e. we only validate access to the production
+		if err := AuthorizeAccessProduction(ctx, c, scopeResourceWrite, prod); err != nil {
+			return platform.ErrorResponse(c, http.StatusUnauthorized, err)
+		}
+	} else {
+		// we assume the resource already exists and we can validate guid and prod
+		if err := AuthorizeAccessResource(ctx, c, scopeResourceWrite, guid); err != nil {
+			return platform.ErrorResponse(c, http.StatusUnauthorized, err)
+		}
 	}
 
 	var payload interface{}
