@@ -6,7 +6,7 @@ import (
 	"github.com/fupas/commons/pkg/env"
 
 	a "github.com/podops/podops/apiv1"
-	cl "github.com/podops/podops/pkg/client"
+	cl "github.com/podops/podops/client"
 )
 
 // NewClient creates a new podcast client.

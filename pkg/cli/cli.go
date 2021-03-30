@@ -19,8 +19,8 @@ import (
 
 	"github.com/podops/podops"
 	a "github.com/podops/podops/apiv1"
+	cl "github.com/podops/podops/client"
 	"github.com/podops/podops/pkg/cli/netrc"
-	cl "github.com/podops/podops/pkg/client"
 )
 
 const (

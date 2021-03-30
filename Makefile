@@ -10,7 +10,6 @@ build_test:
 	cd cmd/cli && go build cli.go && rm cli
 	cd cmd/api && go build main.go && rm main
 	cd cmd/cdn && go build main.go && rm main
-	cd examples/simple && go build main.go && rm main
 
 .PHONY: test
 test:
