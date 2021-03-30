@@ -1,4 +1,4 @@
-package client
+package podops
 
 import (
 	"bytes"
@@ -14,54 +14,54 @@ import (
 )
 
 // Get is used to request data from the API. No payload, only queries!
-func (cl *Client) get(cmd string, response interface{}) (int, error) {
-	url := cl.opts.APIEndpoint + cmd
+func get(url, cmd, token string, response interface{}) (int, error) {
+	uri := url + cmd
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", uri, nil)
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
 
-	return cl.invoke(req, response)
+	return invoke(token, req, response)
 }
 
 // Post is used to invoke an API method using http POST
-func (cl *Client) post(cmd string, request, response interface{}) (int, error) {
-	url := cl.opts.APIEndpoint + cmd
+func post(url, cmd, token string, request, response interface{}) (int, error) {
+	uri := url + cmd
 
 	m, err := json.Marshal(&request)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(m))
+	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(m))
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
 
-	return cl.invoke(req, response)
+	return invoke(token, req, response)
 }
 
 // Put is used to invoke an API method using http PUT
-func (cl *Client) put(cmd string, request, response interface{}) (int, error) {
-	url := cl.opts.APIEndpoint + cmd
+func put(url, cmd, token string, request, response interface{}) (int, error) {
+	uri := url + cmd
 
 	m, err := json.Marshal(&request)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
 
-	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(m))
+	req, err := http.NewRequest("PUT", uri, bytes.NewBuffer(m))
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
 
-	return cl.invoke(req, response)
+	return invoke(token, req, response)
 }
 
 // DELETE is used to request the deletion of a resource. Maybe apayload, no response!
-func (cl *Client) delete(cmd string, request interface{}) (int, error) {
-	url := cl.opts.APIEndpoint + cmd
+func delete(url, cmd, token string, request interface{}) (int, error) {
+	uri := url + cmd
 
 	var req *http.Request
 	var err error
@@ -71,23 +71,23 @@ func (cl *Client) delete(cmd string, request interface{}) (int, error) {
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
-		req, err = http.NewRequest("DELETE", url, bytes.NewBuffer(m))
+		req, err = http.NewRequest("DELETE", uri, bytes.NewBuffer(m))
 	} else {
-		req, err = http.NewRequest("DELETE", url, nil)
+		req, err = http.NewRequest("DELETE", uri, nil)
 	}
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
 
-	return cl.invoke(req, nil)
+	return invoke(token, req, nil)
 }
 
-func (cl *Client) invoke(req *http.Request, response interface{}) (int, error) {
+func invoke(token string, req *http.Request, response interface{}) (int, error) {
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("User-Agent", a.UserAgentString)
-	if cl.opts.Token != "" {
-		req.Header.Set("Authorization", "Bearer "+cl.opts.Token)
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
 	}
 
 	// perform the request
@@ -129,15 +129,15 @@ func (cl *Client) invoke(req *http.Request, response interface{}) (int, error) {
 // FIXME this implementation does not work for VERY large files !
 
 // Creates a new file upload http request with optional extra params
-func (cl *Client) fileUploadRequest(uri, guid, path string) (*http.Request, error) {
+func upload(url, cmd, token, guid, form, path string) (*http.Request, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	body := &bytes.Buffer{}
-	writer := multipart.NewWriter(body)
+	body := bytes.Buffer{}
+	writer := multipart.NewWriter(&body)
 	part, err := writer.CreateFormFile("asset", filepath.Base(path))
 	if err != nil {
 		return nil, err
@@ -149,9 +149,10 @@ func (cl *Client) fileUploadRequest(uri, guid, path string) (*http.Request, erro
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", uri+"/"+guid, body)
+	uri := url + "/" + cmd + "/" + guid
+	req, err := http.NewRequest("POST", uri, &body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req.Header.Set("Authorization", "Bearer "+cl.opts.Token)
+	req.Header.Set("Authorization", "Bearer "+token)
 
 	return req, err
 }

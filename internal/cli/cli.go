@@ -19,7 +19,6 @@ import (
 
 	"github.com/podops/podops"
 	a "github.com/podops/podops/apiv1"
-	cl "github.com/podops/podops/client"
 	"github.com/podops/podops/internal/cli/netrc"
 )
 
@@ -28,18 +27,18 @@ const (
 )
 
 var (
-	client *cl.Client
+	client *podops.Client
 )
 
 func init() {
-	cl := LoadConfiguration()
+	opts := LoadConfiguration()
 
-	c, err := podops.NewClient(context.TODO(), cl.Token, cl)
+	c, err := podops.NewClient(context.TODO(), opts.Token, opts)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if c != nil {
-		c.SetProduction(cl.Production)
+		c.SetProduction(opts.Production)
 		client = c
 	}
 }
@@ -49,18 +48,18 @@ func NoOpCommand(c *cli.Context) error {
 	return cli.Exit(fmt.Sprintf("Command '%s' is not implemented", c.Command.Name), 0)
 }
 
-func LoadConfiguration() *cl.ClientOption {
-	cl := podops.DefaultClientOptions()
+func LoadConfiguration() *podops.ClientOption {
+	opts := podops.DefaultClientOptions()
 
 	nrc := loadNetrc()
 	m := nrc.FindMachine(machineEntry)
 	if m != nil {
-		cl.Token = m.Password
+		opts.Token = m.Password
 		if m.Account != "" {
-			cl.Production = m.Account
+			opts.Production = m.Account
 		}
 	}
-	return cl
+	return opts
 }
 
 // Post is used to invoke an API method using http POST

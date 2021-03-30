@@ -14,7 +14,6 @@ build_test:
 .PHONY: test
 test:
 	go test
-	cd apiv1 && go test
 	cd internal/api && go test
 	cd pkg/auth && go test
 	

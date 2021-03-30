@@ -1,4 +1,4 @@
-package client
+package podops
 
 import (
 	"bytes"
@@ -6,30 +6,28 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/podops/podops/apiv1"
 	a "github.com/podops/podops/apiv1"
 	"github.com/podops/podops/pkg/backend/models"
 )
 
 const (
-	// AuthenticationRoute is used to verify a token
-	authenticationRoute = "/_a/token"
-
 	// productionRoute route to call ProductionEndpoint
-	productionRoute = "/production"
+	productionRoute = apiv1.NamespacePrefix + "/production"
 	// listProductionsRoute route to call ListProductionsEndpoint
-	listProductionsRoute = "/productions"
+	listProductionsRoute = apiv1.NamespacePrefix + "/productions"
 
 	// resourceRoute route to call ResourceEndpoint
-	findResourceRoute   = "/resource/%s"            // "/get/:id"
-	getResourceRoute    = "/resource/%s/%s/%s"      // "/get/:prod/:kind/:id"
-	updateResourceRoute = "/resource/%s/%s/%s?f=%v" // "/update/:prod/:kind/:id"
-	listResourcesRoute  = "/resource/%s/%s"
-	deleteResourceRoute = "/resource/%s/%s/%s"
+	findResourceRoute   = apiv1.NamespacePrefix + "/resource/%s"            // "/get/:id"
+	getResourceRoute    = apiv1.NamespacePrefix + "/resource/%s/%s/%s"      // "/get/:prod/:kind/:id"
+	updateResourceRoute = apiv1.NamespacePrefix + "/resource/%s/%s/%s?f=%v" // "/update/:prod/:kind/:id"
+	listResourcesRoute  = apiv1.NamespacePrefix + "/resource/%s/%s"
+	deleteResourceRoute = apiv1.NamespacePrefix + "/resource/%s/%s/%s"
 
 	// buildRoute route to call BuildEndpoint
-	buildRoute = "/build"
+	buildRoute = apiv1.NamespacePrefix + "/build"
 	// uploadRoute route to UploadEndpoint
-	uploadRoute = "/upload"
+	uploadRoute = apiv1.NamespacePrefix + "/upload"
 )
 
 // CreateProduction invokes the CreateProductionEndpoint
@@ -49,7 +47,7 @@ func (cl *Client) CreateProduction(name, title, summary string) (*models.Product
 	}
 
 	resp := models.Production{}
-	_, err := cl.post(cl.ns+productionRoute, &req, &resp)
+	_, err := post(cl.opts.APIEndpoint, productionRoute, cl.opts.Token, &req, &resp)
 
 	if err != nil {
 		return nil, err
@@ -65,7 +63,7 @@ func (cl *Client) Productions() (*models.ProductionList, error) {
 	}
 
 	var resp models.ProductionList
-	_, err := cl.get(cl.ns+listProductionsRoute, &resp)
+	_, err := get(cl.opts.APIEndpoint, listProductionsRoute, cl.opts.Token, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +77,7 @@ func (cl *Client) CreateResource(production, kind, guid string, force bool, rsrc
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.post(cl.ns+fmt.Sprintf(updateResourceRoute, production, kind, guid, force), rsrc, &resp)
+	status, err := post(cl.opts.APIEndpoint, fmt.Sprintf(updateResourceRoute, production, kind, guid, force), cl.opts.Token, rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -93,7 +91,7 @@ func (cl *Client) GetResource(production, kind, guid string, rsrc interface{}) e
 		return PodopsClientConfigurationErr
 	}
 
-	status, err := cl.get(cl.ns+fmt.Sprintf(getResourceRoute, production, kind, guid), rsrc)
+	status, err := get(cl.opts.APIEndpoint, fmt.Sprintf(getResourceRoute, production, kind, guid), cl.opts.Token, rsrc)
 	if status == http.StatusBadRequest {
 		return fmt.Errorf("not found: '%s/%s-%s'", production, kind, guid)
 	}
@@ -110,7 +108,7 @@ func (cl *Client) FindResource(guid string, rsrc interface{}) error {
 		return PodopsClientConfigurationErr
 	}
 
-	status, err := cl.get(cl.ns+fmt.Sprintf(findResourceRoute, guid), rsrc)
+	status, err := get(cl.opts.APIEndpoint, fmt.Sprintf(findResourceRoute, guid), cl.opts.Token, rsrc)
 	if status == http.StatusBadRequest {
 		return fmt.Errorf("not found: '%s'", guid)
 	}
@@ -131,7 +129,7 @@ func (cl *Client) Resources(production, kind string) (*models.ResourceList, erro
 	}
 
 	var resp models.ResourceList
-	_, err := cl.get(cl.ns+fmt.Sprintf(listResourcesRoute, production, kind), &resp)
+	_, err := get(cl.opts.APIEndpoint, fmt.Sprintf(listResourcesRoute, production, kind), cl.opts.Token, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +143,7 @@ func (cl *Client) UpdateResource(production, kind, guid string, force bool, rsrc
 	}
 
 	resp := a.StatusObject{}
-	status, err := cl.put(cl.ns+fmt.Sprintf(updateResourceRoute, production, kind, guid, force), rsrc, &resp)
+	status, err := put(cl.opts.APIEndpoint, fmt.Sprintf(updateResourceRoute, production, kind, guid, force), cl.opts.Token, rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -159,7 +157,7 @@ func (cl *Client) DeleteResource(production, kind, guid string) (int, error) {
 		return http.StatusBadRequest, PodopsClientConfigurationErr
 	}
 
-	status, err := cl.delete(cl.ns+fmt.Sprintf(deleteResourceRoute, production, kind, guid), nil)
+	status, err := delete(cl.opts.APIEndpoint, fmt.Sprintf(deleteResourceRoute, production, kind, guid), cl.opts.Token, nil)
 	if err != nil {
 		return status, err
 	}
@@ -177,7 +175,7 @@ func (cl *Client) Build(production string) (*models.BuildRequest, error) {
 	}
 	resp := models.BuildRequest{}
 
-	_, err := cl.post(cl.ns+buildRoute, &req, &resp)
+	_, err := post(cl.opts.APIEndpoint, buildRoute, cl.opts.Token, &req, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -190,8 +188,8 @@ func (cl *Client) Upload(production, path string, force bool) error {
 	if !cl.IsValid() {
 		return PodopsClientConfigurationErr
 	}
-
-	req, err := cl.fileUploadRequest(cl.opts.APIEndpoint+cl.ns+uploadRoute, production, path) // FIXME upload should go against the CDN endpoint
+	// FIXME this should be cl.opts.StorageEndpoint or CDNEndpoint
+	req, err := upload(cl.opts.APIEndpoint, uploadRoute, cl.opts.Token, production, "asset", path)
 	if err != nil {
 		log.Fatal(err)
 	}
