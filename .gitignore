@@ -4,6 +4,7 @@ credentials.json
 google-credentials.json
 master.key
 .po
+_*
 
 # Development environment specific
 .DS_Store

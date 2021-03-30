@@ -14,8 +14,8 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
-	"github.com/podops/podops/internal/gql/graph/generated"
-	"github.com/podops/podops/internal/gql/graph/model"
+	"github.com/podops/podops/graphql/graph/generated"
+	"github.com/podops/podops/graphql/graph/model"
 	"github.com/podops/podops/internal/platform"
 )
 

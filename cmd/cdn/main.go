@@ -15,6 +15,7 @@ import (
 	gcp "github.com/fupas/platform/provider/google"
 
 	"github.com/podops/podops/apiv1"
+	"github.com/podops/podops/graphql"
 	"github.com/podops/podops/internal/api"
 	p "github.com/podops/podops/internal/platform"
 )
@@ -54,8 +55,8 @@ func setup() *echo.Echo {
 
 	// grapghql
 	gql := e.Group(apiv1.GraphqlNamespacePrefix)
-	gql.POST(apiv1.GraphqlRoute, api.GraphqlEndpoint())
-	gql.GET(apiv1.GraphqlPlaygroundRoute, api.GraphqlPlaygroundEndpoint())
+	gql.POST(apiv1.GraphqlRoute, graphql.GraphqlEndpoint())
+	gql.GET(apiv1.GraphqlPlaygroundRoute, graphql.GraphqlPlaygroundEndpoint())
 
 	// add the routes last
 	//e.Static("/", staticFileLocation) // serve static files from e.g. ./public

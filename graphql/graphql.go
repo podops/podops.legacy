@@ -1,4 +1,4 @@
-package api
+package graphql
 
 import (
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -6,8 +6,8 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/podops/podops/apiv1"
-	"github.com/podops/podops/internal/gql/graph"
-	"github.com/podops/podops/internal/gql/graph/generated"
+	"github.com/podops/podops/graphql/graph"
+	"github.com/podops/podops/graphql/graph/generated"
 )
 
 // GraphqlEndpoint maps the Graphql handler to gin

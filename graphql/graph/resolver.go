@@ -7,8 +7,8 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
+	"github.com/podops/podops/graphql/graph/model"
 	"github.com/podops/podops/internal/dataloader"
-	"github.com/podops/podops/internal/gql/graph/model"
 )
 
 // This file will not be regenerated automatically.
