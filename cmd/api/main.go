@@ -14,7 +14,6 @@ import (
 
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/auth"
-	"github.com/podops/podops/internal/api"
 )
 
 // ShutdownDelay is the delay before exiting the process
@@ -38,7 +37,7 @@ func setup() *echo.Echo {
 
 	// task endpoints
 	tasks := e.Group(apiv1.TaskNamespacePrefix)
-	tasks.POST(apiv1.ImportTask, api.ImportTaskEndpoint)
+	tasks.POST(apiv1.ImportTask, apiv1.ImportTaskEndpoint)
 
 	// admin endpoints
 	admin := e.Group(apiv1.AdminNamespacePrefix)
@@ -49,16 +48,16 @@ func setup() *echo.Echo {
 
 	// the api endpoints
 	apiEndpoints := e.Group(apiv1.NamespacePrefix)
-	apiEndpoints.GET(apiv1.ListProductionsRoute, api.ListProductionsEndpoint)
-	apiEndpoints.POST(apiv1.ProductionRoute, api.ProductionEndpoint)
-	apiEndpoints.GET(apiv1.FindResourceRoute, api.FindResourceEndpoint)
-	apiEndpoints.GET(apiv1.GetResourceRoute, api.GetResourceEndpoint)
-	apiEndpoints.GET(apiv1.ListResourcesRoute, api.ListResourcesEndpoint)
-	apiEndpoints.POST(apiv1.UpdateResourceRoute, api.UpdateResourceEndpoint)
-	apiEndpoints.PUT(apiv1.UpdateResourceRoute, api.UpdateResourceEndpoint)
-	apiEndpoints.DELETE(apiv1.DeleteResourceRoute, api.DeleteResourceEndpoint)
-	apiEndpoints.POST(apiv1.BuildRoute, api.BuildFeedEndpoint)
-	apiEndpoints.POST(apiv1.UploadRoute, api.UploadEndpoint)
+	apiEndpoints.GET(apiv1.ListProductionsRoute, apiv1.ListProductionsEndpoint)
+	apiEndpoints.POST(apiv1.ProductionRoute, apiv1.ProductionEndpoint)
+	apiEndpoints.GET(apiv1.FindResourceRoute, apiv1.FindResourceEndpoint)
+	apiEndpoints.GET(apiv1.GetResourceRoute, apiv1.GetResourceEndpoint)
+	apiEndpoints.GET(apiv1.ListResourcesRoute, apiv1.ListResourcesEndpoint)
+	apiEndpoints.POST(apiv1.UpdateResourceRoute, apiv1.UpdateResourceEndpoint)
+	apiEndpoints.PUT(apiv1.UpdateResourceRoute, apiv1.UpdateResourceEndpoint)
+	apiEndpoints.DELETE(apiv1.DeleteResourceRoute, apiv1.DeleteResourceEndpoint)
+	apiEndpoints.POST(apiv1.BuildRoute, apiv1.BuildFeedEndpoint)
+	apiEndpoints.POST(apiv1.UploadRoute, apiv1.UploadEndpoint)
 
 	return e
 }

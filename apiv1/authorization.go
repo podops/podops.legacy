@@ -1,13 +1,13 @@
-package api
+package apiv1
 
 import (
 	"context"
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/podops/podops"
 	"github.com/podops/podops/auth"
 	"github.com/podops/podops/backend"
+	"github.com/podops/podops/internal/errordef"
 )
 
 const (
@@ -39,11 +39,11 @@ func AuthorizeAccessProduction(ctx context.Context, c echo.Context, scope, claim
 	p, err := backend.GetProduction(ctx, claim)
 	if err != nil {
 
-		return podops.ErrNoSuchProduction
+		return errordef.ErrNoSuchProduction
 	}
 	if p.Owner != auth.ClientID {
 
-		return podops.ErrNotAuthorized
+		return errordef.ErrNotAuthorized
 	}
 
 	return nil
@@ -59,14 +59,14 @@ func AuthorizeAccessResource(ctx context.Context, c echo.Context, scope, claim s
 
 	r, err := backend.GetResource(ctx, claim)
 	if err != nil {
-		return podops.ErrNoSuchResource
+		return errordef.ErrNoSuchResource
 	}
 	p, err := backend.GetProduction(ctx, r.ParentGUID)
 	if err != nil {
-		return podops.ErrNoSuchProduction
+		return errordef.ErrNoSuchProduction
 	}
 	if p.Owner != auth.ClientID {
-		return podops.ErrNotAuthorized
+		return errordef.ErrNotAuthorized
 	}
 
 	return nil

@@ -1,4 +1,4 @@
-package podops
+package errordef
 
 import "errors"
 

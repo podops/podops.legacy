@@ -15,8 +15,12 @@ import (
 	ds "github.com/fupas/platform/pkg/platform"
 
 	"github.com/podops/podops"
-	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/platform"
+)
+
+const (
+	// full canonical route
+	ImportTaskWithPrefix = "/_t/import"
 )
 
 type (
@@ -107,7 +111,7 @@ func EnsureAsset(ctx context.Context, production string, rsrc *podops.Asset) err
 		}
 
 		// dispatch a request for background import
-		_, err = platform.CreateTask(ctx, apiv1.ImportTaskWithPrefix, &podops.ImportRequest{Source: rsrc.URI, Dest: path, Original: rsrc.AssetName()})
+		_, err = platform.CreateTask(ctx, ImportTaskWithPrefix, &podops.ImportRequest{Source: rsrc.URI, Dest: path, Original: rsrc.AssetName()})
 		if err != nil {
 			return err
 		}

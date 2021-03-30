@@ -5,27 +5,28 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
-	"github.com/podops/podops/apiv1"
 )
 
 const (
+	// NamespacePrefix namespace for the client and CLI
+	NamespacePrefix = "/a/v1"
+
 	// productionRoute route to call ProductionEndpoint
-	productionRoute = apiv1.NamespacePrefix + "/production"
+	productionRoute = NamespacePrefix + "/production"
 	// listProductionsRoute route to call ListProductionsEndpoint
-	listProductionsRoute = apiv1.NamespacePrefix + "/productions"
+	listProductionsRoute = NamespacePrefix + "/productions"
 
 	// resourceRoute route to call ResourceEndpoint
-	findResourceRoute   = apiv1.NamespacePrefix + "/resource/%s"            // "/get/:id"
-	getResourceRoute    = apiv1.NamespacePrefix + "/resource/%s/%s/%s"      // "/get/:prod/:kind/:id"
-	updateResourceRoute = apiv1.NamespacePrefix + "/resource/%s/%s/%s?f=%v" // "/update/:prod/:kind/:id"
-	listResourcesRoute  = apiv1.NamespacePrefix + "/resource/%s/%s"
-	deleteResourceRoute = apiv1.NamespacePrefix + "/resource/%s/%s/%s"
+	findResourceRoute   = NamespacePrefix + "/resource/%s"            // "/get/:id"
+	getResourceRoute    = NamespacePrefix + "/resource/%s/%s/%s"      // "/get/:prod/:kind/:id"
+	updateResourceRoute = NamespacePrefix + "/resource/%s/%s/%s?f=%v" // "/update/:prod/:kind/:id"
+	listResourcesRoute  = NamespacePrefix + "/resource/%s/%s"
+	deleteResourceRoute = NamespacePrefix + "/resource/%s/%s/%s"
 
 	// buildRoute route to call BuildEndpoint
-	buildRoute = apiv1.NamespacePrefix + "/build"
+	buildRoute = NamespacePrefix + "/build"
 	// uploadRoute route to UploadEndpoint
-	uploadRoute = apiv1.NamespacePrefix + "/upload"
+	uploadRoute = NamespacePrefix + "/upload"
 )
 
 // CreateProduction invokes the CreateProductionEndpoint

@@ -16,7 +16,6 @@ import (
 
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/graphql"
-	"github.com/podops/podops/internal/api"
 	p "github.com/podops/podops/internal/platform"
 )
 
@@ -44,14 +43,14 @@ func setup() *echo.Echo {
 	// TODO: e.Logger.SetLevel(log.INFO)
 
 	// frontend routes for feed, show & episode
-	//e.GET(apiv1.ShowRoute, api.RewriteShowHandler)
-	//e.GET(apiv1.EpisodeRoute, api.RewriteEpisodeHandler)
-	e.GET(apiv1.FeedRoute, api.FeedEndpoint)
+	//e.GET(apiv1.ShowRoute, apiv1.RewriteShowHandler)
+	//e.GET(apiv1.EpisodeRoute, apiv1.RewriteEpisodeHandler)
+	e.GET(apiv1.FeedRoute, apiv1.FeedEndpoint)
 
 	// cdn enpoints
 	content := e.Group(apiv1.ContentNamespace)
-	content.GET(apiv1.DefaultCDNRoute, api.RedirectCDNContentEndpoint)
-	content.HEAD(apiv1.DefaultCDNRoute, api.RedirectCDNContentEndpoint)
+	content.GET(apiv1.DefaultCDNRoute, apiv1.RedirectCDNContentEndpoint)
+	content.HEAD(apiv1.DefaultCDNRoute, apiv1.RedirectCDNContentEndpoint)
 
 	// grapghql
 	gql := e.Group(apiv1.GraphqlNamespacePrefix)
