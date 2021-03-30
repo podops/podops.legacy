@@ -12,9 +12,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/fupas/commons/pkg/env"
 	"github.com/urfave/cli/v2"
-	"gopkg.in/yaml.v2"
 
 	"github.com/podops/podops"
 	a "github.com/podops/podops/apiv1"
