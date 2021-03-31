@@ -1,4 +1,4 @@
-name: build_cdn_container
+name: build_cdnapi_container
 
 on:
   push:
@@ -41,11 +41,11 @@ jobs:
     - name: build cdnapi
       run: |
         cd cmd/cdnapi
-        GOOS=linux GOARCH=amd64 go build -o cdn main.go && chmod +x cdn
+        GOOS=linux GOARCH=amd64 go build -o cdnapi main.go && chmod +x cdnapi
 
     - name: build container
       run: |
-        cd cmd/cdn
+        cd cmd/cdnapi
         docker build -t "$REGISTRY_HOSTNAME"/"$REGISTRY"/"$IMAGE_NAME":"$GITHUB_SHA" \
           --build-arg GITHUB_SHA="$GITHUB_SHA" \
           --build-arg GITHUB_REF="$GITHUB_REF" .
