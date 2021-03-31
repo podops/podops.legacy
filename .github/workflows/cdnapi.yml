@@ -1,8 +1,8 @@
-name: build_cdnapi_container
+name: build_cdnapi
 
 on:
   push:
-    branches: [ main ]
+    branches: [ release ]
 
 env:
   IMAGE_NAME: cdnapi
