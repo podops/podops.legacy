@@ -1,0 +1,63 @@
+name: build_cdn_container
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  BRANCH: main
+  IMAGE_NAME: cdn
+  IMAGE_VERSION: 0.9.12
+  REGISTRY: ${{ secrets.REGISTRY }}
+  REGISTRY_HOSTNAME: eu.gcr.io
+  GITHUB_SHA: ${{ github.sha }}
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: setup go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.15
+      id: go
+
+    - name: setup gcloud
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        service_account_email: ${{ secrets.GCP_EMAIL }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    # Configure docker to use the gcloud command-line tool as a credential helper
+    - run: gcloud auth configure-docker    
+
+    - name: checkout code
+      uses: actions/checkout@v2
+      with:
+        ref: $BRANCH
+
+    - name: get dependencies
+      run: cd cmd/cdn && go get -v -t -d ./...
+
+    - name: build cdn
+      run: |
+        cd cmd/cdn
+        GOOS=linux GOARCH=amd64 go build -o cdn main.go && chmod +x cdn
+
+    - name: build container
+      run: |
+        cd cmd/cdn
+        docker build -t "$REGISTRY_HOSTNAME"/"$REGISTRY"/"$IMAGE_NAME":"$GITHUB_SHA" \
+          --build-arg GITHUB_SHA="$GITHUB_SHA" \
+          --build-arg GITHUB_REF="$GITHUB_REF" .
+
+    # Push the docker image to Google Container Registry
+    - name: push container
+      run: |
+        docker push $REGISTRY_HOSTNAME/$REGISTRY/$IMAGE_NAME:$GITHUB_SHA
+        docker tag $REGISTRY_HOSTNAME/$REGISTRY/$IMAGE_NAME:$GITHUB_SHA $REGISTRY_HOSTNAME/$REGISTRY/$IMAGE_NAME:latest
+        docker tag $REGISTRY_HOSTNAME/$REGISTRY/$IMAGE_NAME:$GITHUB_SHA $REGISTRY_HOSTNAME/$REGISTRY/$IMAGE_NAME:$IMAGE_VERSION
+        docker push $REGISTRY_HOSTNAME/$REGISTRY/$IMAGE_NAME:latest
+        docker push $REGISTRY_HOSTNAME/$REGISTRY/$IMAGE_NAME:$IMAGE_VERSION

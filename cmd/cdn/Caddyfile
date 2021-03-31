@@ -1,0 +1,6 @@
+localhost {
+	root * ../../public/podops.dev
+	rewrite /s/* s/_id.html
+	rewrite /e/* e/_id.html
+	file_server
+}

@@ -5,8 +5,8 @@ on:
     branches: [ release ]
 
 env:
-  VERSION: 0.9.7
-  BUILDDIR: cli-0.9.7
+  VERSION: 0.9.12
+  BUILDDIR: cli-0.9.12
   GITHUB_SHA: ${{ github.sha }}
 
 jobs:

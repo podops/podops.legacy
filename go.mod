@@ -8,12 +8,12 @@ require (
 	cloud.google.com/go/storage v1.12.0
 	github.com/99designs/gqlgen v0.13.0
 	github.com/OrlovEvgeny/go-mcache v0.0.0-20200121124330-1a8195b34f3a
+	github.com/caddyserver/caddy/v2 v2.3.0
 	github.com/fupas/commons v1.0.0
 	github.com/fupas/platform v1.1.3
 	github.com/johngb/langreg v0.0.0-20150123211413-5c6abc6d19d2
 	github.com/labstack/echo/v4 v4.2.0
 	github.com/mailgun/mailgun-go/v4 v4.4.1
-	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.5.1
 	github.com/urfave/cli/v2 v2.1.1
 	github.com/vektah/gqlparser/v2 v2.1.0
