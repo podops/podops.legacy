@@ -65,4 +65,4 @@ I am grateful for community involvement, bug reports, & feature requests but I d
 
 There is another way to help the project: many of the most valuable contributions are in the forms of [testing, feedback, and documentation](https://github.com/podops/podops/issues). This helps to harden the software and streamlines its usage for other users.
 
-Should you wish to contribute, please review the [contribution guidelines](/docs/contributing.md) first.
+Should you wish to contribute, please review the [contribution guidelines](CONTRIBUTING.md) first.

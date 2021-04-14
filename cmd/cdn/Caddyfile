@@ -1,6 +1,15 @@
 localhost {
-	root * ../../public/podops.dev
+	encode zstd gzip
+	root * ./public
+
 	rewrite /s/* s/_id.html
 	rewrite /e/* e/_id.html
+	
+	reverse_proxy /q/* localhost:8080
+	reverse_proxy /c/* localhost:8080
+	
 	file_server
+	log {
+		output file ./data/logs/cdn.log
+    }
 }
