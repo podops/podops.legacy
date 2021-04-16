@@ -12,20 +12,22 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/fupas/platform/pkg/platform"
-
-	"github.com/podops/podops"
-	"github.com/podops/podops/apiv1"
 )
 
 const (
 	endpoint = "http://localhost:8080"
 	realm    = "podops"
 	userID   = "me@podops.dev"
+
+	loginRequestRoute      = "/login"
+	loginConfirmationRoute = "/login/:token"
+	logoutRequestRoute     = "/logout"
+	getAuthorizationRoute  = "/auth"
 )
 
 // Scenario 1: new account, login, account confirmation, token swap
 func TestLoginScenario1(t *testing.T) {
-	podops.DefaultAPIEndpoint = endpoint
+	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 	cleaner()
 
@@ -45,7 +47,7 @@ func TestLoginScenario1(t *testing.T) {
 
 // Scenario 2: new account, login, duplicate login request
 func TestLoginScenario2(t *testing.T) {
-	podops.DefaultAPIEndpoint = endpoint
+	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
@@ -67,7 +69,7 @@ func TestLoginScenario2(t *testing.T) {
 
 // Scenario 3: new account, login, duplicate account confirmation
 func TestLoginScenario3(t *testing.T) {
-	podops.DefaultAPIEndpoint = endpoint
+	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
@@ -86,7 +88,7 @@ func TestLoginScenario3(t *testing.T) {
 
 // Scenario 4: new account, login, account confirmation, duplicate token swap
 func TestLoginScenario4(t *testing.T) {
-	podops.DefaultAPIEndpoint = endpoint
+	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
@@ -106,7 +108,7 @@ func TestLoginScenario4(t *testing.T) {
 
 // Scenario 5: new account, login, invalid confirmation
 func TestLoginScenario5(t *testing.T) {
-	podops.DefaultAPIEndpoint = endpoint
+	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
@@ -116,7 +118,7 @@ func TestLoginScenario5(t *testing.T) {
 
 // Scenario 6: new account, login, account confirmation, various invalid token swaps
 func TestLoginScenario6(t *testing.T) {
-	podops.DefaultAPIEndpoint = endpoint
+	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
@@ -137,7 +139,7 @@ func TestLoginScenario6(t *testing.T) {
 func loginStep1(t *testing.T, status int) {
 
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, apiv1.LoginRequestRoute, strings.NewReader(createAuthRequestJSON(realm, userID, "", "")))
+	req := httptest.NewRequest(http.MethodPost, loginRequestRoute, strings.NewReader(createAuthRequestJSON(realm, userID, "", "")))
 	rec := httptest.NewRecorder()
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
@@ -159,7 +161,7 @@ func loginStep2(t *testing.T, token string, status int, validate bool) {
 
 	e := echo.New()
 	r := e.Router()
-	r.Add(http.MethodGet, apiv1.LoginConfirmationRoute, LoginConfirmationEndpoint)
+	r.Add(http.MethodGet, loginConfirmationRoute, LoginConfirmationEndpoint)
 
 	c := e.NewContext(req, rec)
 	r.Find(http.MethodGet, url, c)
@@ -179,7 +181,7 @@ func loginStep2(t *testing.T, token string, status int, validate bool) {
 func loginStep3(t *testing.T, testRealm, testUser, testClient, testToken string, state, status int, validate bool) {
 
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, apiv1.GetAuthorizationRoute, strings.NewReader(createAuthRequestJSON(testRealm, testUser, "", testToken)))
+	req := httptest.NewRequest(http.MethodPost, getAuthorizationRoute, strings.NewReader(createAuthRequestJSON(testRealm, testUser, "", testToken)))
 	rec := httptest.NewRecorder()
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	c := e.NewContext(req, rec)
@@ -199,7 +201,7 @@ func loginStep3(t *testing.T, testRealm, testUser, testClient, testToken string,
 
 func logoutStep(t *testing.T, testRealm, testUser, testClient, testToken string, status int, validate bool) {
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, apiv1.LogoutRequestRoute, strings.NewReader(createAuthRequestJSON(testRealm, testUser, testClient, "")))
+	req := httptest.NewRequest(http.MethodPost, logoutRequestRoute, strings.NewReader(createAuthRequestJSON(testRealm, testUser, testClient, "")))
 	rec := httptest.NewRecorder()
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	req.Header.Set("Authorization", "Bearer "+testToken)

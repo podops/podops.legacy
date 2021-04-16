@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"strconv"
 
 	"cloud.google.com/go/datastore"
 
@@ -20,6 +21,8 @@ import (
 
 func (r *queryResolver) Show(ctx context.Context, name *string, limit int) (*model.Show, error) {
 
+	now := util.Timestamp()
+
 	data, err := r.ShowLoader.Load(ctx, *name)
 	if err != nil {
 		platform.ReportError(err)
@@ -27,9 +30,20 @@ func (r *queryResolver) Show(ctx context.Context, name *string, limit int) (*mod
 	}
 	show := data.(*model.Show)
 
+	// verify that the show has been published
+	p, err := backend.GetProduction(ctx, show.GUID)
+	if err != nil || p == nil {
+		platform.ReportError(err)
+		return nil, err
+	}
+	if p.BuildDate == 0 {
+		return nil, nil // Nope, can't access as it's not public yet
+	}
+
 	// list all episodes, excluding future (i.e. unpublished) ones, descending order
+	// FIXME filter for other flags, e.g. Block = true
 	var er []*podops.Resource
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", show.GUID).Filter("Kind =", podops.ResourceEpisode).Filter("Published <", util.Timestamp()).Order("-Published").Limit(limit), &er); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", show.GUID).Filter("Kind =", podops.ResourceEpisode).Filter("Published <", now).Filter("Published >", 0).Order("-Published").Limit(limit), &er); err != nil {
 		platform.ReportError(err)
 		return nil, err
 	}
@@ -57,7 +71,19 @@ func (r *queryResolver) Episode(ctx context.Context, guid *string) (*model.Episo
 		platform.ReportError(err)
 		return nil, err
 	}
-	return data.(*model.Episode), nil
+
+	// verify that the episode has been published
+	episode := data.(*model.Episode)
+	published, err := strconv.ParseInt(episode.Published, 10, 64)
+	if err != nil {
+		platform.ReportError(err)
+		return nil, err
+	}
+	if published == 0 || published > util.Timestamp() {
+		return nil, nil // Nope, can't access as it's not public yet
+	}
+
+	return episode, nil
 }
 
 func (r *queryResolver) Recent(ctx context.Context, limit int) ([]*model.Show, error) {
@@ -88,7 +114,7 @@ func (r *queryResolver) Recent(ctx context.Context, limit int) ([]*model.Show, e
 }
 
 func (r *queryResolver) Popular(ctx context.Context, limit int) ([]*model.Show, error) {
-	return r.Recent(ctx, limit) // FIXME this is just a placeholder, we don't have useage data at the moment to return a real answer
+	return r.Recent(ctx, limit) // FIXME this is just a placeholder, we don't have usage data at the moment to return a real answer
 }
 
 // Query returns generated.QueryResolver implementation.

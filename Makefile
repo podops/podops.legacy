@@ -14,6 +14,7 @@ build_test:
 test:
 	go test
 	cd apiv1 && go test
+	cd graphql && go test
 	cd auth && go test
 	
 .PHONY: api
