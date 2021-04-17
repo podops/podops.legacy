@@ -41,7 +41,7 @@ jobs:
     - name: build cdnapi
       run: |
         cd cmd/cdnapi
-        GOOS=linux GOARCH=amd64 go build -o cdnapi main.go && chmod +x cdnapi
+        GOOS=linux GOARCH=amd64 go build -o svc main.go && chmod +x svc
 
     - name: build container
       run: |
