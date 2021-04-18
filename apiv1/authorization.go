@@ -11,11 +11,12 @@ import (
 )
 
 const (
-	scopeProductionRead  = "production:read"
-	scopeProductionWrite = "production:write"
-	scopeProductionBuild = "production:build"
-	scopeResourceRead    = "resource:read"
-	scopeResourceWrite   = "resource:write"
+	ScopeProductionRead  = "production:read"
+	ScopeProductionWrite = "production:write"
+	ScopeProductionBuild = "production:build"
+	ScopeResourceRead    = "resource:read"
+	ScopeResourceWrite   = "resource:write"
+	ScopeAPIAdmin        = "api:admin"
 )
 
 // AuthorizeAccess verifies that the user has the required roles in her authorization

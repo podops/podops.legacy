@@ -22,10 +22,10 @@ api:
 	cd cmd/api && gcloud app deploy . --quiet
 
 build_cdn: cmd/cdn/main.go
-	cd cmd/cdn && ${TARGET_LINUX} go build -o cdn main.go
+	cd cmd/cdn && ${TARGET_LINUX} go build -o svc main.go
 
 build_cdnapi: cmd/cdn/main.go
-	cd cmd/cdnapi && ${TARGET_LINUX} go build -o cdnapi main.go
+	cd cmd/cdnapi && ${TARGET_LINUX} go build -o svc main.go
 
 .PHONY: cli
 cli:

@@ -17,6 +17,7 @@ const (
 	defaultAPIEndpoint     = "https://api.podops.dev"
 	defaultCDNEndpoint     = "https://cdn.podops.dev"
 	defaultStorageEndpoint = "https://storage.googleapis.com/cdn.podops.dev"
+	defaultStorageLocation = "/opt/data/storage"
 
 	machineEntry = "api.podops.dev"
 )
@@ -40,6 +41,9 @@ var (
 
 	// StorageEndpoint is the direct link to assets in Google Storage
 	StorageEndpoint string = env.GetString("STORAGE_ENDPOINT", defaultStorageEndpoint)
+
+	// StorageLocation is the root location for the cdn
+	StorageLocation = env.GetString("STORAGE_LOCATION", defaultStorageLocation)
 )
 
 // DefaultClientOptions returns a default configuration bases on ENV variables

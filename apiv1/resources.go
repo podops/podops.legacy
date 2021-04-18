@@ -22,7 +22,7 @@ func FindResourceEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
-	if err := AuthorizeAccessResource(ctx, c, scopeResourceRead, guid); err != nil {
+	if err := AuthorizeAccessResource(ctx, c, ScopeResourceRead, guid); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
@@ -50,7 +50,7 @@ func GetResourceEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
-	if err := AuthorizeAccessResource(ctx, c, scopeResourceRead, guid); err != nil {
+	if err := AuthorizeAccessResource(ctx, c, ScopeResourceRead, guid); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
@@ -79,7 +79,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
-	if err := AuthorizeAccessProduction(ctx, c, scopeResourceRead, prod); err != nil {
+	if err := AuthorizeAccessProduction(ctx, c, ScopeResourceRead, prod); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
@@ -110,12 +110,12 @@ func UpdateResourceEndpoint(c echo.Context) error {
 
 	if forceFlag {
 		// this assumes that the resource does not exist i.e. we only validate access to the production
-		if err := AuthorizeAccessProduction(ctx, c, scopeResourceWrite, prod); err != nil {
+		if err := AuthorizeAccessProduction(ctx, c, ScopeResourceWrite, prod); err != nil {
 			return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 		}
 	} else {
 		// we assume the resource already exists and we can validate guid and prod
-		if err := AuthorizeAccessResource(ctx, c, scopeResourceWrite, guid); err != nil {
+		if err := AuthorizeAccessResource(ctx, c, ScopeResourceWrite, guid); err != nil {
 			return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 		}
 	}
@@ -213,7 +213,7 @@ func DeleteResourceEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
-	if err := AuthorizeAccessResource(ctx, c, scopeResourceWrite, guid); err != nil {
+	if err := AuthorizeAccessResource(ctx, c, ScopeResourceWrite, guid); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 

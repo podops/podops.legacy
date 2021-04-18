@@ -18,7 +18,7 @@ func ProductionEndpoint(c echo.Context) error {
 	var req *podops.Production = new(podops.Production)
 	ctx := platform.NewHttpContext(c)
 
-	if err := AuthorizeAccess(ctx, c, scopeProductionWrite); err != nil {
+	if err := AuthorizeAccess(ctx, c, ScopeProductionWrite); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
@@ -52,7 +52,7 @@ func ProductionEndpoint(c echo.Context) error {
 func ListProductionsEndpoint(c echo.Context) error {
 	ctx := platform.NewHttpContext(c)
 
-	if err := AuthorizeAccess(ctx, c, scopeProductionRead); err != nil {
+	if err := AuthorizeAccess(ctx, c, ScopeProductionRead); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 

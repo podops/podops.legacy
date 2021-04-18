@@ -1,5 +1,13 @@
 package apiv1
 
+import (
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+)
+
+// FIXME check for unused routes and namespaces
+
 const (
 	// NamespacePrefix namespace for the client and CLI
 	NamespacePrefix = "/a/v1"
@@ -9,10 +17,16 @@ const (
 	AdminNamespacePrefix = "/_a"
 	// TaskNamespacePrefix namespace for internal Cloud Task callbacks
 	TaskNamespacePrefix = "/_t"
+	// WebhookNamespacePrefix namespace for webhook callbacks
+	WebhookNamespacePrefix = "/_w"
 	// ContentNamespace namespace for thr CDN
 	ContentNamespace = "/c"
 
 	// All the API & CLI endpoint routes
+
+	// status
+	CheckReadyRoute = "/ready"
+	CheckAliveRoute = "/alive"
 
 	// LoginRequestRoute route to LoginRequestEndpoint
 	LoginRequestRoute = "/login"
@@ -41,6 +55,8 @@ const (
 
 	// ImportTask route to ImportTaskEndpoint
 	ImportTask = "/import"
+	// SyncTask route to SyncTaskEndpoint
+	SyncTask = "/sync"
 
 	// BuildRoute route to BuildEndpoint
 	BuildRoute = "/build"
@@ -65,3 +81,13 @@ const (
 	// GraphqlPlaygroundRoute route to GraphqlPlaygroundEndpoint
 	GraphqlPlaygroundRoute = "/playground"
 )
+
+// CheckAliveEndpoint returns http.StatusOK if the service is able to respond to requests.
+func CheckAliveEndpoint(c echo.Context) error {
+	return c.NoContent(http.StatusOK)
+}
+
+// CheckReadyEndpoint returns http.StatusOK if the service is ready to serve requests.
+func CheckReadyEndpoint(c echo.Context) error {
+	return c.NoContent(http.StatusOK)
+}

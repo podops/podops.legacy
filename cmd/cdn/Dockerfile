@@ -1,6 +1,6 @@
 FROM registry.access.redhat.com/ubi8-minimal
 
-ENV BUILD_NAME cdn
+ENV BUILD_NAME svc
 ENV CADDYFILE /config/caddy/Caddyfile
 
 EXPOSE 80

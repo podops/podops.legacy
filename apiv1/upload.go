@@ -28,7 +28,7 @@ func UploadEndpoint(c echo.Context) error {
 		return p.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':prod'"))
 	}
 
-	if err := AuthorizeAccessProduction(ctx, c, scopeResourceWrite, prod); err != nil {
+	if err := AuthorizeAccessProduction(ctx, c, ScopeResourceWrite, prod); err != nil {
 		return p.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 

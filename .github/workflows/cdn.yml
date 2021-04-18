@@ -2,7 +2,7 @@ name: build_cdn
 
 on:
   push:
-    branches: [ release ]
+    branches: [ main ]
 
 env:
   IMAGE_NAME: cdn
@@ -29,7 +29,7 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
-    # Configure docker to use the gcloud command-line tool as a credential helper
+    # configure docker to use the gcloud command-line tool as a credential helper
     - run: gcloud auth configure-docker    
 
     - name: checkout code
@@ -41,7 +41,7 @@ jobs:
     - name: build cdn
       run: |
         cd cmd/cdn
-        GOOS=linux GOARCH=amd64 go build -o cdn main.go && chmod +x cdn
+        GOOS=linux GOARCH=amd64 go build -o svc main.go && chmod +x svc
 
     - name: build container
       run: |

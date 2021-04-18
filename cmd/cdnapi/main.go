@@ -13,7 +13,7 @@ import (
 	gcp "github.com/fupas/platform/provider/google"
 
 	"github.com/podops/podops/apiv1"
-	"github.com/podops/podops/graphql"
+	"github.com/podops/podops/backend/cdn"
 )
 
 // ShutdownDelay is the delay before exiting the process
@@ -32,15 +32,13 @@ func setup() *echo.Echo {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 
-	// cdn enpoints
-	content := e.Group(apiv1.ContentNamespace)
-	content.GET(apiv1.DefaultCDNRoute, apiv1.RedirectCDNContentEndpoint)
-	content.HEAD(apiv1.DefaultCDNRoute, apiv1.RedirectCDNContentEndpoint)
+	// check for being alive
+	e.GET(apiv1.CheckAliveRoute, apiv1.CheckAliveEndpoint)
 
-	// grapghql
-	gql := e.Group(apiv1.GraphqlNamespacePrefix)
-	gql.POST(apiv1.GraphqlRoute, graphql.GraphqlEndpoint())
-	gql.GET(apiv1.GraphqlPlaygroundRoute, graphql.GraphqlPlaygroundEndpoint())
+	// webhook endpoints
+	webhook := e.Group(apiv1.WebhookNamespacePrefix)
+	webhook.POST(apiv1.ImportTask, cdn.ImportTaskEndpoint)
+	webhook.POST(apiv1.SyncTask, cdn.SyncTaskEndpoint)
 
 	return e
 }
@@ -55,7 +53,7 @@ func init() {
 	if projectID == "" {
 		log.Fatal("Missing variable 'PROJECT_ID'")
 	}
-	serviceName := env.GetString("SERVICE_NAME", "cdn")
+	serviceName := env.GetString("SERVICE_NAME", "api")
 
 	client, err := platform.NewClient(context.Background(), gcp.NewErrorReporting(context.TODO(), projectID, serviceName))
 	if err != nil {

@@ -41,7 +41,6 @@ func CreateTask(ctx context.Context, handler string, payload interface{}) (*task
 		// marshal the payload
 		b, err := json.Marshal(payload)
 		if err != nil {
-			//observer.ReportError(err) FIXME
 			return nil, err
 		}
 		req.Task.GetAppEngineHttpRequest().Body = b
@@ -49,7 +48,6 @@ func CreateTask(ctx context.Context, handler string, payload interface{}) (*task
 
 	task, err := client.CreateTask(ctx, req)
 	if err != nil {
-		// observer.ReportError(err) FIXME
 		return nil, err
 	}
 

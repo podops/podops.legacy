@@ -21,8 +21,7 @@ func BuildFeedEndpoint(c echo.Context) error {
 	if err := c.Bind(req); err != nil {
 		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
-	if err := AuthorizeAccessProduction(ctx, c, scopeProductionBuild, req.GUID); err != nil {
-		fmt.Println("BF1")
+	if err := AuthorizeAccessProduction(ctx, c, ScopeProductionBuild, req.GUID); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 

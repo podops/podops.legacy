@@ -62,9 +62,21 @@ type (
 
 	// ImportRequest is used by the import task
 	ImportRequest struct {
+		GUID     string `json:"guid" binding:"required"`
 		Source   string `json:"src" binding:"required"`
-		Dest     string `json:"dest" binding:"required"`
 		Original string `json:"original" binding:"required"`
+		Dest     string `json:"dest"`
+	}
+
+	// ContentMetadata keeps basic data on resource
+	ContentMetadata struct {
+		Name        string `json:"name"`
+		GUID        string `json:"guid"`
+		Size        int64  `json:"size"`
+		Duration    int64  `json:"duration"`
+		ContentType string `json:"content_type"`
+		Etag        string `json:"etag"`
+		Timestamp   int64  `json:"timestamp"`
 	}
 )
 
