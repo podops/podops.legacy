@@ -16,6 +16,7 @@ env_variables:
   SERVICE_NAME: 'api'
   
   # Required App Settings
+  PODOPS_API_KEY: "xoxo-123..."
   MASTER_KEY: "52a.."
   REALM: "podops"
   

@@ -11,27 +11,36 @@ import (
 	"github.com/fupas/commons/pkg/env"
 )
 
-// CreateTask is used to schedule a background task using the default queue.
+var (
+	// UserAgentString identifies any http request podops makes
+	userAgentString string = fmt.Sprintf("PodOps %d.%d.%d", 0, 9, 13)
+	// workerQueue is the main worker queue for all the background tasks
+	workerQueue string = fmt.Sprintf("projects/%s/locations/%s/queues/%s", env.GetString("PROJECT_ID", ""), env.GetString("LOCATION_ID", ""), env.GetString("DEFAULT_QUEUE", ""))
+)
+
+// CreateHttpTask is used to schedule a background task using the default queue.
 // The payload can be any struct and will be marshalled into a json string.
-func CreateTask(ctx context.Context, handler string, payload interface{}) (*taskspb.Task, error) {
+func CreateHttpTask(ctx context.Context, handler, token string, payload interface{}) (*taskspb.Task, error) {
 
 	client, err := cloudtasks.NewClient(ctx)
 	if err != nil {
-		// observer.ReportError(err) FIXME this is just disabled
+		ReportError(err)
 		return nil, err
 	}
 	defer client.Close()
 
-	queuePath := fmt.Sprintf("projects/%s/locations/%s/queues/%s", env.GetString("PROJECT_ID", ""), env.GetString("LOCATION_ID", ""), env.GetString("DEFAULT_QUEUE", ""))
-
 	req := &taskspb.CreateTaskRequest{
-		Parent: queuePath,
+		Parent: workerQueue,
 		Task: &taskspb.Task{
-			MessageType: &taskspb.Task_AppEngineHttpRequest{
-				AppEngineHttpRequest: &taskspb.AppEngineHttpRequest{
-					HttpMethod:  taskspb.HttpMethod_POST,
-					RelativeUri: handler,
-					Headers:     map[string]string{"Content-Type": "application/json"},
+			MessageType: &taskspb.Task_HttpRequest{
+				HttpRequest: &taskspb.HttpRequest{
+					HttpMethod: taskspb.HttpMethod_POST,
+					Url:        handler,
+					Headers: map[string]string{
+						"Content-Type":  "application/json",
+						"User-Agent":    userAgentString,
+						"Authorization": fmt.Sprintf("Bearer %s", token),
+					},
 				},
 			},
 		},
@@ -43,7 +52,7 @@ func CreateTask(ctx context.Context, handler string, payload interface{}) (*task
 		if err != nil {
 			return nil, err
 		}
-		req.Task.GetAppEngineHttpRequest().Body = b
+		req.Task.GetHttpRequest().Body = b
 	}
 
 	task, err := client.CreateTask(ctx, req)

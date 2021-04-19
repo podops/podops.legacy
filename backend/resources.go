@@ -208,11 +208,6 @@ func ListResources(ctx context.Context, production, kind string) ([]*podops.Reso
 		if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Order("-Created"), &r); err != nil {
 			return nil, err
 		}
-		// as we do not get SHOW with the query, we add it now
-		show, err := GetResource(ctx, production)
-		if err == nil && show != nil { // SHOW could not be there, no worries ...
-			r = append(r, show)
-		}
 	} else if _kind == podops.ResourceShow {
 		// there should only be ONE
 		show, err := GetResource(ctx, production)
@@ -347,12 +342,14 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 			return fmt.Errorf("can not modify resource: expected '%s', received '%s'", r.Kind, show.Kind)
 		}
 		r.Name = show.Metadata.Name
-		r.ParentGUID = show.Metadata.Labels[podops.LabelParentGUID]
+		//GUID:       IMMUTABLE !
+		//Kind:       IMMUTABLE !
+		//ParentGUID: IMMUTABLE !
 		r.Location = location
 		r.Title = show.Description.Title
 		r.Summary = show.Description.Summary
-		// FIXME: r.Image = show.Image.ResolveURI(podops.DefaultCDNEndpoint, show.GUID())
 		r.Image = show.Image.ResolveURI(podops.StorageEndpoint, show.GUID())
+		//Created     IMMUTABLE !
 		r.Updated = util.Timestamp()
 
 		return updateResource(ctx, r)
@@ -364,14 +361,13 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 		Name:       show.Metadata.Name,
 		GUID:       show.GUID(),
 		Kind:       podops.ResourceShow,
-		ParentGUID: show.Metadata.Labels[podops.LabelParentGUID],
+		ParentGUID: show.GUID(),
 		Location:   location,
 		Title:      show.Description.Title,
 		Summary:    show.Description.Summary,
-		// FIXME: Image:      show.Image.ResolveURI(podops.DefaultCDNEndpoint, show.GUID()),
-		Image:   show.Image.ResolveURI(podops.StorageEndpoint, show.GUID()),
-		Created: now,
-		Updated: now,
+		Image:      show.Image.ResolveURI(podops.StorageEndpoint, show.GUID()),
+		Created:    now,
+		Updated:    now,
 	}
 	return updateResource(ctx, &rsrc)
 }

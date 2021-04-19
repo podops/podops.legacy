@@ -7,15 +7,16 @@ import (
 
 	"cloud.google.com/go/storage"
 
+	"github.com/fupas/commons/pkg/env"
 	ds "github.com/fupas/platform/pkg/platform"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/platform"
 )
 
-const (
+var (
 	// full canonical route
-	ImportTaskWithPrefix = "/_t/import"
+	importTaskEndpoint string = podops.DefaultCDNEndpoint + "/_w/import"
 )
 
 // EnsureAsset validates the existence of the asset and imports it if necessary
@@ -43,7 +44,12 @@ func EnsureAsset(ctx context.Context, production string, rsrc *podops.Asset) err
 		}
 
 		// dispatch a request for background import
-		_, err = platform.CreateTask(ctx, ImportTaskWithPrefix, &podops.ImportRequest{Source: rsrc.URI, Dest: path, Original: rsrc.AssetName()})
+		ir := podops.ImportRequest{
+			GUID:     production,
+			Source:   rsrc.URI,
+			Original: rsrc.AssetName(),
+		}
+		_, err = platform.CreateHttpTask(ctx, importTaskEndpoint, env.GetString("PODOPS_API_KEY", ""), &ir)
 		if err != nil {
 			return err
 		}

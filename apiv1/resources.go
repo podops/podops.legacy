@@ -95,20 +95,28 @@ func ListResourcesEndpoint(c echo.Context) error {
 // UpdateResourceEndpoint creates or updates a resource
 func UpdateResourceEndpoint(c echo.Context) error {
 	ctx := platform.NewHttpContext(c)
+	createFlag := true // c.Request().Method == POST, default
+	action := "rsrc_create"
 
 	prod := c.Param("prod")
 	kind := c.Param("kind")
 	guid := c.Param("id")
+
 	forceFlag := false
 	if c.QueryParam("f") == "true" {
 		forceFlag = true
+	}
+
+	if c.Request().Method == "PUT" {
+		createFlag = false
+		action = "rsrc_update"
 	}
 
 	if !validateNotEmpty(prod, kind, guid) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
-	if forceFlag {
+	if createFlag {
 		// this assumes that the resource does not exist i.e. we only validate access to the production
 		if err := AuthorizeAccessProduction(ctx, c, ScopeResourceWrite, prod); err != nil {
 			return platform.ErrorResponse(c, http.StatusUnauthorized, err)
@@ -124,7 +132,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 	location := fmt.Sprintf("%s/%s-%s.yaml", prod, kind, guid)
 
 	if kind == podops.ResourceShow {
-		var show *podops.Show = new(podops.Show)
+		var show *podops.Show = new(podops.Show) // FIXME change this !
 
 		if err := c.Bind(show); err != nil {
 			return platform.ErrorResponse(c, http.StatusInternalServerError, err)
@@ -159,7 +167,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		}
 
 	} else if kind == podops.ResourceEpisode {
-		var episode *podops.Episode = new(podops.Episode)
+		var episode *podops.Episode = new(podops.Episode) // FIXME change this !
 
 		if err := c.Bind(episode); err != nil {
 			return platform.ErrorResponse(c, http.StatusInternalServerError, err)
@@ -186,13 +194,6 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("unsupported kind '%s'", kind))
 	}
 
-	createFlag := true // POST
-	action := "rsrc_create"
-
-	if c.Request().Method == "PUT" {
-		createFlag = false
-		action = "rsrc_update"
-	}
 	if err := backend.WriteResourceContent(ctx, location, createFlag, forceFlag, payload); err != nil {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
