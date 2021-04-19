@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/fupas/commons/pkg/util"
-	cs "github.com/fupas/platform/pkg/platform"
 	"github.com/labstack/echo/v4"
 
 	"github.com/podops/podops"
@@ -46,31 +45,6 @@ func ImportTaskEndpoint(c echo.Context) error {
 	return c.NoContent(status)
 }
 
-// SyncTaskEndpoint syncs files between the cloud storage and the CDN
-func SyncTaskEndpoint(c echo.Context) error {
-	var req podops.ImportRequest
-
-	err := c.Bind(&req)
-	if err != nil {
-		// just report and return, resending will not change anything
-		platform.ReportError(err)
-		return c.NoContent(http.StatusOK)
-	}
-
-	if req.GUID == "" || req.Source == "" {
-		return c.NoContent(http.StatusBadRequest)
-	}
-
-	ctx := platform.NewHttpContext(c)
-
-	if err := apiv1.AuthorizeAccessProduction(ctx, c, apiv1.ScopeAPIAdmin, req.GUID); err != nil {
-		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
-	}
-
-	status := SyncResource(ctx, req.GUID, req.Source)
-	return c.NoContent(status)
-}
-
 // ImportResource imports a resource from src and places it into the CDN
 func ImportResource(ctx context.Context, prod, src, original string) int {
 	resp, err := http.Get(src)
@@ -98,7 +72,7 @@ func ImportResource(ctx context.Context, prod, src, original string) int {
 
 	relPath := prod + "/" + meta.Name
 	path := filepath.Join(podops.StorageLocation, relPath)
-	fmt.Println(path)
+
 	// FIXME check metadata and avoid downloading if still valid?
 
 	os.MkdirAll(filepath.Dir(path), os.ModePerm) // make sure sub-folders exist
@@ -129,33 +103,6 @@ func ImportResource(ctx context.Context, prod, src, original string) int {
 
 	if err := backend.UpdateAsset(ctx, meta.Name, meta.GUID, podops.ResourceAsset, prod, relPath, meta.ContentType, original, meta.Etag, meta.Size, meta.Duration); err != nil {
 		platform.ReportError(fmt.Errorf("error updating inventory: %v", err))
-		return http.StatusBadRequest
-	}
-
-	return http.StatusOK
-}
-
-// SyncResource imports a resource from the cloud storage and places it into the CDN
-func SyncResource(ctx context.Context, prod, src string) int {
-	relPath := prod + "/" + src
-
-	bkt := cs.Storage().Bucket(podops.BucketProduction)
-	reader, err := bkt.Object(relPath).NewReader(ctx)
-	if err != nil {
-		platform.ReportError(fmt.Errorf("can not transfer '%s': %v", src, err))
-		return http.StatusBadRequest
-	}
-
-	path := filepath.Join(podops.StorageLocation, relPath)
-
-	os.MkdirAll(filepath.Dir(path), os.ModePerm) // make sure sub-folders exist
-	out, err := os.Create(path)
-	defer out.Close()
-
-	// transfer the file
-	_, err = io.Copy(out, reader)
-	if err != nil {
-		platform.ReportError(fmt.Errorf("can not transfer '%s': %v", src, err))
 		return http.StatusBadRequest
 	}
 

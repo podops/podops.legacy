@@ -13,7 +13,7 @@ import (
 	gcp "github.com/fupas/platform/provider/google"
 
 	"github.com/podops/podops/apiv1"
-	"github.com/podops/podops/backend/cdn"
+	"github.com/podops/podops/internal/cdn"
 )
 
 // ShutdownDelay is the delay before exiting the process
