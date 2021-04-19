@@ -1,0 +1,35 @@
+{{ inventory_hostname }} {
+	root * /data/public/default
+	file_server
+}
+podops.dev {
+        encode zstd gzip
+        root * /data/public/podops.dev
+        
+        rewrite /s/* s/_id.html
+        rewrite /e/* e/_id.html
+        redir /s/*/feed.xml https://cdn.podops.dev{path}
+        
+        file_server
+        log {
+                output file /data/caddy/logs/podops_dev.log
+        }
+}
+
+storage.podops.dev {
+        encode zstd gzip
+        root * /data/storage
+        
+        file_server
+        log {
+                output file /data/caddy/logs/cdn.log
+        }
+}
+
+cdn.podops.dev {
+        reverse_proxy api:8080
+        
+        log {
+                output file /data/caddy/logs/api.log
+        }
+}

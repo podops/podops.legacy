@@ -25,7 +25,7 @@ var (
 )
 
 func setup() *echo.Echo {
-	// Create a new router instance
+	// create a new router instance
 	e := echo.New()
 
 	// add and configure the middlewares
@@ -39,6 +39,9 @@ func setup() *echo.Echo {
 	webhook := e.Group(apiv1.WebhookNamespacePrefix)
 	webhook.POST(apiv1.ImportTask, cdn.ImportTaskEndpoint)
 	webhook.POST(apiv1.SyncTask, cdn.SyncTaskEndpoint)
+
+	// redirect to the real feed.xml path
+	e.GET(apiv1.FeedRoute, apiv1.FeedEndpoint)
 
 	return e
 }

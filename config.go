@@ -16,8 +16,8 @@ const (
 	defaultEndpoint        = "https://podops.dev"
 	defaultAPIEndpoint     = "https://api.podops.dev"
 	defaultCDNEndpoint     = "https://cdn.podops.dev"
-	defaultStorageEndpoint = "https://storage.googleapis.com/cdn.podops.dev"
-	defaultStorageLocation = "/opt/data/storage"
+	defaultStorageEndpoint = "https://storage.podops.dev"
+	defaultStorageLocation = "/data/storage/cdn"
 
 	machineEntry = "api.podops.dev"
 )

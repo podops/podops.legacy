@@ -98,7 +98,7 @@ func ImportResource(ctx context.Context, prod, src, original string) int {
 
 	relPath := prod + "/" + meta.Name
 	path := filepath.Join(podops.StorageLocation, relPath)
-
+	fmt.Println(path)
 	// FIXME check metadata and avoid downloading if still valid?
 
 	os.MkdirAll(filepath.Dir(path), os.ModePerm) // make sure sub-folders exist

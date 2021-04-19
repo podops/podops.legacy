@@ -26,16 +26,12 @@ var (
 )
 
 func setup() *echo.Echo {
-	// Create a new router instance
+	// create a new router instance
 	e := echo.New()
 
 	// add and configure the middlewares
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 	e.Use(middleware.Recover())
-
-	// task endpoints
-	tasks := e.Group(apiv1.TaskNamespacePrefix)
-	tasks.POST(apiv1.ImportTask, apiv1.ImportTaskEndpoint)
 
 	// admin endpoints
 	admin := e.Group(apiv1.AdminNamespacePrefix)
@@ -44,7 +40,7 @@ func setup() *echo.Echo {
 	admin.GET(apiv1.LoginConfirmationRoute, auth.LoginConfirmationEndpoint)
 	admin.POST(apiv1.GetAuthorizationRoute, auth.GetAuthorizationEndpoint)
 
-	// the api endpoints
+	// api endpoints
 	apiEndpoints := e.Group(apiv1.NamespacePrefix)
 	apiEndpoints.GET(apiv1.ListProductionsRoute, apiv1.ListProductionsEndpoint)
 	apiEndpoints.POST(apiv1.ProductionRoute, apiv1.ProductionEndpoint)
@@ -57,20 +53,10 @@ func setup() *echo.Echo {
 	apiEndpoints.POST(apiv1.BuildRoute, apiv1.BuildFeedEndpoint)
 	apiEndpoints.POST(apiv1.UploadRoute, apiv1.UploadEndpoint)
 
-	// FIXME this will go away
-
-	// cdn enpoints
-	content := e.Group(apiv1.ContentNamespace)
-	content.GET(apiv1.DefaultCDNRoute, apiv1.RedirectCDNContentEndpoint)
-	content.HEAD(apiv1.DefaultCDNRoute, apiv1.RedirectCDNContentEndpoint)
-
-	// grapghql
+	// grapghql endpoints
 	gql := e.Group(apiv1.GraphqlNamespacePrefix)
 	gql.POST(apiv1.GraphqlRoute, graphql.GraphqlEndpoint())
 	gql.GET(apiv1.GraphqlPlaygroundRoute, graphql.GraphqlPlaygroundEndpoint())
-
-	e.GET(apiv1.FeedRoute, apiv1.FeedEndpoint)
-	// END FIXME
 
 	return e
 }
