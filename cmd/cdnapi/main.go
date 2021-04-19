@@ -19,11 +19,6 @@ import (
 // ShutdownDelay is the delay before exiting the process
 const ShutdownDelay = 10
 
-var (
-	// the router instance
-	mux *echo.Echo
-)
-
 func setup() *echo.Echo {
 	// create a new router instance
 	e := echo.New()
@@ -41,7 +36,7 @@ func setup() *echo.Echo {
 	webhook.POST(apiv1.SyncTask, cdn.SyncTaskEndpoint)
 
 	// redirect to the real feed.xml path
-	e.GET(apiv1.FeedRoute, apiv1.FeedEndpoint)
+	e.GET(apiv1.FeedRoute, cdn.FeedEndpoint)
 
 	return e
 }

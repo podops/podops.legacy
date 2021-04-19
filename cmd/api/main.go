@@ -20,11 +20,6 @@ import (
 // ShutdownDelay is the delay before exiting the process
 const ShutdownDelay = 10
 
-var (
-	// the router instance
-	mux *echo.Echo
-)
-
 func setup() *echo.Echo {
 	// create a new router instance
 	e := echo.New()

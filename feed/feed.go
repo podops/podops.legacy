@@ -139,7 +139,7 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 	}
 
 	// dump the feed to the CDN location
-	obj := platform.Storage().Bucket(a.BucketCDN).Object(fmt.Sprintf("%s/feed.xml", production))
+	obj := platform.Storage().Bucket(a.BucketProduction).Object(fmt.Sprintf("%s/feed.xml", production))
 	writer := obj.NewWriter(ctx)
 	if _, err := writer.Write(feed.Bytes()); err != nil {
 		return err
