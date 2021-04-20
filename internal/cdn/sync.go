@@ -42,7 +42,7 @@ func SyncTaskEndpoint(c echo.Context) error {
 	return c.NoContent(status)
 }
 
-// DeleteTaskEndpoint removes files from the CDN
+// DeleteTaskEndpoint removes a file from the CDN
 func DeleteTaskEndpoint(c echo.Context) error {
 	ctx := platform.NewHttpContext(c)
 

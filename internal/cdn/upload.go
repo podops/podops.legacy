@@ -61,13 +61,17 @@ func UploadEndpoint(c echo.Context) error {
 
 			// FIXME get the real metadata
 			contentType := part.Header.Get("content-type")
-			duration := calculateLength(contentType, path)
-			original := part.FileName()
-			etag := "etag"
-			size := int64(0)
+			meta := podops.ResourceMetadata{
+				Name:        part.FileName(),
+				GUID:        util.Checksum(location),
+				Size:        0,
+				Duration:    backend.CalculateLength(contentType, path),
+				ContentType: contentType,
+				Etag:        "",
+			}
 
 			// update the inventory
-			backend.UpdateAsset(ctx, part.FileName(), util.Checksum(location), podops.ResourceAsset, prod, location, contentType, original, etag, size, duration)
+			backend.UpdateAsset(ctx, meta.Name, meta.GUID, podops.ResourceAsset, prod, location, contentType, meta.Name, meta.Etag, meta.Size, meta.Duration)
 		}
 	}
 

@@ -193,6 +193,9 @@ func DeleteResource(ctx context.Context, prod, kind, guid string) error {
 	}
 
 	if r.Kind == podops.ResourceAsset {
+		if err := DeleteResourceMetadata(ctx, guid); err != nil {
+			return err
+		}
 		return RemoveAsset(ctx, prod, r.Location)
 	}
 	return RemoveResource(ctx, r.Location)
