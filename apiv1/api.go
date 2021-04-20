@@ -58,7 +58,7 @@ const (
 	// SyncTask route to SyncTaskEndpoint
 	SyncTask = "/sync"
 	// DeleteTask route to DeleteTaskEndpoint
-	DeleteTask = "/sync/:prod/:kind/:id"
+	DeleteTask = "/sync/:prod"
 
 	// BuildRoute route to BuildEndpoint
 	BuildRoute = "/build"
