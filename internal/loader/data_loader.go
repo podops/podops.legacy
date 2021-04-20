@@ -1,4 +1,4 @@
-package dataloader
+package loader
 
 /*
 This is a not type safe data loaders for go, inspired by https://github.com/facebook/dataloader.
@@ -31,8 +31,8 @@ type (
 	}
 )
 
-// NewLoader initializes the loader
-func NewLoader(f FetchFunc, ttl time.Duration) *Loader {
+// New initializes the loader
+func New(f FetchFunc, ttl time.Duration) *Loader {
 	return &Loader{
 		fetch:        f,
 		c:            cache.New(),

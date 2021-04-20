@@ -1,4 +1,4 @@
-package backend
+package loader
 
 import (
 	"fmt"
@@ -8,8 +8,6 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/validator"
 )
-
-// FIXME is this in the right package ?
 
 type (
 	// ResourceLoaderFunc implements loading of resources
@@ -29,7 +27,7 @@ func init() {
 // LoadResource takes a byte array and determines its kind before unmarshalling it into its struct form
 func LoadResource(data []byte) (interface{}, string, string, error) {
 
-	r, err := LoadResourceMetadata(data)
+	r, _ := LoadGenericResource(data)
 	loader := resourceLoaders[r.Kind]
 	if loader == nil {
 		return nil, "", "", fmt.Errorf("unsupported resource '%s'", r.Kind)
@@ -42,9 +40,9 @@ func LoadResource(data []byte) (interface{}, string, string, error) {
 	return resource, r.Kind, guid, nil
 }
 
-// LoadResourceMetadata reads only the metadata of a resource
-func LoadResourceMetadata(data []byte) (*podops.ResourceMetadata, error) {
-	var r podops.ResourceMetadata
+// LoadGenericResource reads only the metadata of a resource
+func LoadGenericResource(data []byte) (*podops.GenericResource, error) {
+	var r podops.GenericResource
 
 	err := yaml.Unmarshal([]byte(data), &r)
 	if err != nil {

@@ -89,8 +89,8 @@ type (
 		Labels map[string]string `json:"labels" yaml:"labels,omitempty"`      // REQUIRED
 	}
 
-	// ResourceMetadata holds only the kind and metadata of a resource
-	ResourceMetadata struct {
+	// GenericResource holds only the kind and metadata of a resource
+	GenericResource struct {
 		APIVersion string   `json:"apiVersion" yaml:"apiVersion" binding:"required"` // REQUIRED default: v1.0
 		Kind       string   `json:"kind" yaml:"kind" binding:"required"`             // REQUIRED default: show
 		Metadata   Metadata `json:"metadata" yaml:"metadata" binding:"required"`     // REQUIRED
@@ -193,7 +193,7 @@ func (e *Episode) Parent() string {
 }
 
 // GUID is a convenience method to access the resources guid
-func (r *ResourceMetadata) GUID() string {
+func (r *GenericResource) GUID() string {
 	return r.Metadata.Labels[LabelGUID]
 }
 

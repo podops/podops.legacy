@@ -17,10 +17,10 @@ import (
 	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
-	ds "github.com/fupas/platform/pkg/platform"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/loader"
 	p "github.com/podops/podops/internal/platform"
 )
 
@@ -306,7 +306,7 @@ func ReadResource(ctx context.Context, path string) (interface{}, string, string
 		return nil, "", "", err
 	}
 
-	return LoadResource(data)
+	return loader.LoadResource(data)
 }
 
 // RemoveResource removes a resource from Cloud Storage
@@ -501,9 +501,8 @@ func pingURL(url string) (http.Header, error) {
 
 // resourceExists verifies the resource .yaml exists
 func resourceExists(ctx context.Context, path string) bool {
-	obj := ds.Storage().Bucket(podops.BucketCDN).Object(path)
-	_, err := obj.Attrs(ctx)
-	if err == storage.ErrObjectNotExist {
+	obj := platform.Storage().Bucket(podops.BucketCDN).Object(path)
+	if _, err := obj.Attrs(ctx); err != nil {
 		return false
 	}
 	return true

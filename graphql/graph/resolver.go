@@ -8,7 +8,7 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/graphql/graph/model"
-	"github.com/podops/podops/internal/dataloader"
+	"github.com/podops/podops/internal/loader"
 )
 
 // This file will not be regenerated automatically.
@@ -17,8 +17,8 @@ import (
 
 // Resolver holds the loaders
 type Resolver struct {
-	ShowLoader    *dataloader.Loader
-	EpisodeLoader *dataloader.Loader
+	ShowLoader    *loader.Loader
+	EpisodeLoader *loader.Loader
 }
 
 // LoadShow load a show
@@ -147,7 +147,7 @@ func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 // CreateResolver returns a resolver for loading shows and episodes
 func CreateResolver() *Resolver {
 	return &Resolver{
-		ShowLoader:    dataloader.NewLoader(LoadShow, dataloader.DefaultTTL),
-		EpisodeLoader: dataloader.NewLoader(LoadEpisode, dataloader.DefaultTTL),
+		ShowLoader:    loader.New(LoadShow, loader.DefaultTTL),
+		EpisodeLoader: loader.New(LoadEpisode, loader.DefaultTTL),
 	}
 }

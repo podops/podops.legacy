@@ -86,7 +86,7 @@ func ValidateProduction(ctx context.Context, production string) error {
 	if err != nil {
 		return err
 	}
-	if rsrc == nil || len(rsrc) == 0 {
+	if len(rsrc) == 0 {
 		return fmt.Errorf("no resources")
 	}
 

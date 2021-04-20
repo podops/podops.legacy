@@ -16,6 +16,7 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/cli/netrc"
+	"github.com/podops/podops/internal/loader"
 )
 
 const (
@@ -130,7 +131,7 @@ func loadResource(path string) (interface{}, string, string, error) {
 		return nil, "", "", fmt.Errorf("can not read file '%s': %w", path, err)
 	}
 
-	r, kind, guid, err := LoadResource(data)
+	r, kind, guid, err := loader.LoadResource(data)
 	if err != nil {
 		return nil, "", "", err
 	}
@@ -158,12 +159,14 @@ func getProduction(c *cli.Context) string {
 	return prod
 }
 
+/*
 func shorten(s string, l int) string {
 	if len(s) <= l {
 		return s
 	}
 	return fmt.Sprintf("%s..%s", s[0:(l-11)], s[(len(s)-9):])
 }
+*/
 
 func productionListing(guid, name, title string, current bool) string {
 	if current {
