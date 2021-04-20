@@ -67,11 +67,16 @@ func UploadEndpoint(c echo.Context) error {
 				Size:        0,
 				Duration:    backend.CalculateLength(contentType, path),
 				ContentType: contentType,
-				Etag:        "",
+				Etag:        "", // FIXME hash of Name + Size + Timestamp?
 			}
 
 			// update the inventory
-			backend.UpdateAsset(ctx, meta.Name, meta.GUID, podops.ResourceAsset, prod, location, contentType, meta.Name, meta.Etag, meta.Size, meta.Duration)
+			if err := backend.UpdateResourceMetadata(ctx, &meta); err != nil {
+				return p.ErrorResponse(c, http.StatusInternalServerError, err)
+			}
+			if err := backend.UpdateAsset(ctx, meta.Name, meta.GUID, podops.ResourceAsset, prod, location, contentType, meta.Name, meta.Etag, meta.Size, meta.Duration); err != nil {
+				return p.ErrorResponse(c, http.StatusInternalServerError, err)
+			}
 		}
 	}
 
