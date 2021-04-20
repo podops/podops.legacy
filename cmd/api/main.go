@@ -46,7 +46,6 @@ func setup() *echo.Echo {
 	apiEndpoints.PUT(apiv1.UpdateResourceRoute, apiv1.UpdateResourceEndpoint)
 	apiEndpoints.DELETE(apiv1.DeleteResourceRoute, apiv1.DeleteResourceEndpoint)
 	apiEndpoints.POST(apiv1.BuildRoute, apiv1.BuildFeedEndpoint)
-	apiEndpoints.POST(apiv1.UploadRoute, apiv1.UploadEndpoint)
 
 	// grapghql endpoints
 	gql := e.Group(apiv1.GraphqlNamespacePrefix)

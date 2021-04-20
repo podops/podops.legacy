@@ -27,8 +27,8 @@ const (
 
 	// buildRoute route to call BuildEndpoint
 	buildRoute = NamespacePrefix + "/build"
-	// uploadRoute route to UploadEndpoint
-	uploadRoute = NamespacePrefix + "/upload"
+	// uploadRoute route to the CDN UploadEndpoint
+	uploadRoute = "/_w/upload"
 )
 
 // CreateProduction invokes the CreateProductionEndpoint
@@ -190,7 +190,7 @@ func (cl *Client) Upload(production, path string, force bool) error {
 		return PodopsClientConfigurationErr
 	}
 	// FIXME this should be cl.opts.StorageEndpoint or CDNEndpoint
-	req, err := upload(cl.opts.APIEndpoint, uploadRoute, cl.opts.Token, production, "asset", path)
+	req, err := upload(cl.opts.CDNEndpoint, uploadRoute, cl.opts.Token, production, "asset", path)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -77,6 +77,10 @@ func ImportResource(ctx context.Context, prod, src, original string) int {
 
 	os.MkdirAll(filepath.Dir(path), os.ModePerm) // make sure sub-folders exist
 	out, err := os.Create(path)
+	if err != nil {
+		platform.ReportError(fmt.Errorf("can not transfer '%s': %v", src, err))
+		return http.StatusBadRequest
+	}
 	defer out.Close()
 
 	// transfer using a buffer

@@ -405,7 +405,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 		r.Published = episode.PublishDateTimestamp()
 		r.Index = int(index) // episode number
 		r.Image = episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
-		r.Extra1 = episode.Enclosure.ResolveURI(podops.DefaultCDNEndpoint+"/c", episode.Parent())
+		r.Extra1 = episode.Enclosure.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
 		r.Size = int64(episode.Enclosure.Size)
 		r.Duration = int64(episode.Description.Duration)
 		r.Updated = util.Timestamp()
@@ -428,7 +428,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 		Published:  episode.PublishDateTimestamp(),
 		Index:      int(index), // episode number
 		Image:      episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent()),
-		Extra1:     episode.Enclosure.ResolveURI(podops.DefaultCDNEndpoint+"/c", episode.Parent()),
+		Extra1:     episode.Enclosure.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent()),
 		Size:       int64(episode.Enclosure.Size),
 		Duration:   int64(episode.Description.Duration),
 		Created:    now,

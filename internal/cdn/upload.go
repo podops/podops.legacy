@@ -1,16 +1,18 @@
-package apiv1
+package cdn
 
 import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/labstack/echo/v4"
 
 	"github.com/fupas/commons/pkg/util"
-	"github.com/fupas/platform/pkg/platform"
 
 	"github.com/podops/podops"
+	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/backend"
 	p "github.com/podops/podops/internal/platform"
 )
@@ -28,7 +30,7 @@ func UploadEndpoint(c echo.Context) error {
 		return p.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':prod'"))
 	}
 
-	if err := AuthorizeAccessProduction(ctx, c, ScopeResourceWrite, prod); err != nil {
+	if err := apiv1.AuthorizeAccessProduction(ctx, c, apiv1.ScopeResourceWrite, prod); err != nil {
 		return p.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
@@ -43,28 +45,29 @@ func UploadEndpoint(c echo.Context) error {
 
 		if part.FormName() == "asset" {
 			location := fmt.Sprintf("%s/%s", prod, part.FileName())
+			path := filepath.Join(podops.StorageLocation, location)
 
-			bkt := platform.Storage().Bucket(podops.BucketCDN)
-			obj := bkt.Object(location)
-			writer := obj.NewWriter(ctx)
-			defer writer.Close() // just to be sure we really close the writer
-
-			if _, err := io.Copy(writer, part); err != nil {
-				return p.ErrorResponse(c, http.StatusInternalServerError, err)
-			}
-			writer.Close() // force close to have attributes like size etc correct
-
-			// get the attributes back
-			attr, err := obj.Attrs(ctx)
+			os.MkdirAll(filepath.Dir(path), os.ModePerm) // make sure sub-folders exist
+			out, err := os.Create(path)
 			if err != nil {
 				return p.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
+			defer out.Close()
 
-			duration := int64(0) // FIXME implement it
+			if _, err := io.Copy(out, part); err != nil {
+				return p.ErrorResponse(c, http.StatusInternalServerError, err)
+			}
+			out.Close() // force close to have attributes like size etc correct
+
+			// FIXME get the real metadata
+			contentType := part.Header.Get("content-type")
+			duration := calculateLength(contentType, path)
 			original := part.FileName()
+			etag := "etag"
+			size := int64(0)
 
 			// update the inventory
-			backend.UpdateAsset(ctx, part.FileName(), util.Checksum(location), podops.ResourceAsset, prod, location, attr.ContentType, original, attr.Etag, attr.Size, duration)
+			backend.UpdateAsset(ctx, part.FileName(), util.Checksum(location), podops.ResourceAsset, prod, location, contentType, original, etag, size, duration)
 		}
 	}
 

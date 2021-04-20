@@ -211,7 +211,7 @@ func TransformToItem(e *a.Episode) (*rss.Item, error) {
 		Description: e.Description.Summary,
 	}
 
-	ef.AddEnclosure(e.Enclosure.ResolveURI(a.DefaultCDNEndpoint+"/c", e.Parent()), mediaTypeMap[e.Enclosure.Type], (int64)(e.Enclosure.Size))
+	ef.AddEnclosure(e.Enclosure.ResolveURI(a.DefaultStorageEndpoint, e.Parent()), mediaTypeMap[e.Enclosure.Type], (int64)(e.Enclosure.Size))
 	ef.AddImage(e.Image.ResolveURI(a.DefaultStorageEndpoint, e.Parent()))
 	ef.AddPubDate(&pubDate)
 	ef.AddSummary(e.Description.EpisodeText)
