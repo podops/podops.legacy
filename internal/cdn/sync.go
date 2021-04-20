@@ -54,7 +54,7 @@ func DeleteTaskEndpoint(c echo.Context) error {
 	if !apiv1.ValidateNotEmpty(prod, kind, guid) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
-	if err := apiv1.AuthorizeAccessResource(ctx, c, apiv1.ScopeAPIAdmin, guid); err != nil {
+	if err := apiv1.AuthorizeAccessProduction(ctx, c, apiv1.ScopeAPIAdmin, prod); err != nil { // validate against production only, the resource is already gone by now
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
@@ -63,7 +63,7 @@ func DeleteTaskEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	status := DeleteResource(ctx, prod, r.Location)
+	status := DeleteResource(ctx, r.Location)
 	return c.NoContent(status)
 }
 
@@ -99,7 +99,7 @@ func SyncResource(ctx context.Context, prod, src string) int {
 }
 
 // DeleteResource removes a resource from the CDN
-func DeleteResource(ctx context.Context, prod, location string) int {
+func DeleteResource(ctx context.Context, location string) int {
 	path := filepath.Join(podops.StorageLocation, location)
 	err := os.Remove(path)
 	if err != nil {
