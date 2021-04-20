@@ -5,7 +5,6 @@ import (
 )
 
 type (
-
 	// Production is the parent struct of all other resources.
 	Production struct {
 		Name      string `json:"name" binding:"required"`

@@ -63,23 +63,24 @@ func put(url, cmd, token string, request, response interface{}) (int, error) {
 func delete(url, cmd, token string, request interface{}) (int, error) {
 	uri := url + cmd
 
-	var req *http.Request
-	var err error
-
 	if request != nil {
 		m, err := json.Marshal(&request)
 		if err != nil {
 			return http.StatusInternalServerError, err
 		}
-		req, err = http.NewRequest("DELETE", uri, bytes.NewBuffer(m))
-	} else {
-		req, err = http.NewRequest("DELETE", uri, nil)
+		req, err := http.NewRequest("DELETE", uri, bytes.NewBuffer(m))
+		if err != nil {
+			return http.StatusBadRequest, err
+		}
+		return invoke(token, req, nil)
 	}
+
+	req, err := http.NewRequest("DELETE", uri, nil)
 	if err != nil {
 		return http.StatusBadRequest, err
 	}
-
 	return invoke(token, req, nil)
+
 }
 
 func invoke(token string, req *http.Request, response interface{}) (int, error) {
@@ -138,18 +139,22 @@ func upload(url, cmd, token, guid, form, path string) (*http.Request, error) {
 
 	body := bytes.Buffer{}
 	writer := multipart.NewWriter(&body)
-	part, err := writer.CreateFormFile("asset", filepath.Base(path))
+	part, err := writer.CreateFormFile(form, filepath.Base(path))
 	if err != nil {
 		return nil, err
 	}
+
 	_, err = io.Copy(part, file)
+	if err != nil {
+		return nil, err
+	}
 
 	err = writer.Close()
 	if err != nil {
 		return nil, err
 	}
 
-	uri := url + "/" + cmd + "/" + guid
+	uri := url + cmd + "/" + guid
 	req, err := http.NewRequest("POST", uri, &body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	req.Header.Set("Authorization", "Bearer "+token)

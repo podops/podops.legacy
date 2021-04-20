@@ -29,7 +29,7 @@ type (
 )
 
 var (
-	PodopsClientConfigurationErr error = fmt.Errorf("client: invalid configuration")
+	ErrClientConfig error = fmt.Errorf("client: invalid configuration")
 )
 
 // NewClient creates a new podcast client.
@@ -53,7 +53,7 @@ func NewClient(ctx context.Context, token string, opts ...*ClientOption) (*Clien
 
 func New(ctx context.Context, o *ClientOption) (*Client, error) {
 	if o == nil || !o.IsValid() {
-		return nil, PodopsClientConfigurationErr
+		return nil, ErrClientConfig
 	}
 	return &Client{
 		opts:      o,

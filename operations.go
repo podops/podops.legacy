@@ -34,7 +34,7 @@ const (
 // CreateProduction invokes the CreateProductionEndpoint
 func (cl *Client) CreateProduction(name, title, summary string) (*Production, error) {
 	if !cl.IsValid() {
-		return nil, PodopsClientConfigurationErr
+		return nil, ErrClientConfig
 	}
 
 	if name == "" {
@@ -60,7 +60,7 @@ func (cl *Client) CreateProduction(name, title, summary string) (*Production, er
 // Productions retrieves a list of productions
 func (cl *Client) Productions() (*ProductionList, error) {
 	if !cl.IsValid() {
-		return nil, PodopsClientConfigurationErr
+		return nil, ErrClientConfig
 	}
 
 	var resp ProductionList
@@ -74,7 +74,7 @@ func (cl *Client) Productions() (*ProductionList, error) {
 // CreateResource invokes the ResourceEndpoint
 func (cl *Client) CreateResource(production, kind, guid string, force bool, rsrc interface{}) (int, error) {
 	if !cl.IsValid() {
-		return http.StatusBadRequest, PodopsClientConfigurationErr
+		return http.StatusBadRequest, ErrClientConfig
 	}
 
 	resp := platform.StatusObject{}
@@ -89,7 +89,7 @@ func (cl *Client) CreateResource(production, kind, guid string, force bool, rsrc
 // GetResource returns a resource file
 func (cl *Client) GetResource(production, kind, guid string, rsrc interface{}) error {
 	if !cl.IsValid() {
-		return PodopsClientConfigurationErr
+		return ErrClientConfig
 	}
 
 	status, err := get(cl.opts.APIEndpoint, fmt.Sprintf(getResourceRoute, production, kind, guid), cl.opts.Token, rsrc)
@@ -106,7 +106,7 @@ func (cl *Client) GetResource(production, kind, guid string, rsrc interface{}) e
 // FindResource returns a resource file
 func (cl *Client) FindResource(guid string, rsrc interface{}) error {
 	if !cl.IsValid() {
-		return PodopsClientConfigurationErr
+		return ErrClientConfig
 	}
 
 	status, err := get(cl.opts.APIEndpoint, fmt.Sprintf(findResourceRoute, guid), cl.opts.Token, rsrc)
@@ -123,7 +123,7 @@ func (cl *Client) FindResource(guid string, rsrc interface{}) error {
 // Resources retrieves a list of resources
 func (cl *Client) Resources(production, kind string) (*ResourceList, error) {
 	if !cl.IsValid() {
-		return nil, PodopsClientConfigurationErr
+		return nil, ErrClientConfig
 	}
 	if kind == "" {
 		kind = "ALL"
@@ -140,7 +140,7 @@ func (cl *Client) Resources(production, kind string) (*ResourceList, error) {
 // UpdateResource invokes the ResourceEndpoint
 func (cl *Client) UpdateResource(production, kind, guid string, force bool, rsrc interface{}) (int, error) {
 	if !cl.IsValid() {
-		return http.StatusBadRequest, PodopsClientConfigurationErr
+		return http.StatusBadRequest, ErrClientConfig
 	}
 
 	resp := platform.StatusObject{}
@@ -155,7 +155,7 @@ func (cl *Client) UpdateResource(production, kind, guid string, force bool, rsrc
 // DeleteResource deletes a resources
 func (cl *Client) DeleteResource(production, kind, guid string) (int, error) {
 	if !cl.IsValid() {
-		return http.StatusBadRequest, PodopsClientConfigurationErr
+		return http.StatusBadRequest, ErrClientConfig
 	}
 
 	status, err := delete(cl.opts.APIEndpoint, fmt.Sprintf(deleteResourceRoute, production, kind, guid), cl.opts.Token, nil)
@@ -168,7 +168,7 @@ func (cl *Client) DeleteResource(production, kind, guid string) (int, error) {
 // Build invokes the BuildEndpoint
 func (cl *Client) Build(production string) (*BuildRequest, error) {
 	if !cl.IsValid() {
-		return nil, PodopsClientConfigurationErr
+		return nil, ErrClientConfig
 	}
 
 	req := BuildRequest{
@@ -187,7 +187,7 @@ func (cl *Client) Build(production string) (*BuildRequest, error) {
 // Upload invokes the UploadEndpoint
 func (cl *Client) Upload(production, path string, force bool) error {
 	if !cl.IsValid() {
-		return PodopsClientConfigurationErr
+		return ErrClientConfig
 	}
 	// FIXME this should be cl.opts.StorageEndpoint or CDNEndpoint
 	req, err := upload(cl.opts.CDNEndpoint, uploadRoute, cl.opts.Token, production, "asset", path)

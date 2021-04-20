@@ -225,7 +225,7 @@ func (r *Asset) FingerprintURI(parent string) string {
 	id := util.Checksum(r.URI)
 	parts := strings.Split(r.URI, ".")
 	if len(parts) == 0 {
-		return fmt.Sprintf("%s", id)
+		return id
 	}
 	return fmt.Sprintf("%s/%s.%s", parent, id, parts[len(parts)-1])
 }

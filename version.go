@@ -2,6 +2,12 @@ package podops
 
 import "fmt"
 
+/*
+Make sure to also change here:
+- platform/tasks.go
+- podops-infra/inventory/*
+*/
+
 const (
 	// Version specifies the verion of the API and its structs
 	Version = "v1"
