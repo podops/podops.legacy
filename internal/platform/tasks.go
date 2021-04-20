@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
+	"google.golang.org/genproto/googleapis/cloud/tasks/v2"
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 
 	"github.com/fupas/commons/pkg/env"
@@ -20,7 +21,7 @@ var (
 
 // CreateHttpTask is used to schedule a background task using the default queue.
 // The payload can be any struct and will be marshalled into a json string.
-func CreateHttpTask(ctx context.Context, handler, token string, payload interface{}) (*taskspb.Task, error) {
+func CreateHttpTask(ctx context.Context, method tasks.HttpMethod, handler, token string, payload interface{}) (*taskspb.Task, error) {
 
 	client, err := cloudtasks.NewClient(ctx)
 	if err != nil {
@@ -34,7 +35,7 @@ func CreateHttpTask(ctx context.Context, handler, token string, payload interfac
 		Task: &taskspb.Task{
 			MessageType: &taskspb.Task_HttpRequest{
 				HttpRequest: &taskspb.HttpRequest{
-					HttpMethod: taskspb.HttpMethod_POST,
+					HttpMethod: method,
 					Url:        handler,
 					Headers: map[string]string{
 						"Content-Type":  "application/json",

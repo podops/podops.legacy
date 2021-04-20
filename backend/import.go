@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"cloud.google.com/go/storage"
+	"google.golang.org/genproto/googleapis/cloud/tasks/v2"
 
 	"github.com/fupas/commons/pkg/env"
 	ds "github.com/fupas/platform/pkg/platform"
@@ -17,6 +18,7 @@ import (
 var (
 	// full canonical route
 	importTaskEndpoint string = podops.DefaultCDNEndpoint + "/_w/import"
+	syncTaskEndpoint   string = podops.DefaultCDNEndpoint + "/_w/sync"
 )
 
 // EnsureAsset validates the existence of the asset and imports it if necessary
@@ -49,7 +51,7 @@ func EnsureAsset(ctx context.Context, production string, rsrc *podops.Asset) err
 			Source:   rsrc.URI,
 			Original: rsrc.AssetName(),
 		}
-		_, err = platform.CreateHttpTask(ctx, importTaskEndpoint, env.GetString("PODOPS_API_KEY", ""), &ir)
+		_, err = platform.CreateHttpTask(ctx, tasks.HttpMethod_POST, importTaskEndpoint, env.GetString("PODOPS_API_KEY", ""), &ir)
 		if err != nil {
 			return err
 		}

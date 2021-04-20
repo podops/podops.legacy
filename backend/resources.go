@@ -9,13 +9,16 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
+	"google.golang.org/genproto/googleapis/cloud/tasks/v2"
 	"gopkg.in/yaml.v2"
 
+	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
+	p "github.com/podops/podops/internal/platform"
 )
 
 const (
@@ -190,7 +193,7 @@ func DeleteResource(ctx context.Context, guid string) error {
 	}
 
 	if r.Kind == podops.ResourceAsset {
-		return RemoveAsset(ctx, r.Location)
+		return RemoveAsset(ctx, r.GUID, r.Location)
 	}
 	return RemoveResource(ctx, r.Location)
 }
@@ -320,16 +323,16 @@ func RemoveResource(ctx context.Context, path string) error {
 }
 
 // RemoveAsset removes a asset from Cloud Storage
-func RemoveAsset(ctx context.Context, path string) error {
-	bkt := platform.Storage().Bucket(podops.BucketCDN)
+func RemoveAsset(ctx context.Context, prod, path string) error {
 
-	obj := bkt.Object(path)
-	_, err := obj.Attrs(ctx)
-	if err == storage.ErrObjectNotExist {
-		return errordef.ErrNoSuchAsset
+	// dispatch a request for background deletion
+	ir := podops.ImportRequest{
+		GUID: prod,
+		Dest: path,
 	}
+	_, err := p.CreateHttpTask(ctx, tasks.HttpMethod_DELETE, syncTaskEndpoint, env.GetString("PODOPS_API_KEY", ""), &ir)
 
-	return bkt.Object(path).Delete(ctx)
+	return err
 }
 
 // UpdateShow is a helper function to update a show resource

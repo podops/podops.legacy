@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strings"
 
+	"google.golang.org/genproto/googleapis/cloud/tasks/v2"
+
 	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
@@ -61,7 +63,7 @@ func BuildFeedEndpoint(c echo.Context) error {
 			GUID:   req.GUID,
 			Source: "feed.xml",
 		}
-		_, err = platform.CreateHttpTask(ctx, syncTaskEndpoint, env.GetString("PODOPS_API_KEY", ""), &ir)
+		_, err = platform.CreateHttpTask(ctx, tasks.HttpMethod_POST, syncTaskEndpoint, env.GetString("PODOPS_API_KEY", ""), &ir)
 		if err != nil {
 			return err
 		}

@@ -3,9 +3,13 @@ package podops
 import "fmt"
 
 /*
-Make sure to also change here:
+
+Make sure to update version numbers in these locations also:
+
 - platform/tasks.go
+- .github/*
 - podops-infra/inventory/*
+
 */
 
 const (
