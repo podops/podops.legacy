@@ -114,8 +114,8 @@ func ImportResource(ctx context.Context, prod, src, original string) int {
 }
 
 // extractMetadataFromResponse extracts the metadata from http.Response
-func extractMetadataFromResponse(resp *http.Response) *podops.ContentMetadata {
-	meta := podops.ContentMetadata{
+func extractMetadataFromResponse(resp *http.Response) *podops.ResourceMetadata {
+	meta := podops.ResourceMetadata{
 		ContentType: resp.Header.Get("content-type"),
 		Etag:        resp.Header.Get("etag"),
 	}

@@ -52,8 +52,8 @@ type (
 		Resources []*Resource `json:"resources" `
 	}
 
-	// ContentMetadata keeps basic metadata of a cdn resource
-	ContentMetadata struct {
+	// ResourceMetadata keeps basic metadata of a cdn resource
+	ResourceMetadata struct {
 		Name        string `json:"name"`
 		GUID        string `json:"guid"`
 		Size        int64  `json:"size"`

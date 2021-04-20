@@ -11,7 +11,6 @@ import (
 
 const (
 	defaultBucketProduction = "production.podops.dev"
-	defaultBucketCDN        = "cdn.podops.dev"
 
 	defaultEndpoint        = "https://podops.dev"
 	defaultAPIEndpoint     = "https://api.podops.dev"
@@ -37,10 +36,6 @@ var (
 
 	// BucketProduction is the canonical name of the production bucket
 	BucketProduction string = env.GetString("BUCKET_PRODUCTION", defaultBucketProduction)
-
-	// BucketCDN is the canonical name of the CDN bucket
-	// FIXME will be obsolete
-	BucketCDN string = env.GetString("BUCKET_CDN", defaultBucketCDN)
 
 	// StorageLocation is the root location for the cdn
 	StorageLocation = env.GetString("STORAGE_LOCATION", defaultStorageLocation)

@@ -444,9 +444,11 @@ func EnsureAsset(ctx context.Context, production string, rsrc *podops.Asset) err
 		return err
 	}
 	if rsrc.Rel == podops.ResourceTypeLocal {
-		path := fmt.Sprintf("%s/%s", production, rsrc.URI)
-		if !resourceExists(ctx, path) {
-			return fmt.Errorf("can not find '%s'", rsrc.URI)
+		// FIXME replace later with checking of the ResourceMetadata entries ...
+		path := fmt.Sprintf("%s/%s/%s", podops.DefaultStorageEndpoint, production, rsrc.URI)
+		_, err := pingURL(path) // ping the CDN
+		if err != nil {
+			return err
 		}
 		return nil
 	}
@@ -456,10 +458,7 @@ func EnsureAsset(ctx context.Context, production string, rsrc *podops.Asset) err
 			return err
 		}
 
-		path := rsrc.FingerprintURI(production)
-		if resourceExists(ctx, path) { // do nothing as the asset is present FIXME re-download if --force is set
-			return nil // FIXME verify that the asset is unchanged, otherwise re-import
-		}
+		// FIXME compare to ResourceMetadata first ...
 
 		// dispatch a request for background import
 		ir := podops.ImportRequest{
@@ -497,15 +496,6 @@ func pingURL(url string) (http.Header, error) {
 		}
 	}
 	return resp.Header.Clone(), nil
-}
-
-// resourceExists verifies the resource .yaml exists
-func resourceExists(ctx context.Context, path string) bool {
-	obj := platform.Storage().Bucket(podops.BucketCDN).Object(path)
-	if _, err := obj.Attrs(ctx); err != nil {
-		return false
-	}
-	return true
 }
 
 // updateResource does what the name suggests

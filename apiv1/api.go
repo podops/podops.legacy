@@ -19,14 +19,10 @@ const (
 	TaskNamespacePrefix = "/_t"
 	// WebhookNamespacePrefix namespace for webhook callbacks
 	WebhookNamespacePrefix = "/_w"
-	// ContentNamespace namespace for thr CDN
-	ContentNamespace = "/c"
 
-	// All the API & CLI endpoint routes
+	// All the API & CLI routes
 
-	// status
-	CheckReadyRoute = "/ready"
-	CheckAliveRoute = "/alive"
+	// login and authentication
 
 	// LoginRequestRoute route to LoginRequestEndpoint
 	LoginRequestRoute = "/login"
@@ -37,10 +33,14 @@ const (
 	// GetAuthorizationRoute route to GetAuthorizationEndpoint
 	GetAuthorizationRoute = "/auth"
 
+	// production routes
+
 	// ProductionRoute route to ProductionEndpoint
 	ProductionRoute = "/production"
 	// ListProductionsRoute route to ListProductionsEndpoint
 	ListProductionsRoute = "/productions"
+
+	// resource routes
 
 	// FindResourceRoute route to FindResourceEndpoint
 	FindResourceRoute = "/resource/:id"
@@ -53,6 +53,25 @@ const (
 	// DeleteResourceRoute route to ResourceEndpoint
 	DeleteResourceRoute = "/resource/:prod/:kind/:id"
 
+	// BuildRoute route to BuildEndpoint
+	BuildRoute = "/build"
+	// UploadRoute route to UploadEndpoint
+	UploadRoute = "/upload/:prod"
+
+	// CDN routes
+
+	// FeedRoute route to feed.xml
+	FeedRoute = "/s/:name/feed.xml"
+
+	// GraphQL API routes
+
+	// GraphqlRoute route to GraphqlEndpoint
+	GraphqlRoute = "/query"
+	// GraphqlPlaygroundRoute route to GraphqlPlaygroundEndpoint
+	GraphqlPlaygroundRoute = "/playground"
+
+	// internal routes
+
 	// ImportTask route to ImportTaskEndpoint
 	ImportTask = "/import"
 	// SyncTask route to SyncTaskEndpoint
@@ -60,28 +79,10 @@ const (
 	// DeleteTask route to DeleteTaskEndpoint
 	DeleteTask = "/sync/:prod"
 
-	// BuildRoute route to BuildEndpoint
-	BuildRoute = "/build"
-	// UploadRoute route to UploadEndpoint
-	UploadRoute = "/upload/:prod"
+	// status routes
 
-	// ShowRoute route to show.json
-	ShowRoute = "/s/:name"
-
-	// EpisodeRoute route to show.json
-	EpisodeRoute = "/e/:guid"
-
-	// FeedRoute route to feed.xml
-	FeedRoute = "/s/:name/feed.xml"
-
-	// DefaultCDNRoute route to /:guid/:asset
-	DefaultCDNRoute = "/:guid/:asset"
-
-	// GraphqlRoute route to GraphqlEndpoint
-	GraphqlRoute = "/query"
-
-	// GraphqlPlaygroundRoute route to GraphqlPlaygroundEndpoint
-	GraphqlPlaygroundRoute = "/playground"
+	CheckReadyRoute = "/ready"
+	CheckAliveRoute = "/alive"
 )
 
 // CheckAliveEndpoint returns http.StatusOK if the service is able to respond to requests.
