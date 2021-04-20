@@ -11,6 +11,8 @@ import (
 	"github.com/podops/podops/internal/platform"
 )
 
+// FIXME move this to the caddy handler ?
+
 // FeedEndpoint handles request for feed.xml by redirecting to the public storage bucket
 func FeedEndpoint(c echo.Context) error { // FIXME not needed !
 
@@ -28,7 +30,7 @@ func FeedEndpoint(c echo.Context) error { // FIXME not needed !
 		return platform.ErrorResponse(c, http.StatusNotFound, fmt.Errorf("can not find '%s/feed.xml'", name))
 	}
 
-	redirectTo := fmt.Sprintf("%s/%s/feed.xml", podops.StorageEndpoint, prod.GUID)
+	redirectTo := fmt.Sprintf("%s/%s/feed.xml", podops.DefaultStorageEndpoint, prod.GUID)
 
 	// track the event
 	platform.TrackEvent(c.Request(), "cdn", "feed", prod.GUID, 1)

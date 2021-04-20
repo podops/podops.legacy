@@ -85,9 +85,10 @@ type (
 //
 
 // GetPublicLocation returns the public url of a resource if it exists on the CDN or an empty string otherwise
+// FIXME is this what it should be?
 func (r *Resource) GetPublicLocation() string {
 	if r.Kind == ResourceAsset {
-		return fmt.Sprintf("%s/c/%s", DefaultCDNEndpoint, r.Location)
+		return fmt.Sprintf("%s/%s", DefaultStorageEndpoint, r.Location)
 	}
 	return ""
 }

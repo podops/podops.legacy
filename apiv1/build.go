@@ -3,7 +3,9 @@ package apiv1
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
+	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
 
@@ -13,9 +15,14 @@ import (
 	"github.com/podops/podops/internal/platform"
 )
 
+var (
+	// full canonical route
+	syncTaskEndpoint string = podops.DefaultCDNEndpoint + "/_w/sync"
+)
+
 // BuildFeedEndpoint starts the build of the feed
 func BuildFeedEndpoint(c echo.Context) error {
-	var req *podops.BuildRequest = new(podops.BuildRequest)
+	var req *podops.BuildRequest = new(podops.BuildRequest) // FIXME change this
 	ctx := platform.NewHttpContext(c)
 
 	if err := c.Bind(req); err != nil {
@@ -23,6 +30,11 @@ func BuildFeedEndpoint(c echo.Context) error {
 	}
 	if err := AuthorizeAccessProduction(ctx, c, ScopeProductionBuild, req.GUID); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
+	}
+
+	validateOnly := false
+	if strings.ToLower(c.QueryParam("v")) == "true" {
+		validateOnly = true
 	}
 
 	p, err := backend.GetProduction(ctx, req.GUID)
@@ -33,25 +45,36 @@ func BuildFeedEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid guid '%s'", req.GUID))
 	}
 
-	// FIXME make this async, make validateOnly a flag
-	if err := feed.Build(ctx, req.GUID, false); err != nil {
+	if err := feed.Build(ctx, req.GUID, validateOnly); err != nil {
 		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("error building feed '%s': %v", req.GUID, err))
 	}
 
-	// update the PRODUCTION record
-	p.BuildDate = util.Timestamp()
-	if err := backend.UpdateProduction(ctx, p); err != nil {
-		return platform.ErrorResponse(c, http.StatusBadRequest, err)
-	}
+	if !validateOnly {
+		// update the PRODUCTION record
+		p.BuildDate = util.Timestamp()
+		if err := backend.UpdateProduction(ctx, p); err != nil {
+			return platform.ErrorResponse(c, http.StatusBadRequest, err)
+		}
 
-	resp := podops.BuildRequest{
-		GUID:         req.GUID,
-		FeedURL:      fmt.Sprintf("%s/c/%s/feed.xml", podops.DefaultCDNEndpoint, req.GUID),
-		FeedAliasURL: fmt.Sprintf("%s/s/%s/feed.xml", podops.DefaultEndpoint, p.Name),
+		// dispatch a request for background sync
+		ir := podops.ImportRequest{
+			GUID:   req.GUID,
+			Source: "feed.xml",
+		}
+		_, err = platform.CreateHttpTask(ctx, syncTaskEndpoint, env.GetString("PODOPS_API_KEY", ""), &ir)
+		if err != nil {
+			return err
+		}
 	}
 
 	// track api access for billing etc
 	platform.TrackEvent(c.Request(), "api", "build", p.GUID, 1)
+
+	resp := podops.BuildRequest{
+		GUID:         req.GUID,
+		FeedURL:      fmt.Sprintf("%s/%s/feed.xml", podops.DefaultStorageEndpoint, req.GUID),
+		FeedAliasURL: fmt.Sprintf("%s/s/%s/feed.xml", podops.DefaultEndpoint, p.Name),
+	}
 
 	return platform.StandardResponse(c, http.StatusCreated, &resp)
 }

@@ -28,8 +28,8 @@ VOLUME /data
 
 # copy the binary
 COPY $BUILD_NAME /usr/bin/$BUILD_NAME
-# make it executable and test it
-RUN chmod +x /usr/bin/$BUILD_NAME ; \
-	$BUILD_NAME version
+
+# make it executable
+RUN chmod +x /usr/bin/$BUILD_NAME
 
 CMD ["/root/usr/bin/run"]

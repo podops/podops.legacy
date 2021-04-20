@@ -3,6 +3,7 @@ package apiv1
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
@@ -103,7 +104,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 	guid := c.Param("id")
 
 	forceFlag := false
-	if c.QueryParam("f") == "true" {
+	if strings.ToLower(c.QueryParam("f")) == "true" {
 		forceFlag = true
 	}
 

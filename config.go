@@ -32,15 +32,15 @@ var (
 	// DefaultCDNEndpoint points to the CDN
 	DefaultCDNEndpoint string = env.GetString("CDN_URL", defaultCDNEndpoint)
 
+	// DefaultStorageEndpoint is the direct link to assets in the CDN
+	DefaultStorageEndpoint string = env.GetString("STORAGE_ENDPOINT", defaultStorageEndpoint)
+
 	// BucketProduction is the canonical name of the production bucket
 	BucketProduction string = env.GetString("BUCKET_PRODUCTION", defaultBucketProduction)
 
 	// BucketCDN is the canonical name of the CDN bucket
 	// FIXME will be obsolete
 	BucketCDN string = env.GetString("BUCKET_CDN", defaultBucketCDN)
-
-	// StorageEndpoint is the direct link to assets in Google Storage
-	StorageEndpoint string = env.GetString("STORAGE_ENDPOINT", defaultStorageEndpoint)
 
 	// StorageLocation is the root location for the cdn
 	StorageLocation = env.GetString("STORAGE_LOCATION", defaultStorageLocation)

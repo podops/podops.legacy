@@ -348,7 +348,7 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 		r.Location = location
 		r.Title = show.Description.Title
 		r.Summary = show.Description.Summary
-		r.Image = show.Image.ResolveURI(podops.StorageEndpoint, show.GUID())
+		r.Image = show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID())
 		//Created     IMMUTABLE !
 		r.Updated = util.Timestamp()
 
@@ -365,7 +365,7 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 		Location:   location,
 		Title:      show.Description.Title,
 		Summary:    show.Description.Summary,
-		Image:      show.Image.ResolveURI(podops.StorageEndpoint, show.GUID()),
+		Image:      show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID()),
 		Created:    now,
 		Updated:    now,
 	}
@@ -404,7 +404,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 		r.Summary = episode.Description.Summary
 		r.Published = episode.PublishDateTimestamp()
 		r.Index = int(index) // episode number
-		r.Image = episode.Image.ResolveURI(podops.StorageEndpoint, episode.Parent())
+		r.Image = episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
 		r.Extra1 = episode.Enclosure.ResolveURI(podops.DefaultCDNEndpoint+"/c", episode.Parent())
 		r.Size = int64(episode.Enclosure.Size)
 		r.Duration = int64(episode.Description.Duration)
@@ -427,7 +427,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 		Summary:    episode.Description.Summary,
 		Published:  episode.PublishDateTimestamp(),
 		Index:      int(index), // episode number
-		Image:      episode.Image.ResolveURI(podops.StorageEndpoint, episode.Parent()),
+		Image:      episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent()),
 		Extra1:     episode.Enclosure.ResolveURI(podops.DefaultCDNEndpoint+"/c", episode.Parent()),
 		Size:       int64(episode.Enclosure.Size),
 		Duration:   int64(episode.Description.Duration),
