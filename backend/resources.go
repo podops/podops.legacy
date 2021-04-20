@@ -163,7 +163,7 @@ func UpdateAsset(ctx context.Context, name, guid, kind, production, location, co
 }
 
 // DeleteResource deletes a resource and it's backing .yaml file
-func DeleteResource(ctx context.Context, guid string) error {
+func DeleteResource(ctx context.Context, prod, kind, guid string) error {
 	r, err := GetResource(ctx, guid)
 	if err != nil {
 		return err
@@ -177,12 +177,6 @@ func DeleteResource(ctx context.Context, guid string) error {
 	}
 
 	// validate the production after deleting a resource
-	prod := ""
-	if r.Kind == podops.ResourceShow {
-		prod = r.GUID
-	} else {
-		prod = r.ParentGUID
-	}
 	if err = ValidateProduction(ctx, prod); err != nil {
 		p, err := GetProduction(ctx, prod)
 		if err != nil {
@@ -193,7 +187,7 @@ func DeleteResource(ctx context.Context, guid string) error {
 	}
 
 	if r.Kind == podops.ResourceAsset {
-		return RemoveAsset(ctx, r.GUID, r.Location)
+		return RemoveAsset(ctx, prod, kind, r.GUID)
 	}
 	return RemoveResource(ctx, r.Location)
 }
@@ -323,14 +317,11 @@ func RemoveResource(ctx context.Context, path string) error {
 }
 
 // RemoveAsset removes a asset from Cloud Storage
-func RemoveAsset(ctx context.Context, prod, path string) error {
+func RemoveAsset(ctx context.Context, prod, kind, guid string) error {
 
+	uri := fmt.Sprintf("%s/%s/%s/%s", syncTaskEndpoint, prod, kind, guid)
 	// dispatch a request for background deletion
-	ir := podops.ImportRequest{
-		GUID: prod,
-		Dest: path,
-	}
-	_, err := p.CreateHttpTask(ctx, tasks.HttpMethod_DELETE, syncTaskEndpoint, env.GetString("PODOPS_API_KEY", ""), &ir)
+	_, err := p.CreateHttpTask(ctx, tasks.HttpMethod_DELETE, uri, env.GetString("PODOPS_API_KEY", ""), nil)
 
 	return err
 }

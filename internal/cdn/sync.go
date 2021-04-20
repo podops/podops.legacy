@@ -13,6 +13,8 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
+	"github.com/podops/podops/backend"
+	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/platform"
 )
 
@@ -43,26 +45,25 @@ func SyncTaskEndpoint(c echo.Context) error {
 
 // DeleteTaskEndpoint removes files from the CDN
 func DeleteTaskEndpoint(c echo.Context) error {
-	var req podops.ImportRequest
-
-	err := c.Bind(&req)
-	if err != nil {
-		// just report and return, resending will not change anything
-		platform.ReportError(err)
-		return c.NoContent(http.StatusOK)
-	}
-
-	if req.GUID == "" || req.Dest == "" {
-		return c.NoContent(http.StatusBadRequest)
-	}
-
 	ctx := platform.NewHttpContext(c)
 
-	if err := apiv1.AuthorizeAccessProduction(ctx, c, apiv1.ScopeAPIAdmin, req.GUID); err != nil {
+	prod := c.Param("prod")
+	kind := c.Param("kind")
+	guid := c.Param("id")
+
+	if !apiv1.ValidateNotEmpty(prod, kind, guid) {
+		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
+	}
+	if err := apiv1.AuthorizeAccessResource(ctx, c, apiv1.ScopeAPIAdmin, guid); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
-	status := DeleteResource(ctx, req.GUID, req.Dest)
+	r, err := backend.GetResource(ctx, guid)
+	if err != nil {
+		return platform.ErrorResponse(c, http.StatusBadRequest, err)
+	}
+
+	status := DeleteResource(ctx, prod, r.Location)
 	return c.NoContent(status)
 }
 
@@ -98,6 +99,11 @@ func SyncResource(ctx context.Context, prod, src string) int {
 }
 
 // DeleteResource removes a resource from the CDN
-func DeleteResource(ctx context.Context, prod, path string) int {
+func DeleteResource(ctx context.Context, prod, location string) int {
+	path := filepath.Join(podops.StorageLocation, location)
+	err := os.Remove(path)
+	if err != nil {
+		return http.StatusInternalServerError
+	}
 	return http.StatusOK
 }

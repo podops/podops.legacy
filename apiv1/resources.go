@@ -47,7 +47,7 @@ func GetResourceEndpoint(c echo.Context) error {
 	kind := c.Param("kind")
 	guid := c.Param("id")
 
-	if !validateNotEmpty(prod, kind, guid) {
+	if !ValidateNotEmpty(prod, kind, guid) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
@@ -76,7 +76,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 	prod := c.Param("prod")
 	kind := c.Param("kind")
 
-	if !validateNotEmpty(prod, kind) {
+	if !ValidateNotEmpty(prod, kind) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
@@ -113,7 +113,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		action = "rsrc_update"
 	}
 
-	if !validateNotEmpty(prod, kind, guid) {
+	if !ValidateNotEmpty(prod, kind, guid) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
@@ -211,16 +211,14 @@ func DeleteResourceEndpoint(c echo.Context) error {
 	kind := c.Param("kind")
 	guid := c.Param("id")
 
-	if !validateNotEmpty(prod, kind, guid) {
+	if !ValidateNotEmpty(prod, kind, guid) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
-
 	if err := AuthorizeAccessResource(ctx, c, ScopeResourceWrite, guid); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
-	// FIXME prod, kind are ignored, assumption is that guid is globally unique ...
-	if err := backend.DeleteResource(ctx, guid); err != nil {
+	if err := backend.DeleteResource(ctx, prod, kind, guid); err != nil {
 		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 

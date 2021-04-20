@@ -34,7 +34,7 @@ func setup() *echo.Echo {
 	webhook := e.Group(apiv1.WebhookNamespacePrefix)
 	webhook.POST(apiv1.ImportTask, cdn.ImportTaskEndpoint)
 	webhook.POST(apiv1.SyncTask, cdn.SyncTaskEndpoint)
-	webhook.DELETE(apiv1.SyncTask, cdn.DeleteTaskEndpoint)
+	webhook.DELETE(apiv1.DeleteTask, cdn.DeleteTaskEndpoint)
 	webhook.POST(apiv1.UploadRoute, cdn.UploadEndpoint)
 
 	// redirect to the real feed.xml path

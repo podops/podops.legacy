@@ -57,6 +57,8 @@ const (
 	ImportTask = "/import"
 	// SyncTask route to SyncTaskEndpoint
 	SyncTask = "/sync"
+	// DeleteTask route to DeleteTaskEndpoint
+	DeleteTask = "/sync/:prod/:kind/:id"
 
 	// BuildRoute route to BuildEndpoint
 	BuildRoute = "/build"
