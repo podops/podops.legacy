@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
 
 	"github.com/podops/podops"
@@ -60,14 +59,11 @@ func ImportResource(ctx context.Context, prod, src, original string) int {
 	// update the inventory
 	meta := metadata.ExtractMetadataFromResponse(resp)
 
-	temp := podops.Asset{
-		URI: src,
-		Rel: podops.ResourceTypeImport,
-	}
-	parts := strings.Split(temp.FingerprintURI(prod), "/")
+	parts := strings.Split(metadata.FingerprintWithExt(prod, src), "/")
+	meta.Name = parts[len(parts)-1:][0] // hashed name + ext
 
-	meta.Name = parts[len(parts)-1:][0]
-	meta.GUID = util.Checksum(src)
+	meta.GUID = metadata.FingerprintURI(prod, src)
+	meta.ParentGUID = prod
 
 	relPath := prod + "/" + meta.Name
 	path := filepath.Join(podops.StorageLocation, relPath)
@@ -104,12 +100,8 @@ func ImportResource(ctx context.Context, prod, src, original string) int {
 		meta.Duration, _ = metadata.CalculateLength(path)
 	}
 
-	if err := backend.UpdateResourceMetadata(ctx, meta); err != nil {
-		platform.ReportError(fmt.Errorf("error updating metadata: %v", err))
-		return http.StatusBadRequest
-	}
-
-	if err := backend.UpdateAsset(ctx, meta.Name, meta.GUID, podops.ResourceAsset, prod, relPath, meta.ContentType, original, meta.Etag, meta.Size, meta.Duration); err != nil {
+	// update the inventory
+	if err := backend.UpdateAsset(ctx, meta, prod, relPath); err != nil {
 		platform.ReportError(fmt.Errorf("error updating inventory: %v", err))
 		return http.StatusBadRequest
 	}

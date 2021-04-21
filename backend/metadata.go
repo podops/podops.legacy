@@ -15,8 +15,8 @@ const (
 	DatastoreMetadata = "METADATA"
 )
 
-// GetResourceMetadata retrieves the metadata for a resource
-func GetResourceMetadata(ctx context.Context, guid string) (*metadata.Metadata, error) {
+// GetMetadata retrieves the metadata for a resource
+func GetMetadata(ctx context.Context, guid string) (*metadata.Metadata, error) {
 	var m metadata.Metadata
 
 	if err := platform.DataStore().Get(ctx, metadataKey(guid), &m); err != nil {
@@ -28,17 +28,17 @@ func GetResourceMetadata(ctx context.Context, guid string) (*metadata.Metadata, 
 	return &m, nil
 }
 
-// UpdateResourceMetadata does what the name suggests
-func UpdateResourceMetadata(ctx context.Context, m *metadata.Metadata) error {
+// UpdateMetadata does what the name suggests
+func UpdateMetadata(ctx context.Context, m *metadata.Metadata) error {
 	if _, err := platform.DataStore().Put(ctx, metadataKey(m.GUID), m); err != nil {
 		return err
 	}
 	return nil
 }
 
-// DeleteResource deletes a resource and it's backing .yaml file
-func DeleteResourceMetadata(ctx context.Context, guid string) error {
-	m, err := GetResourceMetadata(ctx, guid)
+// DeleteMetadata deletes a resource and it's backing .yaml file
+func DeleteMetadata(ctx context.Context, guid string) error {
+	m, err := GetMetadata(ctx, guid)
 	if err != nil {
 		return err
 	}

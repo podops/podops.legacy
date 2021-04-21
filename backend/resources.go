@@ -21,6 +21,7 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/loader"
+	"github.com/podops/podops/internal/metadata"
 	p "github.com/podops/podops/internal/platform"
 )
 
@@ -123,24 +124,14 @@ func UpdateResource(ctx context.Context, name, guid, kind, production, location 
 }
 
 // UpdateAsset updates the resource inventory
-func UpdateAsset(ctx context.Context, name, guid, kind, production, location, contentType, original, etag string, size, duration int64) error {
-	r, _ := GetResource(ctx, guid)
-
-	_kind, err := NormalizeKind(kind)
-	if err != nil {
-		return err
-	}
+func UpdateAsset(ctx context.Context, meta *metadata.Metadata, production, location string) error {
+	r, _ := GetResource(ctx, meta.GUID)
 
 	if r != nil {
 		// resource already exists, just update the inventory
-		if r.Kind != _kind {
-			return fmt.Errorf("can not modify resource: expected '%s', received '%s'", r.Kind, _kind)
-		}
-		r.Name = name
+		r.Name = meta.Name
 		r.ParentGUID = production
 		r.Location = location
-		r.Extra1 = original
-		r.Extra2 = etag
 		r.Updated = util.Timestamp()
 
 		return updateResource(ctx, r)
@@ -149,15 +140,17 @@ func UpdateAsset(ctx context.Context, name, guid, kind, production, location, co
 	// create a new inventory entry
 	now := util.Timestamp()
 	rsrc := podops.Resource{
-		Name:       name,
-		GUID:       guid,
-		Kind:       _kind,
+		Name:       meta.Name,
+		GUID:       meta.GUID,
+		Kind:       podops.ResourceAsset,
 		ParentGUID: production,
 		Location:   location,
-		Extra1:     original,
-		Extra2:     etag,
 		Created:    now,
 		Updated:    now,
+	}
+
+	if err := UpdateMetadata(ctx, meta); err != nil {
+		return err
 	}
 	return updateResource(ctx, &rsrc)
 }
@@ -187,7 +180,7 @@ func DeleteResource(ctx context.Context, prod, kind, guid string) error {
 	}
 
 	if r.Kind == podops.ResourceAsset {
-		if err := DeleteResourceMetadata(ctx, guid); err != nil {
+		if err := DeleteMetadata(ctx, guid); err != nil {
 			return err
 		}
 		return RemoveAsset(ctx, prod, r.Location)
@@ -237,14 +230,14 @@ func GetResourceContent(ctx context.Context, guid string) (interface{}, error) {
 	}
 
 	if r.Kind == podops.ResourceAsset {
-		meta, err := GetResourceMetadata(ctx, guid)
+		meta, err := GetMetadata(ctx, guid)
 		if err != nil {
 			return nil, err
 		}
 
 		asset := podops.Asset{
 			URI:   r.GetPublicLocation(),
-			Title: r.Extra1,
+			Title: r.Name,
 			Type:  meta.ContentType,
 			Size:  int(meta.Size),
 			Rel:   podops.ResourceTypeLocal,
@@ -350,7 +343,7 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 		r.Location = location
 		r.Title = show.Description.Title
 		r.Summary = show.Description.Summary
-		r.Extra3 = show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID())
+		r.Extra2 = show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID())
 		//Created     IMMUTABLE !
 		r.Updated = util.Timestamp()
 
@@ -367,7 +360,7 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 		Location:   location,
 		Title:      show.Description.Title,
 		Summary:    show.Description.Summary,
-		Extra3:     show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID()),
+		Extra2:     show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID()),
 		Created:    now,
 		Updated:    now,
 	}
@@ -407,7 +400,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 		r.Published = episode.PublishDateTimestamp()
 		r.Index = int(index) // episode number
 		r.Extra1 = episode.Enclosure.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
-		r.Extra3 = episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
+		r.Extra2 = episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
 		r.Updated = util.Timestamp()
 
 		return updateResource(ctx, r)
@@ -428,7 +421,7 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 		Published:  episode.PublishDateTimestamp(),
 		Index:      int(index), // episode number
 		Extra1:     episode.Enclosure.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent()),
-		Extra3:     episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent()),
+		Extra2:     episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent()),
 		Created:    now,
 		Updated:    now,
 	}

@@ -36,9 +36,9 @@ type (
 		Published int64  `json:"published"`
 
 		// flex fields that can stored different information depending on the resource type
-		Extra1   string `json:"extra1"`   // These two attributes are just placeholders for any kind of resource specific data
-		Extra2   string `json:"extra2"`   // One possible use is to e.g. store the URL of an episodes media file here.
-		Extra3   string `json:"extra3"`   // One possible use is to e.g. store the URL of an episodes media file here
+		Extra1 string `json:"extra1"` // These two attributes are just placeholders for any kind of resource specific data
+		Extra2 string `json:"extra2"` // One possible use is to e.g. store the URL of an episodes media file here.
+		//Extra3   string `json:"extra3"`   // One possible use is to e.g. store the URL of an episodes media file here
 		Location string `json:"location"` // path to the backing resource file (.yaml,.mp3, etc.)
 
 		// internal

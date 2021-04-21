@@ -46,7 +46,7 @@ func GetResourcesCommand(c *cli.Context) error {
 			fmt.Println(assetListing("ID", "NAME", "KIND"))
 			for _, details := range l.Resources {
 				if details.Kind == podops.ResourceAsset {
-					fmt.Println(assetListing(details.GUID, details.Extra1, details.Kind))
+					fmt.Println(assetListing(details.GUID, details.Name, details.Kind))
 				} else {
 					fmt.Println(assetListing(details.GUID, details.Name, details.Kind))
 				}

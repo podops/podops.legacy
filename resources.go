@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fupas/commons/pkg/util"
+	"github.com/podops/podops/internal/metadata"
 )
 
 const (
@@ -209,25 +210,11 @@ func (r *Asset) ResolveURI(cdn, parent string) string {
 		return fmt.Sprintf("%s/%s/%s", cdn, parent, r.URI)
 	}
 	if r.Rel == ResourceTypeImport {
-		id := r.FingerprintURI(parent)
-		return fmt.Sprintf("%s/%s", cdn, id)
-	}
-	if r.Rel == "" || r.Rel == ResourceTypeExternal {
-		return r.URI
+		return fmt.Sprintf("%s/%s", cdn, metadata.FingerprintWithExt(parent, r.URI))
 	}
 
-	// anything else, just return the URI as is ...
+	// r.Rel == ResourceTypeExternal or anything else, just return the URI as is ...
 	return r.URI
-}
-
-// FingerprintURI is used in rewriting the URI when Rel == IMPORT
-func (r *Asset) FingerprintURI(parent string) string {
-	id := util.Checksum(r.URI)
-	parts := strings.Split(r.URI, ".")
-	if len(parts) == 0 {
-		return id
-	}
-	return fmt.Sprintf("%s/%s.%s", parent, id, parts[len(parts)-1])
 }
 
 func (r *Asset) AssetName() string {

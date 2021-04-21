@@ -8,8 +8,10 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
+	"github.com/fupas/commons/pkg/util"
 	"github.com/tcolgate/mp3"
 )
 
@@ -22,6 +24,7 @@ type (
 	Metadata struct {
 		Name        string `json:"name"`
 		GUID        string `json:"guid"`
+		ParentGUID  string `json:"parent_guid"`
 		Size        int64  `json:"size"`
 		Duration    int64  `json:"duration"`
 		ContentType string `json:"content_type"`
@@ -125,4 +128,19 @@ func CalculateLength(path string) (int64, error) {
 		return 0, err
 	}
 	return m.Duration, nil
+}
+
+// FingerprintURI creates a unique uri based on the input
+func FingerprintURI(parent, uri string) string {
+	return util.Checksum(parent + uri)
+}
+
+// FingerprintWithExt creates a unique uri based on the input
+func FingerprintWithExt(parent, uri string) string {
+	id := util.Checksum(parent + uri)
+	parts := strings.Split(uri, ".")
+	if len(parts) == 0 {
+		return id
+	}
+	return fmt.Sprintf("%s/%s.%s", parent, id, parts[len(parts)-1])
 }
