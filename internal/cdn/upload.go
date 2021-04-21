@@ -9,11 +9,10 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/fupas/commons/pkg/util"
-
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/backend"
+	"github.com/podops/podops/internal/metadata"
 	p "github.com/podops/podops/internal/platform"
 )
 
@@ -59,22 +58,16 @@ func UploadEndpoint(c echo.Context) error {
 			}
 			out.Close() // force close to have attributes like size etc correct
 
-			// FIXME get the real metadata
-			contentType := part.Header.Get("content-type")
-			meta := podops.ResourceMetadata{
-				Name:        part.FileName(),
-				GUID:        util.Checksum(location),
-				Size:        0,
-				Duration:    backend.CalculateLength(contentType, path),
-				ContentType: contentType,
-				Etag:        "", // FIXME hash of Name + Size + Timestamp?
-			}
-
-			// update the inventory
-			if err := backend.UpdateResourceMetadata(ctx, &meta); err != nil {
+			// extract the metadata from the file
+			meta, err := metadata.ExtractMetadataFromFile(path)
+			if err != nil {
 				return p.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
-			if err := backend.UpdateAsset(ctx, meta.Name, meta.GUID, podops.ResourceAsset, prod, location, contentType, meta.Name, meta.Etag, meta.Size, meta.Duration); err != nil {
+			// update the inventory
+			if err := backend.UpdateResourceMetadata(ctx, meta); err != nil {
+				return p.ErrorResponse(c, http.StatusInternalServerError, err)
+			}
+			if err := backend.UpdateAsset(ctx, meta.Name, meta.GUID, podops.ResourceAsset, prod, location, meta.ContentType, meta.Name, meta.Etag, meta.Size, meta.Duration); err != nil {
 				return p.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
 		}

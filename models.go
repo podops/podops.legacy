@@ -52,17 +52,6 @@ type (
 		Resources []*Resource `json:"resources" `
 	}
 
-	// ResourceMetadata keeps basic metadata of a cdn resource
-	ResourceMetadata struct {
-		Name        string `json:"name"`
-		GUID        string `json:"guid"`
-		Size        int64  `json:"size"`
-		Duration    int64  `json:"duration"`
-		ContentType string `json:"content_type"`
-		Etag        string `json:"etag"`
-		Timestamp   int64  `json:"timestamp"`
-	}
-
 	// BuildRequest initiates the build of the feed
 	BuildRequest struct {
 		GUID         string `json:"guid" binding:"required"`

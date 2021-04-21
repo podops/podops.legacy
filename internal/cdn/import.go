@@ -15,6 +15,7 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/backend"
+	"github.com/podops/podops/internal/metadata"
 	"github.com/podops/podops/internal/platform"
 )
 
@@ -57,7 +58,7 @@ func ImportResource(ctx context.Context, prod, src, original string) int {
 	}
 
 	// update the inventory
-	meta := backend.ExtractMetadataFromResponse(resp)
+	meta := metadata.ExtractMetadataFromResponse(resp)
 
 	temp := podops.Asset{
 		URI: src,
@@ -99,7 +100,9 @@ func ImportResource(ctx context.Context, prod, src, original string) int {
 	out.Close()
 
 	// calculate the length of an audio file, if it is an audio file
-	meta.Duration = backend.CalculateLength(meta.ContentType, path)
+	if meta.IsMP3() {
+		meta.Duration, _ = metadata.CalculateLength(path)
+	}
 
 	if err := backend.UpdateResourceMetadata(ctx, meta); err != nil {
 		platform.ReportError(fmt.Errorf("error updating metadata: %v", err))
