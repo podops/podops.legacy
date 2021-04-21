@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
 
 	"github.com/podops/podops"
@@ -63,6 +64,8 @@ func UploadEndpoint(c echo.Context) error {
 			if err != nil {
 				return p.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
+			meta.GUID = util.Checksum(meta.Name)
+
 			// update the inventory
 			if err := backend.UpdateResourceMetadata(ctx, meta); err != nil {
 				return p.ErrorResponse(c, http.StatusInternalServerError, err)

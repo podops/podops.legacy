@@ -141,9 +141,6 @@ func UpdateAsset(ctx context.Context, name, guid, kind, production, location, co
 		r.Location = location
 		r.Extra1 = original
 		r.Extra2 = etag
-		r.ContentType = contentType
-		r.Size = size
-		r.Duration = duration
 		r.Updated = util.Timestamp()
 
 		return updateResource(ctx, r)
@@ -152,18 +149,15 @@ func UpdateAsset(ctx context.Context, name, guid, kind, production, location, co
 	// create a new inventory entry
 	now := util.Timestamp()
 	rsrc := podops.Resource{
-		Name:        name,
-		GUID:        guid,
-		Kind:        _kind,
-		ParentGUID:  production,
-		Location:    location,
-		Extra1:      original,
-		Extra2:      etag,
-		ContentType: contentType,
-		Size:        size,
-		Duration:    duration,
-		Created:     now,
-		Updated:     now,
+		Name:       name,
+		GUID:       guid,
+		Kind:       _kind,
+		ParentGUID: production,
+		Location:   location,
+		Extra1:     original,
+		Extra2:     etag,
+		Created:    now,
+		Updated:    now,
 	}
 	return updateResource(ctx, &rsrc)
 }
@@ -243,11 +237,16 @@ func GetResourceContent(ctx context.Context, guid string) (interface{}, error) {
 	}
 
 	if r.Kind == podops.ResourceAsset {
+		meta, err := GetResourceMetadata(ctx, guid)
+		if err != nil {
+			return nil, err
+		}
+
 		asset := podops.Asset{
 			URI:   r.GetPublicLocation(),
 			Title: r.Extra1,
-			Type:  r.ContentType,
-			Size:  int(r.Size),
+			Type:  meta.ContentType,
+			Size:  int(meta.Size),
 			Rel:   podops.ResourceTypeLocal,
 		}
 		return &asset, nil
@@ -351,7 +350,7 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 		r.Location = location
 		r.Title = show.Description.Title
 		r.Summary = show.Description.Summary
-		r.Image = show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID())
+		r.Extra3 = show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID())
 		//Created     IMMUTABLE !
 		r.Updated = util.Timestamp()
 
@@ -368,7 +367,7 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 		Location:   location,
 		Title:      show.Description.Title,
 		Summary:    show.Description.Summary,
-		Image:      show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID()),
+		Extra3:     show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID()),
 		Created:    now,
 		Updated:    now,
 	}
@@ -407,10 +406,8 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 		r.Summary = episode.Description.Summary
 		r.Published = episode.PublishDateTimestamp()
 		r.Index = int(index) // episode number
-		r.Image = episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
 		r.Extra1 = episode.Enclosure.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
-		r.Size = int64(episode.Enclosure.Size)
-		r.Duration = int64(episode.Description.Duration)
+		r.Extra3 = episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
 		r.Updated = util.Timestamp()
 
 		return updateResource(ctx, r)
@@ -430,10 +427,8 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 		Summary:    episode.Description.Summary,
 		Published:  episode.PublishDateTimestamp(),
 		Index:      int(index), // episode number
-		Image:      episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent()),
 		Extra1:     episode.Enclosure.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent()),
-		Size:       int64(episode.Enclosure.Size),
-		Duration:   int64(episode.Description.Duration),
+		Extra3:     episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent()),
 		Created:    now,
 		Updated:    now,
 	}
