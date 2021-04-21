@@ -12,6 +12,7 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
+	"github.com/podops/podops/internal/metadata"
 )
 
 // GetResourcesCommand list all resource associated with a show
@@ -46,7 +47,7 @@ func GetResourcesCommand(c *cli.Context) error {
 			fmt.Println(assetListing("ID", "NAME", "KIND"))
 			for _, details := range l.Resources {
 				if details.Kind == podops.ResourceAsset {
-					fmt.Println(assetListing(details.GUID, details.Name, details.Kind))
+					fmt.Println(assetListing(details.GUID, metadata.LocalNamePart(details.OriginURI), details.Kind))
 				} else {
 					fmt.Println(assetListing(details.GUID, details.Name, details.Kind))
 				}

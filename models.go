@@ -29,18 +29,15 @@ type (
 		GUID       string `json:"guid"`
 		Kind       string `json:"kind"`
 		ParentGUID string `json:"parent_guid"`
-
-		// metadata used in e.g. the web UI
+		// content
 		Title     string `json:"title"`
 		Summary   string `json:"summary"`
 		Published int64  `json:"published"`
-
-		// flex fields that can stored different information depending on the resource type
-		Extra1 string `json:"extra1"` // These two attributes are just placeholders for any kind of resource specific data
-		Extra2 string `json:"extra2"` // One possible use is to e.g. store the URL of an episodes media file here.
-		//Extra3   string `json:"extra3"`   // One possible use is to e.g. store the URL of an episodes media file here
-		Location string `json:"location"` // path to the backing resource file (.yaml,.mp3, etc.)
-
+		// metadata
+		OriginURI    string `json:"origin"`    // e.g. the import URI
+		Location     string `json:"location"`  // path to the backing resource file (.yaml,.mp3, etc.)
+		EnclosureURI string `json:"enclosure"` // used in episode
+		ImageURI     string `json:"image"`     // used in show, episode
 		// internal
 		Index   int   `json:"index"` // A running number that can be used to sort resources, e.g. episode number
 		Created int64 `json:"-"`

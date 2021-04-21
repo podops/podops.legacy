@@ -23,6 +23,7 @@ type (
 	// Metadata keeps basic metadata of a cdn resource
 	Metadata struct {
 		Name        string `json:"name"`
+		Origin      string `json:"origin"`
 		GUID        string `json:"guid"`
 		ParentGUID  string `json:"parent_guid"`
 		Size        int64  `json:"size"`
@@ -70,6 +71,7 @@ func ExtractMetadataFromFile(path string) (*Metadata, error) {
 	// the basics
 	meta := Metadata{
 		Name:        fi.Name(),
+		Origin:      fi.Name(),
 		Size:        fi.Size(),
 		ContentType: defaultContentType,
 		Timestamp:   fi.ModTime().Unix(),
@@ -143,4 +145,10 @@ func FingerprintWithExt(parent, uri string) string {
 		return id
 	}
 	return fmt.Sprintf("%s/%s.%s", parent, id, parts[len(parts)-1])
+}
+
+// LocalNamePart returns the part after the last /, if any
+func LocalNamePart(uri string) string {
+	parts := strings.Split(uri, "/")
+	return parts[len(parts)-1:][0]
 }

@@ -65,6 +65,7 @@ func UploadEndpoint(c echo.Context) error {
 			}
 			meta.GUID = metadata.FingerprintURI(prod, meta.Name)
 			meta.ParentGUID = prod
+			meta.Origin = location
 
 			// update the inventory
 			if err := backend.UpdateAsset(ctx, meta, prod, location); err != nil {

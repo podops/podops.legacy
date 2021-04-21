@@ -79,7 +79,7 @@ func LoadShow(ctx context.Context, key string) (interface{}, error) {
 				Email: show.Description.Owner.Email,
 			},
 		},
-		Image: r.Extra2,
+		Image: r.ImageURI,
 		// Episodes are loaded by hthe schema.resolver implementation in order make use of the dataloader
 	}, nil
 }
@@ -130,7 +130,7 @@ func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 			Link:        episode.Description.Link.URI,
 			Duration:    episode.Description.Duration,
 		},
-		Image: r.Extra2,
+		Image: r.ImageURI,
 		Enclosure: &model.Enclosure{
 			Link: episode.Enclosure.URI,
 			Type: episode.Enclosure.Type,

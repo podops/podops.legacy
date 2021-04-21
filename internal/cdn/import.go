@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 
@@ -59,9 +58,8 @@ func ImportResource(ctx context.Context, prod, src, original string) int {
 	// update the inventory
 	meta := metadata.ExtractMetadataFromResponse(resp)
 
-	parts := strings.Split(metadata.FingerprintWithExt(prod, src), "/")
-	meta.Name = parts[len(parts)-1:][0] // hashed name + ext
-
+	meta.Name = metadata.LocalNamePart(metadata.FingerprintWithExt(prod, src))
+	meta.Origin = src
 	meta.GUID = metadata.FingerprintURI(prod, src)
 	meta.ParentGUID = prod
 
