@@ -94,6 +94,11 @@ func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 		return nil, fmt.Errorf("episode '%s' not found", key)
 	}
 
+	meta, err := backend.GetMetadataForResource(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+
 	e, err := backend.GetResourceContent(ctx, r.GUID)
 	if err != nil {
 		return nil, err
@@ -128,13 +133,13 @@ func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 			Summary:     episode.Description.Summary,
 			Description: &episode.Description.EpisodeText,
 			Link:        episode.Description.Link.URI,
-			Duration:    episode.Description.Duration,
+			Duration:    int(meta.Duration), // episode.Description.Duration,
 		},
 		Image: r.ImageURI,
 		Enclosure: &model.Enclosure{
-			Link: episode.Enclosure.URI,
-			Type: episode.Enclosure.Type,
-			Size: episode.Enclosure.Size,
+			Link: r.EnclosureURI, //episode.Enclosure.URI,
+			Type: r.EnclosureRel, // episode.Enclosure.Type,
+			Size: int(meta.Size), // episode.Enclosure.Size,
 		},
 		Production: &model.Production{
 			GUID:  p.GUID,

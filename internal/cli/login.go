@@ -11,7 +11,7 @@ import (
 
 const (
 	loginEndpoint  = "/_a/login"
-	logoutEndpoint = "/_a/logout"
+	logoutEndpoint = "/logout"
 	authEndpoint   = "/_a/auth"
 )
 

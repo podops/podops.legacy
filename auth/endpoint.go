@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/platform"
 )
@@ -138,7 +139,7 @@ func LogoutRequestEndpoint(c echo.Context) error {
 // LoginConfirmationEndpoint validates an email.
 //
 // GET /login/:token
-// status 204: account is confirmed, next step started
+// status 307: account is confirmed, redirect to podops.dev/confirmed
 // status 400: the request could not be understood by the server due to malformed syntax
 // status 401: token is wrong
 // status 403: token is expired or has already been used
@@ -166,8 +167,8 @@ func LoginConfirmationEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
-	// status 204: account is confirmed, email with auth token sent
-	return c.NoContent(http.StatusNoContent)
+	// status 307: account is confirmed, email with auth token sent, redirect now
+	return c.Redirect(http.StatusTemporaryRedirect, fmt.Sprintf("%s/confirmed", podops.DefaultEndpoint))
 }
 
 // GetAuthorizationEndpoint exchanges a temporary confirmation token for a 'real' token.

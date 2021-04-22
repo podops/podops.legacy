@@ -25,15 +25,19 @@ func setup() *echo.Echo {
 	e := echo.New()
 
 	// add and configure the middlewares
-	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 	e.Use(middleware.Recover())
+	// e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig)) // needed for the GraphQL endpoints
 
 	// admin endpoints
+	e.GET(apiv1.LoginConfirmationRoute, auth.LoginConfirmationEndpoint)
+	e.POST(apiv1.LogoutRequestRoute, auth.LogoutRequestEndpoint)
+
 	admin := e.Group(apiv1.AdminNamespacePrefix)
 	admin.POST(apiv1.LoginRequestRoute, auth.LoginRequestEndpoint)
-	admin.POST(apiv1.LogoutRequestRoute, auth.LogoutRequestEndpoint)
-	admin.GET(apiv1.LoginConfirmationRoute, auth.LoginConfirmationEndpoint)
 	admin.POST(apiv1.GetAuthorizationRoute, auth.GetAuthorizationEndpoint)
+
+	admin.GET(apiv1.LoginConfirmationRoute, auth.LoginConfirmationEndpoint)
+	admin.POST(apiv1.LogoutRequestRoute, auth.LogoutRequestEndpoint)
 
 	// api endpoints
 	apiEndpoints := e.Group(apiv1.NamespacePrefix)
@@ -48,7 +52,7 @@ func setup() *echo.Echo {
 	apiEndpoints.POST(apiv1.BuildRoute, apiv1.BuildFeedEndpoint)
 
 	// grapghql endpoints
-	gql := e.Group(apiv1.GraphqlNamespacePrefix)
+	gql := e.Group(apiv1.GraphqlNamespacePrefix, middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 	gql.POST(apiv1.GraphqlRoute, graphql.GraphqlEndpoint())
 	gql.GET(apiv1.GraphqlPlaygroundRoute, graphql.GraphqlPlaygroundEndpoint())
 

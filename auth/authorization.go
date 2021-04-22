@@ -126,6 +126,8 @@ func CheckAuthorization(ctx context.Context, c echo.Context, scope string) (*Aut
 		return nil, errordef.ErrNotAuthorized
 	}
 
+	// FIXME check it auth is still valid !
+
 	if !hasScope(auth.Scope, scope) {
 		return nil, errordef.ErrNotAuthorized
 	}
