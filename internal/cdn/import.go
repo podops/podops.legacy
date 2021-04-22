@@ -12,6 +12,7 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
+	"github.com/podops/podops/auth"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/metadata"
 	"github.com/podops/podops/internal/platform"
@@ -34,7 +35,7 @@ func ImportTaskEndpoint(c echo.Context) error {
 
 	ctx := platform.NewHttpContext(c)
 
-	if err := apiv1.AuthorizeAccessProduction(ctx, c, apiv1.ScopeAPIAdmin, req.GUID); err != nil {
+	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, req.GUID); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 

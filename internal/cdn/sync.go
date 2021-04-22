@@ -13,6 +13,7 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
+	"github.com/podops/podops/auth"
 	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/platform"
 )
@@ -34,7 +35,7 @@ func SyncTaskEndpoint(c echo.Context) error {
 
 	ctx := platform.NewHttpContext(c)
 
-	if err := apiv1.AuthorizeAccessProduction(ctx, c, apiv1.ScopeAPIAdmin, req.GUID); err != nil {
+	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, req.GUID); err != nil {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
@@ -52,7 +53,7 @@ func DeleteTaskEndpoint(c echo.Context) error {
 	if !apiv1.ValidateNotEmpty(prod, location) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
-	if err := apiv1.AuthorizeAccessProduction(ctx, c, apiv1.ScopeAPIAdmin, prod); err != nil {
+	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, prod); err != nil {
 		// validate against production only, the resource is already gone by now
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}

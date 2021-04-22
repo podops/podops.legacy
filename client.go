@@ -133,5 +133,5 @@ func (co ClientOption) Merge(opts *ClientOption) *ClientOption {
 
 // IsValid checks if all configuration parameters are provided
 func (co ClientOption) IsValid() bool {
-	return co.Token != "" && co.APIEndpoint != "" && co.CDNEndpoint != "" && co.DefaultEndpoint != ""
+	return co.APIEndpoint != "" && co.CDNEndpoint != "" && co.DefaultEndpoint != ""
 }

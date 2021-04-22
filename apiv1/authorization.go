@@ -16,7 +16,6 @@ const (
 	ScopeProductionBuild = "production:build"
 	ScopeResourceRead    = "resource:read"
 	ScopeResourceWrite   = "resource:write"
-	ScopeAPIAdmin        = "api:admin"
 )
 
 // AuthorizeAccess verifies that the user has the required roles in her authorization
@@ -37,10 +36,16 @@ func AuthorizeAccessProduction(ctx context.Context, c echo.Context, scope, claim
 		return err
 	}
 
+	if auth.HasAdminScope() {
+		// can access any production
+		return nil
+	}
+
 	p, err := backend.GetProduction(ctx, claim)
 	if err != nil || p == nil {
 		return errordef.ErrNoSuchProduction
 	}
+
 	if p.Owner != auth.ClientID {
 		return errordef.ErrNotAuthorized
 	}
@@ -54,6 +59,11 @@ func AuthorizeAccessResource(ctx context.Context, c echo.Context, scope, claim s
 	auth, err := auth.CheckAuthorization(ctx, c, scope)
 	if err != nil {
 		return err
+	}
+
+	if auth.HasAdminScope() {
+		// can access any resource
+		return nil
 	}
 
 	r, err := backend.GetResource(ctx, claim)

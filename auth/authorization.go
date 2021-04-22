@@ -29,6 +29,9 @@ const (
 	DefaultAuthenticationExpiration = 10
 	// DefaultAuthorizationExpiration in days
 	DefaultAuthorizationExpiration = 90
+
+	// default scopes
+	ScopeAPIAdmin = "api:admin"
 )
 
 type (
@@ -62,13 +65,18 @@ func namedKey(part1, part2 string) string {
 
 // IsValid verifies that the Authorization is still valid, i.e. is not expired and not revoked.
 func (a *Authorization) IsValid() bool {
-	if a.Revoked == true {
+	if a.Revoked {
 		return false
 	}
 	if a.Expires < util.Timestamp() {
 		return false
 	}
 	return true
+}
+
+// HasAdminScope checks if the authorization includes scope 'api:admin'
+func (a *Authorization) HasAdminScope() bool {
+	return strings.Contains(a.Scope, ScopeAPIAdmin)
 }
 
 // GetBearerToken extracts the bearer token
