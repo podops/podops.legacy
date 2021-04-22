@@ -19,7 +19,7 @@ import (
 
 // SyncTaskEndpoint syncs files between the cloud storage and the CDN
 func SyncTaskEndpoint(c echo.Context) error {
-	var req podops.ImportRequest
+	var req podops.SyncRequest
 
 	err := c.Bind(&req)
 	if err != nil {

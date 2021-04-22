@@ -473,10 +473,9 @@ func EnsureAsset(ctx context.Context, production string, rsrc *podops.Asset) err
 		// FIXME compare to ResourceMetadata first ...
 
 		// dispatch a request for background import
-		ir := podops.ImportRequest{
-			GUID:     production,
-			Source:   rsrc.URI,
-			Original: rsrc.AssetName(),
+		ir := podops.SyncRequest{
+			GUID:   production,
+			Source: rsrc.URI,
 		}
 		_, err = p.CreateHttpTask(ctx, tasks.HttpMethod_POST, importTaskEndpoint, env.GetString("PODOPS_API_KEY", ""), &ir)
 		if err != nil {

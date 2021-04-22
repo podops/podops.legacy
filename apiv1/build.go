@@ -59,7 +59,7 @@ func BuildFeedEndpoint(c echo.Context) error {
 		}
 
 		// dispatch a request for background sync
-		ir := podops.ImportRequest{
+		ir := podops.SyncRequest{
 			GUID:   req.GUID,
 			Source: "feed.xml",
 		}

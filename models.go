@@ -57,12 +57,11 @@ type (
 		FeedAliasURL string `json:"alias"`
 	}
 
-	// ImportRequest is used by the import task
-	ImportRequest struct {
-		GUID     string `json:"guid" binding:"required"`
-		Source   string `json:"src" binding:"required"`
-		Original string `json:"original" binding:"required"` // FIXME can we drop this ?
-		Dest     string `json:"dest"`
+	// SyncRequest is used by the import and sync task
+	SyncRequest struct {
+		GUID   string `json:"guid" binding:"required"`
+		Source string `json:"src" binding:"required"`
+		Dest   string `json:"dest"`
 	}
 )
 

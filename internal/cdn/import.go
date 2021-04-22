@@ -19,7 +19,7 @@ import (
 
 // ImportTaskEndpoint implements async file import from a remote source into the CDN
 func ImportTaskEndpoint(c echo.Context) error {
-	var req podops.ImportRequest
+	var req podops.SyncRequest
 
 	err := c.Bind(&req)
 	if err != nil {
@@ -28,7 +28,7 @@ func ImportTaskEndpoint(c echo.Context) error {
 		return c.NoContent(http.StatusOK)
 	}
 
-	if req.GUID == "" || req.Source == "" || req.Original == "" {
+	if req.GUID == "" || req.Source == "" {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
@@ -38,12 +38,12 @@ func ImportTaskEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
-	status := ImportResource(ctx, req.GUID, req.Source, req.Original)
+	status := ImportResource(ctx, req.GUID, req.Source)
 	return c.NoContent(status)
 }
 
 // ImportResource imports a resource from src and places it into the CDN
-func ImportResource(ctx context.Context, prod, src, original string) int {
+func ImportResource(ctx context.Context, prod, src string) int {
 	resp, err := http.Get(src)
 	if err != nil {
 		return resp.StatusCode
