@@ -2,10 +2,12 @@ package backend
 
 import (
 	"context"
+	"strings"
 
 	"cloud.google.com/go/datastore"
 	"github.com/fupas/platform/pkg/platform"
 
+	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/metadata"
 )
@@ -26,6 +28,20 @@ func GetMetadata(ctx context.Context, guid string) (*metadata.Metadata, error) {
 		return nil, err
 	}
 	return &m, nil
+}
+
+// GetMetadataForResource retrieves the metadata associated with a resource, if the resource is of type "episode", nil otherwise.
+func GetMetadataForResource(ctx context.Context, guid string) (*metadata.Metadata, error) {
+	r, err := GetResource(ctx, guid)
+	if err != nil {
+		return nil, err
+	}
+	if r.Kind != podops.ResourceEpisode {
+		return nil, nil
+	}
+
+	metaGUID := strings.Split(metadata.LocalNamePart(r.EnclosureURI), ".")[0]
+	return GetMetadata(ctx, metaGUID)
 }
 
 // UpdateMetadata does what the name suggests

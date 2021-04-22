@@ -6,7 +6,6 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/podops/podops"
-	"github.com/podops/podops/internal/validator"
 )
 
 type (
@@ -52,31 +51,40 @@ func LoadGenericResource(data []byte) (*podops.GenericResource, error) {
 }
 
 func loadShowResource(data []byte) (interface{}, string, error) {
-	var r podops.Show
+	var show podops.Show
 
-	err := yaml.Unmarshal([]byte(data), &r)
+	err := yaml.Unmarshal([]byte(data), &show)
 	if err != nil {
 		return nil, "", fmt.Errorf("can not parse resource: %w", err)
 	}
-	v := r.Validate(validator.New(podops.ResourceShow))
-	if !v.IsValid() {
-		return nil, "", fmt.Errorf(v.Error())
-	}
 
-	return &r, r.GUID(), nil
+	// FIXME validate before write, not on every read!
+
+	/*
+		v := r.Validate(validator.New(podops.ResourceShow))
+		if !v.IsValid() {
+			return nil, "", fmt.Errorf(v.Error())
+		}
+	*/
+	return &show, show.GUID(), nil
 }
 
 func loadEpisodeResource(data []byte) (interface{}, string, error) {
-	var r podops.Episode
+	var episode podops.Episode
 
-	err := yaml.Unmarshal([]byte(data), &r)
+	err := yaml.Unmarshal([]byte(data), &episode)
 	if err != nil {
 		return nil, "", fmt.Errorf("can not parse resource: %w", err)
 	}
-	v := r.Validate(validator.New(podops.ResourceEpisode))
-	if !v.IsValid() {
-		return nil, "", fmt.Errorf(v.Error())
-	}
 
-	return &r, r.GUID(), nil
+	// FIXME validate before write, not on every read!
+
+	/*
+		v := r.Validate(validator.New(podops.ResourceEpisode))
+		if !v.IsValid() {
+			return nil, "", fmt.Errorf(v.Error())
+		}
+	*/
+
+	return &episode, episode.GUID(), nil
 }

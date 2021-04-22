@@ -211,6 +211,13 @@ func DeleteResourceEndpoint(c echo.Context) error {
 	kind := c.Param("kind")
 	guid := c.Param("id")
 
+	// FIXME implement cascading deletes
+	/*
+		forceFlag := false
+		if strings.ToLower(c.QueryParam("f")) == "true" {
+			forceFlag = true
+		}
+	*/
 	if !ValidateNotEmpty(prod, kind, guid) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}

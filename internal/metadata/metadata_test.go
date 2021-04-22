@@ -29,7 +29,7 @@ func TestExtractMetadataFromFile(t *testing.T) {
 	assert.Greater(t, meta.Timestamp, int64(0))
 	assert.Empty(t, meta.GUID, meta.ParentGUID)
 
-	assert.True(t, meta.IsMP3())
+	assert.True(t, meta.IsAudio())
 }
 
 func TestLocalNamePart(t *testing.T) {

@@ -94,12 +94,12 @@ func ImportResource(ctx context.Context, prod, src, original string) int {
 	out.Close()
 
 	// calculate the length of an audio file, if it is an audio file
-	if meta.IsMP3() {
+	if meta.IsAudio() {
 		meta.Duration, _ = metadata.CalculateLength(path)
 	}
 
 	// update the inventory
-	if err := backend.UpdateAsset(ctx, meta, prod, relPath); err != nil {
+	if err := backend.UpdateAsset(ctx, meta, prod, relPath, podops.ResourceTypeImport); err != nil {
 		platform.ReportError(fmt.Errorf("error updating inventory: %v", err))
 		return http.StatusBadRequest
 	}

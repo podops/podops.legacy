@@ -21,7 +21,7 @@ type Resolver struct {
 	EpisodeLoader *loader.Loader
 }
 
-// LoadShow load a show
+// LoadShow loads a show
 func LoadShow(ctx context.Context, key string) (interface{}, error) {
 	p, err := backend.FindProductionByName(ctx, key)
 	if err != nil {
@@ -84,7 +84,7 @@ func LoadShow(ctx context.Context, key string) (interface{}, error) {
 	}, nil
 }
 
-// LoadEpisode load a show
+// LoadEpisode loads an episode
 func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 	r, err := backend.GetResource(ctx, key)
 	if err != nil {

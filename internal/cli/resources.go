@@ -47,7 +47,15 @@ func GetResourcesCommand(c *cli.Context) error {
 			fmt.Println(assetListing("ID", "NAME", "KIND"))
 			for _, details := range l.Resources {
 				if details.Kind == podops.ResourceAsset {
-					fmt.Println(assetListing(details.GUID, metadata.LocalNamePart(details.OriginURI), details.Kind))
+					name := "???"
+
+					if details.EnclosureURI != "" {
+						name = metadata.LocalNamePart(details.EnclosureURI)
+					} else if details.ImageURI != "" {
+						name = metadata.LocalNamePart(details.ImageURI)
+					}
+
+					fmt.Println(assetListing(details.GUID, name, details.Kind))
 				} else {
 					fmt.Println(assetListing(details.GUID, details.Name, details.Kind))
 				}

@@ -151,12 +151,11 @@ type (
 
 	// Asset provides a link to a media resource
 	Asset struct {
-		URI    string `json:"uri" yaml:"uri" binding:"required"`        // REQUIRED
-		Title  string `json:"title,omitempty" yaml:"title,omitempty"`   // OPTIONAL
-		Anchor string `json:"anchor,omitempty" yaml:"anchor,omitempty"` // OPTIONAL
-		Rel    string `json:"rel,omitempty" yaml:"rel,omitempty"`       // OPTIONAL
-		Type   string `json:"type,omitempty" yaml:"type,omitempty"`     // OPTIONAL
-		Size   int    `json:"size,omitempty" yaml:"size,omitempty"`     // OPTIONAL
+		URI   string `json:"uri" yaml:"uri" binding:"required"`      // REQUIRED
+		Title string `json:"title,omitempty" yaml:"title,omitempty"` // OPTIONAL
+		Rel   string `json:"rel,omitempty" yaml:"rel,omitempty"`     // OPTIONAL
+		Type  string `json:"type,omitempty" yaml:"type,omitempty"`   // OPTIONAL
+		Size  int    `json:"size,omitempty" yaml:"size,omitempty"`   // OPTIONAL
 	}
 )
 
@@ -329,7 +328,6 @@ func DefaultEpisode(name, parentName, guid, parent, portal, cdn string) *Episode
 			URI:  fmt.Sprintf("%s/%s.mp3", parent, name),
 			Type: "audio/mpeg",
 			Rel:  "local",
-			Size: 1, // bytes
 		},
 	}
 }

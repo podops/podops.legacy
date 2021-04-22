@@ -34,10 +34,11 @@ type (
 		Summary   string `json:"summary"`
 		Published int64  `json:"published"`
 		// metadata
-		OriginURI    string `json:"origin"`    // e.g. the import URI
-		Location     string `json:"location"`  // path to the backing resource file (.yaml,.mp3, etc.)
-		EnclosureURI string `json:"enclosure"` // used in episode
-		ImageURI     string `json:"image"`     // used in show, episode
+		Location     string `json:"location"`      // path to the backing resource file (.yaml,.mp3, etc.)
+		EnclosureURI string `json:"enclosure"`     // used in episode
+		EnclosureRel string `json:"enclosure_rel"` // local, import, external
+		ImageURI     string `json:"image"`         // used in show, episode
+		ImageRel     string `json:"image_rel"`     // local, import, external
 		// internal
 		Index   int   `json:"index"` // A running number that can be used to sort resources, e.g. episode number
 		Created int64 `json:"-"`

@@ -93,7 +93,7 @@ func ExtractMetadataFromFile(path string) (*Metadata, error) {
 
 	// in case it is a .mp3, calculate the play time.
 	// thanks to https://stackoverflow.com/questions/60281655/how-to-find-the-length-of-mp3-file-in-golang
-	if meta.IsMP3() {
+	if meta.IsAudio() {
 		d := mp3.NewDecoder(file)
 
 		var f mp3.Frame
@@ -119,8 +119,12 @@ func (m *Metadata) ETAG() string {
 	return hex.EncodeToString(hash[:])
 }
 
-func (m *Metadata) IsMP3() bool {
-	return m.ContentType == "audio/mpeg"
+func (m *Metadata) IsAudio() bool {
+	return m.ContentType == "audio/mpeg" // FIXME to include other types also
+}
+
+func (m *Metadata) IsImage() bool {
+	return !m.IsAudio()
 }
 
 // CalculateLength returns the play duration of a media file like a .mp3

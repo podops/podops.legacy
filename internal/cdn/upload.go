@@ -68,7 +68,7 @@ func UploadEndpoint(c echo.Context) error {
 			meta.Origin = location
 
 			// update the inventory
-			if err := backend.UpdateAsset(ctx, meta, prod, location); err != nil {
+			if err := backend.UpdateAsset(ctx, meta, prod, location, podops.ResourceTypeLocal); err != nil {
 				return p.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
 		}

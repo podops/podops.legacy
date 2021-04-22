@@ -124,17 +124,27 @@ func UpdateResource(ctx context.Context, name, guid, kind, production, location 
 }
 
 // UpdateAsset updates the resource inventory
-func UpdateAsset(ctx context.Context, meta *metadata.Metadata, production, location string) error {
+func UpdateAsset(ctx context.Context, meta *metadata.Metadata, production, location, rel string) error {
 	r, _ := GetResource(ctx, meta.GUID)
 
 	if r != nil {
 		// resource already exists, just update the inventory
 		r.Name = meta.Name
-		r.OriginURI = meta.Origin
 		r.ParentGUID = production
 		r.Location = location
 		r.Updated = util.Timestamp()
 
+		if meta.IsImage() {
+			r.ImageURI = meta.Origin
+			r.ImageRel = rel
+		} else {
+			r.EnclosureURI = meta.Origin
+			r.EnclosureRel = rel
+		}
+
+		if err := UpdateMetadata(ctx, meta); err != nil {
+			return err
+		}
 		return updateResource(ctx, r)
 	}
 
@@ -142,13 +152,20 @@ func UpdateAsset(ctx context.Context, meta *metadata.Metadata, production, locat
 	now := util.Timestamp()
 	rsrc := podops.Resource{
 		Name:       meta.Name,
-		OriginURI:  meta.Origin,
 		GUID:       meta.GUID,
 		Kind:       podops.ResourceAsset,
 		ParentGUID: production,
 		Location:   location,
 		Created:    now,
 		Updated:    now,
+	}
+
+	if meta.IsImage() {
+		rsrc.ImageURI = meta.Origin
+		rsrc.ImageRel = rel
+	} else {
+		rsrc.EnclosureURI = meta.Origin
+		rsrc.EnclosureRel = rel
 	}
 
 	if err := UpdateMetadata(ctx, meta); err != nil {
@@ -346,6 +363,7 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 		r.Title = show.Description.Title
 		r.Summary = show.Description.Summary
 		r.ImageURI = show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID())
+		r.ImageRel = show.Image.Rel
 		//Created     IMMUTABLE !
 		r.Updated = util.Timestamp()
 
@@ -363,6 +381,7 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 		Title:      show.Description.Title,
 		Summary:    show.Description.Summary,
 		ImageURI:   show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID()),
+		ImageRel:   show.Image.Rel,
 		Created:    now,
 		Updated:    now,
 	}
@@ -402,7 +421,9 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 		r.Published = episode.PublishDateTimestamp()
 		r.Index = int(index) // episode number
 		r.EnclosureURI = episode.Enclosure.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
+		r.EnclosureRel = episode.Enclosure.Rel
 		r.ImageURI = episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
+		r.ImageRel = episode.Image.Rel
 		r.Updated = util.Timestamp()
 
 		return updateResource(ctx, r)
@@ -423,7 +444,9 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 		Published:    episode.PublishDateTimestamp(),
 		Index:        int(index), // episode number
 		EnclosureURI: episode.Enclosure.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent()),
+		EnclosureRel: episode.Enclosure.Rel,
 		ImageURI:     episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent()),
+		ImageRel:     episode.Image.Rel,
 		Created:      now,
 		Updated:      now,
 	}
