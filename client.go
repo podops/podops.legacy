@@ -2,7 +2,8 @@ package podops
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/podops/podops/internal/errordef"
 )
 
 // Client is a client for interacting with the PodOps service.
@@ -28,10 +29,6 @@ type (
 	}
 )
 
-var (
-	ErrClientConfig error = fmt.Errorf("client: invalid configuration")
-)
-
 // NewClient creates a new podcast client.
 //
 // Clients should be reused instead of created as needed.
@@ -40,8 +37,7 @@ func NewClient(ctx context.Context, token string, opts ...*ClientOption) (*Clien
 
 	co := DefaultClientOptions()
 	if len(opts) != 0 {
-		// FIXME we assume only 1 opts is provided!
-		co = co.Merge(opts[0])
+		co = co.Merge(opts[0]) // FIXME we assume only 1 opts is provided!
 	}
 
 	if token != "" {
@@ -53,7 +49,7 @@ func NewClient(ctx context.Context, token string, opts ...*ClientOption) (*Clien
 
 func New(ctx context.Context, o *ClientOption) (*Client, error) {
 	if o == nil || !o.IsValid() {
-		return nil, ErrClientConfig
+		return nil, errordef.ErrInvalidConfiguration
 	}
 	return &Client{
 		opts:      o,
@@ -137,6 +133,5 @@ func (co ClientOption) Merge(opts *ClientOption) *ClientOption {
 
 // IsValid checks if all configuration parameters are provided
 func (co ClientOption) IsValid() bool {
-	return co.APIEndpoint != "" && co.CDNEndpoint != "" && co.DefaultEndpoint != ""
-	// FIXME we can not validate token and production. There are some API calls that do not need them...
+	return co.Token != "" && co.APIEndpoint != "" && co.CDNEndpoint != "" && co.DefaultEndpoint != ""
 }

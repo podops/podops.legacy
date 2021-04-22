@@ -108,6 +108,7 @@ func LogoutCommand(c *cli.Context) error {
 	}
 
 	if status == http.StatusNoContent {
+		clearLogin()
 		fmt.Println("Logout successful.")
 	} else {
 		return fmt.Errorf("api error %d", status)

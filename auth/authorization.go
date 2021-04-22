@@ -122,11 +122,18 @@ func CheckAuthorization(ctx context.Context, c echo.Context, scope string) (*Aut
 	}
 
 	auth, err := FindAuthorizationByToken(ctx, token)
-	if err != nil || auth == nil {
+	if err != nil || auth == nil || !auth.IsValid() {
 		return nil, errordef.ErrNotAuthorized
 	}
 
-	// FIXME check it auth is still valid !
+	account, err := FindAccountByUserID(ctx, auth.Realm, auth.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	if account.Status != AccountActive {
+		return nil, errordef.ErrNotAuthorized // not logged-in
+	}
 
 	if !hasScope(auth.Scope, scope) {
 		return nil, errordef.ErrNotAuthorized

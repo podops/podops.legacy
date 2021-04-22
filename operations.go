@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/platform"
 )
 
@@ -31,14 +32,25 @@ const (
 	uploadRoute = "/_w/upload"
 )
 
+func assertNotEmpty(claims ...string) bool {
+	if len(claims) == 0 {
+		return false
+	}
+	for _, s := range claims {
+		if s == "" {
+			return false
+		}
+	}
+	return true
+}
+
 // CreateProduction invokes the CreateProductionEndpoint
 func (cl *Client) CreateProduction(name, title, summary string) (*Production, error) {
 	if !cl.IsValid() {
-		return nil, ErrClientConfig
+		return nil, errordef.ErrInvalidConfiguration
 	}
-
 	if name == "" {
-		return nil, fmt.Errorf("name must not be empty") // FIXME replace with const
+		return nil, errordef.ErrInvalidParameters
 	}
 
 	req := Production{
@@ -60,7 +72,7 @@ func (cl *Client) CreateProduction(name, title, summary string) (*Production, er
 // Productions retrieves a list of productions
 func (cl *Client) Productions() (*ProductionList, error) {
 	if !cl.IsValid() {
-		return nil, ErrClientConfig
+		return nil, errordef.ErrInvalidConfiguration
 	}
 
 	var resp ProductionList
@@ -74,7 +86,10 @@ func (cl *Client) Productions() (*ProductionList, error) {
 // CreateResource invokes the ResourceEndpoint
 func (cl *Client) CreateResource(production, kind, guid string, force bool, rsrc interface{}) (int, error) {
 	if !cl.IsValid() {
-		return http.StatusBadRequest, ErrClientConfig
+		return http.StatusBadRequest, errordef.ErrInvalidConfiguration
+	}
+	if !assertNotEmpty(production, kind, guid) {
+		return http.StatusBadRequest, errordef.ErrInvalidParameters
 	}
 
 	resp := platform.StatusObject{}
@@ -89,7 +104,10 @@ func (cl *Client) CreateResource(production, kind, guid string, force bool, rsrc
 // GetResource returns a resource file
 func (cl *Client) GetResource(production, kind, guid string, rsrc interface{}) error {
 	if !cl.IsValid() {
-		return ErrClientConfig
+		return errordef.ErrInvalidConfiguration
+	}
+	if !assertNotEmpty(production, kind, guid) {
+		return errordef.ErrInvalidParameters
 	}
 
 	status, err := get(cl.opts.APIEndpoint, fmt.Sprintf(getResourceRoute, production, kind, guid), cl.opts.Token, rsrc)
@@ -106,7 +124,10 @@ func (cl *Client) GetResource(production, kind, guid string, rsrc interface{}) e
 // FindResource returns a resource file
 func (cl *Client) FindResource(guid string, rsrc interface{}) error {
 	if !cl.IsValid() {
-		return ErrClientConfig
+		return errordef.ErrInvalidConfiguration
+	}
+	if guid == "" {
+		return errordef.ErrInvalidParameters
 	}
 
 	status, err := get(cl.opts.APIEndpoint, fmt.Sprintf(findResourceRoute, guid), cl.opts.Token, rsrc)
@@ -123,7 +144,10 @@ func (cl *Client) FindResource(guid string, rsrc interface{}) error {
 // Resources retrieves a list of resources
 func (cl *Client) Resources(production, kind string) (*ResourceList, error) {
 	if !cl.IsValid() {
-		return nil, ErrClientConfig
+		return nil, errordef.ErrInvalidConfiguration
+	}
+	if production == "" {
+		return nil, errordef.ErrInvalidParameters
 	}
 	if kind == "" {
 		kind = "ALL"
@@ -140,7 +164,10 @@ func (cl *Client) Resources(production, kind string) (*ResourceList, error) {
 // UpdateResource invokes the ResourceEndpoint
 func (cl *Client) UpdateResource(production, kind, guid string, force bool, rsrc interface{}) (int, error) {
 	if !cl.IsValid() {
-		return http.StatusBadRequest, ErrClientConfig
+		return http.StatusBadRequest, errordef.ErrInvalidConfiguration
+	}
+	if !assertNotEmpty(production, kind, guid) {
+		return http.StatusBadRequest, errordef.ErrInvalidParameters
 	}
 
 	resp := platform.StatusObject{}
@@ -155,7 +182,10 @@ func (cl *Client) UpdateResource(production, kind, guid string, force bool, rsrc
 // DeleteResource deletes a resources
 func (cl *Client) DeleteResource(production, kind, guid string) (int, error) {
 	if !cl.IsValid() {
-		return http.StatusBadRequest, ErrClientConfig
+		return http.StatusBadRequest, errordef.ErrInvalidConfiguration
+	}
+	if !assertNotEmpty(production, kind, guid) {
+		return http.StatusBadRequest, errordef.ErrInvalidParameters
 	}
 
 	status, err := delete(cl.opts.APIEndpoint, fmt.Sprintf(deleteResourceRoute, production, kind, guid), cl.opts.Token, nil)
@@ -168,7 +198,10 @@ func (cl *Client) DeleteResource(production, kind, guid string) (int, error) {
 // Build invokes the BuildEndpoint
 func (cl *Client) Build(production string) (*BuildRequest, error) {
 	if !cl.IsValid() {
-		return nil, ErrClientConfig
+		return nil, errordef.ErrInvalidConfiguration
+	}
+	if production == "" {
+		return nil, errordef.ErrInvalidParameters
 	}
 
 	req := BuildRequest{
@@ -187,9 +220,12 @@ func (cl *Client) Build(production string) (*BuildRequest, error) {
 // Upload invokes the UploadEndpoint
 func (cl *Client) Upload(production, path string, force bool) error {
 	if !cl.IsValid() {
-		return ErrClientConfig
+		return errordef.ErrInvalidConfiguration
 	}
-	// FIXME this should be cl.opts.StorageEndpoint or CDNEndpoint
+	if !assertNotEmpty(production, path) {
+		return errordef.ErrInvalidParameters
+	}
+
 	req, err := upload(cl.opts.CDNEndpoint, uploadRoute, cl.opts.Token, production, "asset", path)
 	if err != nil {
 		log.Fatal(err)

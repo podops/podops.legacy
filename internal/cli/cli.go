@@ -102,7 +102,7 @@ func storeLogin(userID, token string) error {
 	nrc := loadNetrc()
 	m := nrc.FindMachine(machineEntry)
 	if m == nil {
-		m = nrc.NewMachine(machineEntry, userID, token, "GUID")
+		nrc.NewMachine(machineEntry, userID, token, "GUID")
 	} else {
 		m.UpdateLogin(userID)
 		m.UpdatePassword(token)
@@ -111,11 +111,23 @@ func storeLogin(userID, token string) error {
 	return ioutil.WriteFile(podops.DefaultConfigPath(), data, 0644)
 }
 
+func clearLogin() error {
+	nrc := loadNetrc()
+	m := nrc.FindMachine(machineEntry)
+	if m != nil {
+		nrc.RemoveMachine(machineEntry)
+
+		data, _ := nrc.MarshalText()
+		return ioutil.WriteFile(podops.DefaultConfigPath(), data, 0644)
+	}
+	return nil
+}
+
 func storeDefaultProduction(production string) error {
 	nrc := loadNetrc()
 	m := nrc.FindMachine(machineEntry)
 	if m == nil {
-		m = nrc.NewMachine(machineEntry, "", "", production)
+		nrc.NewMachine(machineEntry, "", "", production)
 	} else {
 		m.UpdateAccount(production)
 	}
@@ -158,15 +170,6 @@ func getProduction(c *cli.Context) string {
 	}
 	return prod
 }
-
-/*
-func shorten(s string, l int) string {
-	if len(s) <= l {
-		return s
-	}
-	return fmt.Sprintf("%s..%s", s[0:(l-11)], s[(len(s)-9):])
-}
-*/
 
 func productionListing(guid, name, title string, current bool) string {
 	if current {
