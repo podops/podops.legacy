@@ -135,10 +135,10 @@ func UpdateAsset(ctx context.Context, meta *metadata.Metadata, production, locat
 		r.Updated = util.Timestamp()
 
 		if meta.IsImage() {
-			r.ImageURI = meta.Origin
+			r.ImageURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location) // FIXME validate this, what about external assets?
 			r.ImageRel = rel
 		} else {
-			r.EnclosureURI = meta.Origin
+			r.EnclosureURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location) // FIXME validate this, what about external assets?
 			r.EnclosureRel = rel
 		}
 
@@ -161,10 +161,10 @@ func UpdateAsset(ctx context.Context, meta *metadata.Metadata, production, locat
 	}
 
 	if meta.IsImage() {
-		rsrc.ImageURI = meta.Origin
+		rsrc.ImageURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location) // FIXME validate this, what about external assets?
 		rsrc.ImageRel = rel
 	} else {
-		rsrc.EnclosureURI = meta.Origin
+		rsrc.EnclosureURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location) // FIXME validate this, what about external assets?
 		rsrc.EnclosureRel = rel
 	}
 
