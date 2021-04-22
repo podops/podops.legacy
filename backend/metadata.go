@@ -36,11 +36,19 @@ func GetMetadataForResource(ctx context.Context, guid string) (*metadata.Metadat
 	if err != nil {
 		return nil, err
 	}
-	if r.Kind != podops.ResourceEpisode {
+	if r.Kind == podops.ResourceAsset {
 		return nil, nil
 	}
 
-	metaGUID := strings.Split(metadata.LocalNamePart(r.EnclosureURI), ".")[0]
+	metaGUID := ""
+	if r.Kind == podops.ResourceShow {
+		metaGUID = strings.Split(metadata.LocalNamePart(r.ImageURI), ".")[0]
+	} else if r.Kind == podops.ResourceEpisode {
+		metaGUID = strings.Split(metadata.LocalNamePart(r.EnclosureURI), ".")[0]
+	} else {
+		return nil, errordef.ErrNoSuchResource
+	}
+
 	return GetMetadata(ctx, metaGUID)
 }
 

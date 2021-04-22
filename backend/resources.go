@@ -269,7 +269,26 @@ func GetResourceContent(ctx context.Context, guid string) (interface{}, error) {
 		return nil, err
 	}
 
-	return rsrc, nil
+	// metadata mix-in
+	if r.Kind == podops.ResourceShow {
+		show := rsrc.(*podops.Show)
+		show.Image.URI = r.ImageURI
+		return show, nil
+
+	} else if r.Kind == podops.ResourceEpisode {
+		meta, err := GetMetadataForResource(ctx, guid)
+		if err != nil {
+			return nil, err
+		}
+		episode := rsrc.(*podops.Episode)
+		episode.Enclosure.URI = r.EnclosureURI
+		episode.Enclosure.Size = int(meta.Size)
+		episode.Description.Duration = int(meta.Duration)
+
+		return episode, nil
+	}
+
+	return nil, errordef.ErrNoSuchResource
 }
 
 // WriteResourceContent creates a resource .yaml file. An existing resource will be overwritten if force==true
