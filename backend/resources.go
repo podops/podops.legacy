@@ -356,15 +356,11 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 			return fmt.Errorf("can not modify resource: expected '%s', received '%s'", r.Kind, show.Kind)
 		}
 		r.Name = show.Metadata.Name
-		//GUID:       IMMUTABLE !
-		//Kind:       IMMUTABLE !
-		//ParentGUID: IMMUTABLE !
 		r.Location = location
 		r.Title = show.Description.Title
 		r.Summary = show.Description.Summary
 		r.ImageURI = show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID())
 		r.ImageRel = show.Image.Rel
-		//Created     IMMUTABLE !
 		r.Updated = util.Timestamp()
 
 		return updateResource(ctx, r)
