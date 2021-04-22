@@ -23,8 +23,8 @@ func init() {
 	resourceLoaders[podops.ResourceEpisode] = loadEpisodeResource
 }
 
-// LoadResource takes a byte array and determines its kind before unmarshalling it into its struct form
-func LoadResource(data []byte) (interface{}, string, string, error) {
+// UnmarshalResource takes a byte array and determines its kind before unmarshalling it into its struct form
+func UnmarshalResource(data []byte) (interface{}, string, string, error) {
 
 	r, _ := LoadGenericResource(data)
 	loader := resourceLoaders[r.Kind]

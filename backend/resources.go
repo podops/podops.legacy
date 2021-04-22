@@ -326,7 +326,7 @@ func WriteResourceContent(ctx context.Context, path string, create, force bool, 
 	return nil
 }
 
-// ReadResource reads a resource from Cloud Storage
+// ReadResource reads a resource from the Cloud Storage
 func ReadResource(ctx context.Context, path string) (interface{}, string, string, error) {
 
 	bkt := platform.Storage().Bucket(podops.BucketProduction)
@@ -339,7 +339,7 @@ func ReadResource(ctx context.Context, path string) (interface{}, string, string
 		return nil, "", "", err
 	}
 
-	return loader.LoadResource(data)
+	return loader.UnmarshalResource(data)
 }
 
 // RemoveResource removes a resource from Cloud Storage

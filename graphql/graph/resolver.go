@@ -31,11 +31,6 @@ func LoadShow(ctx context.Context, key string) (interface{}, error) {
 		return nil, fmt.Errorf("show '%s' not found", key)
 	}
 
-	r, err := backend.GetResource(ctx, p.GUID)
-	if err != nil {
-		return nil, err
-	}
-
 	s, err := backend.GetResourceContent(ctx, p.GUID)
 	if err != nil {
 		return nil, err
@@ -79,8 +74,8 @@ func LoadShow(ctx context.Context, key string) (interface{}, error) {
 				Email: show.Description.Owner.Email,
 			},
 		},
-		Image: r.ImageURI,
-		// Episodes are loaded by hthe schema.resolver implementation in order make use of the dataloader
+		Image: show.Image.URI,
+		// Episodes are loaded by the schema.resolver implementation in order make use of the dataloader
 	}, nil
 }
 
@@ -93,8 +88,7 @@ func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 	if r == nil {
 		return nil, fmt.Errorf("episode '%s' not found", key)
 	}
-
-	meta, err := backend.GetMetadataForResource(ctx, key)
+	p, err := backend.GetProduction(ctx, r.ParentGUID)
 	if err != nil {
 		return nil, err
 	}
@@ -104,11 +98,6 @@ func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 		return nil, err
 	}
 	episode := e.(*podops.Episode)
-
-	p, err := backend.GetProduction(ctx, r.ParentGUID)
-	if err != nil {
-		return nil, err
-	}
 
 	n, _ := strconv.ParseInt(episode.Metadata.Labels[podops.LabelEpisode], 10, 64)
 	season, _ := strconv.ParseInt(episode.Metadata.Labels[podops.LabelSeason], 10, 64)
@@ -133,13 +122,13 @@ func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 			Summary:     episode.Description.Summary,
 			Description: &episode.Description.EpisodeText,
 			Link:        episode.Description.Link.URI,
-			Duration:    int(meta.Duration), // episode.Description.Duration,
+			Duration:    episode.Description.Duration,
 		},
-		Image: r.ImageURI,
+		Image: episode.Image.URI,
 		Enclosure: &model.Enclosure{
-			Link: r.EnclosureURI, //episode.Enclosure.URI,
-			Type: r.EnclosureRel, // episode.Enclosure.Type,
-			Size: int(meta.Size), // episode.Enclosure.Size,
+			Link: episode.Enclosure.URI,
+			Type: episode.Enclosure.Type,
+			Size: episode.Enclosure.Size,
 		},
 		Production: &model.Production{
 			GUID:  p.GUID,

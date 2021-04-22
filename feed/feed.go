@@ -4,30 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sort"
 	"time"
 
-	"cloud.google.com/go/storage"
-	"google.golang.org/api/iterator"
+	"cloud.google.com/go/datastore"
 
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/feed/rss"
+	pl "github.com/podops/podops/internal/platform"
 )
-
-type (
-	// EpisodeList holds the list of valid episodes that will be added to a podcast
-	EpisodeList []*a.Episode
-)
-
-func (e EpisodeList) Len() int      { return len(e) }
-func (e EpisodeList) Swap(i, j int) { e[i], e[j] = e[j], e[i] }
-func (e EpisodeList) Less(i, j int) bool {
-	return e[i].PublishDateTimestamp() > e[j].PublishDateTimestamp() // sorting direction is descending
-}
 
 var mediaTypeMap map[string]rss.EnclosureType
 
@@ -44,8 +32,6 @@ func init() {
 
 // Build gathers all resources and builds the feed.xml
 func Build(ctx context.Context, production string, validateOnly bool) error {
-
-	var episodes EpisodeList
 
 	p, err := backend.GetProduction(ctx, production)
 	if err != nil {
@@ -66,55 +52,37 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 		return fmt.Errorf("can not build feed")
 	}
 
-	// FIXME build this new !
-
-	// find all episodes and sort them by pubDate
-	q := &storage.Query{
-		Prefix: fmt.Sprintf("%s/episode", p.GUID),
+	// list all episodes, excluding future (i.e. unpublished) ones, descending order
+	// FIXME filter for other flags, e.g. Block = true
+	var er []*podops.Resource
+	now := util.Timestamp()
+	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", production).Filter("Kind =", podops.ResourceEpisode).Filter("Published <", now).Filter("Published >", 0).Order("-Published"), &er); err != nil {
+		pl.ReportError(err)
+		return err
 	}
-	it := platform.Storage().Bucket(a.BucketProduction).Objects(ctx, q)
-	for {
-		attr, err := it.Next()
-		if err == iterator.Done {
-			break
-		}
+
+	if len(er) == 0 {
+		return fmt.Errorf("can not build feed without episodes")
+	}
+
+	// read all episodes
+	episodes := make([]*podops.Episode, len(er))
+	for i := range er {
+		e, err := backend.GetResourceContent(ctx, er[i].GUID)
 		if err != nil {
 			return err
 		}
-
-		e, _, _, err := backend.ReadResource(ctx, attr.Name)
-		if err != nil {
-			return err
-		}
-		episode := e.(*a.Episode)
-
-		// FIXME skip episodes if block == yes or publish date is in the future
-		if episode.PublishDateTimestamp() > util.Timestamp() {
-			continue
-		}
-		if episode.Metadata.Labels[a.LabelBlock] == "yes" {
-			continue
-		}
-
-		episodes = append(episodes, episode)
+		episodes[i] = e.(*podops.Episode)
 	}
-	if episodes.Len() == 0 {
-		return fmt.Errorf("can not build feed with zero episodes")
-	}
-
-	sort.Sort(episodes)
 
 	// read the show
-	s, kind, _, err := backend.ReadResource(ctx, fmt.Sprintf("%s/show-%s.yaml", production, production))
+	s, err := backend.GetResourceContent(ctx, production)
 	if err != nil {
 		return err
 	}
-	if kind != a.ResourceShow {
-		return fmt.Errorf("unsupported resource '%s'", kind)
-	}
 
 	// build the feed XML
-	show := s.(*a.Show)
+	show := s.(*podops.Show)
 	feed, err := TransformToPodcast(show)
 	if err != nil {
 		return err
@@ -139,7 +107,7 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 	}
 
 	// dump the feed to the CDN location
-	obj := platform.Storage().Bucket(a.BucketProduction).Object(fmt.Sprintf("%s/feed.xml", production))
+	obj := platform.Storage().Bucket(podops.BucketProduction).Object(fmt.Sprintf("%s/feed.xml", production))
 	writer := obj.NewWriter(ctx)
 	if _, err := writer.Write(feed.Bytes()); err != nil {
 		return err
@@ -152,7 +120,7 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 }
 
 // TransformToPodcast transforms Show metadata into a podcast feed struct
-func TransformToPodcast(s *a.Show) (*rss.Channel, error) {
+func TransformToPodcast(s *podops.Show) (*rss.Channel, error) {
 	now := time.Now()
 
 	// basics
@@ -165,7 +133,7 @@ func TransformToPodcast(s *a.Show) (*rss.Channel, error) {
 		pf.IAuthor = s.Description.Author
 	}
 	pf.AddCategory(s.Description.Category.Name, s.Description.Category.SubCategory)
-	pf.AddImage(s.Image.ResolveURI(a.DefaultStorageEndpoint, s.GUID()))
+	pf.AddImage(s.Image.URI)
 	pf.IOwner = &rss.Author{
 		Name:  s.Description.Owner.Name,
 		Email: s.Description.Owner.Email,
@@ -174,19 +142,19 @@ func TransformToPodcast(s *a.Show) (*rss.Channel, error) {
 	if s.Description.NewFeed != nil {
 		pf.INewFeedURL = s.Description.NewFeed.URI
 	}
-	pf.Language = s.Metadata.Labels[a.LabelLanguage]
-	pf.IExplicit = s.Metadata.Labels[a.LabelExplicit]
+	pf.Language = s.Metadata.Labels[podops.LabelLanguage]
+	pf.IExplicit = s.Metadata.Labels[podops.LabelExplicit]
 
-	t := s.Metadata.Labels[a.LabelType]
-	if t == a.ShowTypeEpisodic || t == a.ShowTypeSerial {
+	t := s.Metadata.Labels[podops.LabelType]
+	if t == podops.ShowTypeEpisodic || t == podops.ShowTypeSerial {
 		pf.IType = t
 	} else {
 		return nil, errors.New("Show type must be 'Episodic' or 'Serial' ")
 	}
-	if s.Metadata.Labels[a.LabelBlock] == "yes" {
+	if s.Metadata.Labels[podops.LabelBlock] == "yes" {
 		pf.IBlock = "yes"
 	}
-	if s.Metadata.Labels[a.LabelComplete] == "yes" {
+	if s.Metadata.Labels[podops.LabelComplete] == "yes" {
 		pf.IComplete = "yes"
 	}
 
@@ -199,9 +167,9 @@ func TransformToPodcast(s *a.Show) (*rss.Channel, error) {
 //	complete:	Yes OPTIONAL 'channel.itunes.complete' Anything else than 'Yes' has no effect
 
 // TransformToItem returns the episode struct needed for a podcast feed struct
-func TransformToItem(e *a.Episode) (*rss.Item, error) {
+func TransformToItem(e *podops.Episode) (*rss.Item, error) {
 
-	pubDate, err := time.Parse(time.RFC1123Z, e.Metadata.Labels[a.LabelDate])
+	pubDate, err := time.Parse(time.RFC1123Z, e.Metadata.Labels[podops.LabelDate])
 	if err != nil {
 		return nil, err
 	}
@@ -211,19 +179,19 @@ func TransformToItem(e *a.Episode) (*rss.Item, error) {
 		Description: e.Description.Summary,
 	}
 
-	ef.AddEnclosure(e.Enclosure.ResolveURI(a.DefaultStorageEndpoint, e.Parent()), mediaTypeMap[e.Enclosure.Type], (int64)(e.Enclosure.Size))
-	ef.AddImage(e.Image.ResolveURI(a.DefaultStorageEndpoint, e.Parent()))
+	ef.AddEnclosure(e.Enclosure.URI, mediaTypeMap[e.Enclosure.Type], (int64)(e.Enclosure.Size))
+	ef.AddImage(e.Image.URI)
 	ef.AddPubDate(&pubDate)
 	ef.AddSummary(e.Description.EpisodeText)
 	ef.AddDuration((int64)(e.Description.Duration))
 	ef.Link = e.Description.Link.URI
 	ef.ISubtitle = e.Description.Summary
-	ef.GUID = e.Metadata.Labels[a.LabelGUID]
-	ef.IExplicit = e.Metadata.Labels[a.LabelExplicit]
-	ef.ISeason = e.Metadata.Labels[a.LabelSeason]
-	ef.IEpisode = e.Metadata.Labels[a.LabelEpisode]
-	ef.IEpisodeType = e.Metadata.Labels[a.LabelType]
-	if e.Metadata.Labels[a.LabelBlock] == "yes" {
+	ef.GUID = e.Metadata.Labels[podops.LabelGUID]
+	ef.IExplicit = e.Metadata.Labels[podops.LabelExplicit]
+	ef.ISeason = e.Metadata.Labels[podops.LabelSeason]
+	ef.IEpisode = e.Metadata.Labels[podops.LabelEpisode]
+	ef.IEpisodeType = e.Metadata.Labels[podops.LabelType]
+	if e.Metadata.Labels[podops.LabelBlock] == "yes" {
 		ef.IBlock = "yes"
 	}
 
