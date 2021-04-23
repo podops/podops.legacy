@@ -18,7 +18,6 @@ require (
 	github.com/tcolgate/mp3 v0.0.0-20170426193717-e79c5a46d300
 	github.com/urfave/cli/v2 v2.1.1
 	github.com/vektah/gqlparser/v2 v2.1.0
-	google.golang.org/api v0.40.0
 	google.golang.org/appengine v1.6.7
 	google.golang.org/genproto v0.0.0-20210222152913-aa3ee6e6a81c
 	gopkg.in/yaml.v2 v2.3.0

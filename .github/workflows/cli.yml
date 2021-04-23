@@ -2,11 +2,11 @@ name: build_cli
 
 on:
   push:
-    branches: [ release ]
+    branches: [ main ]
 
 env:
-  VERSION: 0.9.13
-  BUILDDIR: cli-0.9.13
+  VERSION: 1.0.0
+  BUILDDIR: cli-1.0.0
   GITHUB_SHA: ${{ github.sha }}
 
 jobs:

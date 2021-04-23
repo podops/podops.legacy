@@ -13,7 +13,7 @@ import (
 
 var (
 	// UserAgentString identifies any http request podops makes
-	userAgentString string = fmt.Sprintf("PodOps %d.%d.%d", 0, 9, 13)
+	userAgentString string = fmt.Sprintf("PodOps %d.%d.%d", 1, 0, 0)
 	// workerQueue is the main worker queue for all the background tasks
 	workerQueue string = fmt.Sprintf("projects/%s/locations/%s/queues/%s", env.GetString("PROJECT_ID", ""), env.GetString("LOCATION_ID", ""), env.GetString("DEFAULT_QUEUE", ""))
 )

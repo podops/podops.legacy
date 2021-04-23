@@ -17,11 +17,11 @@ const (
 	Version = "v1"
 
 	// MajorVersion of the API
-	MajorVersion = 0
+	MajorVersion = 1
 	// MinorVersion of the API
-	MinorVersion = 9
+	MinorVersion = 0
 	// FixVersion of the API
-	FixVersion = 13
+	FixVersion = 0
 )
 
 var (
