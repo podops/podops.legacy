@@ -26,7 +26,7 @@ func setup() *echo.Echo {
 
 	// add and configure the middlewares
 	e.Use(middleware.Recover())
-	// e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig)) // needed for the GraphQL endpoints
+	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig)) // needed for the GraphQL endpoints
 
 	// admin endpoints
 	e.GET(apiv1.LoginConfirmationRoute, auth.LoginConfirmationEndpoint)
@@ -52,7 +52,7 @@ func setup() *echo.Echo {
 	apiEndpoints.POST(apiv1.BuildRoute, apiv1.BuildFeedEndpoint)
 
 	// grapghql endpoints
-	gql := e.Group(apiv1.GraphqlNamespacePrefix, middleware.CORSWithConfig(middleware.DefaultCORSConfig))
+	gql := e.Group(apiv1.GraphqlNamespacePrefix)
 	gql.POST(apiv1.GraphqlRoute, graphql.GraphqlEndpoint())
 	gql.GET(apiv1.GraphqlPlaygroundRoute, graphql.GraphqlPlaygroundEndpoint())
 
