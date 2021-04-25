@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/platform"
 )
 
@@ -110,7 +111,7 @@ func invoke(token string, req *http.Request, response interface{}) (int, error) 
 			status := platform.StatusObject{}
 			err = json.NewDecoder(resp.Body).Decode(&status)
 			if err != nil {
-				return resp.StatusCode, fmt.Errorf("status: %d", resp.StatusCode)
+				return resp.StatusCode, fmt.Errorf(errordef.MsgStatus, resp.StatusCode)
 			}
 			return status.Status, fmt.Errorf(status.Message)
 		}

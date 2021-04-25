@@ -10,6 +10,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
 	"github.com/podops/podops"
+	"github.com/podops/podops/internal/errordef"
 )
 
 const (
@@ -20,7 +21,7 @@ const (
 // CreateProduction initializes a new show and all its metadata
 func CreateProduction(ctx context.Context, name, title, summary, clientID string) (*podops.Production, error) {
 	if name == "" {
-		return nil, fmt.Errorf("name must not be empty")
+		return nil, errordef.ErrInvalidParameters
 	}
 
 	p, err := FindProductionByName(ctx, name)
@@ -30,7 +31,7 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 	if p != nil {
 		if p.Owner != clientID {
 			// do not access someone else's production
-			return nil, fmt.Errorf("name '%s' already exists", name)
+			return nil, fmt.Errorf(errordef.MsgResourceAlreadyExists, name)
 		}
 		return p, nil
 	}
@@ -87,7 +88,7 @@ func ValidateProduction(ctx context.Context, production string) error {
 		return err
 	}
 	if len(rsrc) == 0 {
-		return fmt.Errorf("no resources")
+		return errordef.ErrNoSuchResource
 	}
 
 	for _, r := range rsrc {
@@ -102,10 +103,10 @@ func ValidateProduction(ctx context.Context, production string) error {
 
 	// a podcast needs 1 show and >= 1 episodes to valid
 	if show != 1 {
-		return fmt.Errorf("missing show")
+		return errordef.ErrNoSuchProduction
 	}
 	if episodes == 0 {
-		return fmt.Errorf("missing episodes")
+		return errordef.ErrNoSuchEpisode
 	}
 	return nil
 }

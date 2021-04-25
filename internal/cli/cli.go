@@ -140,7 +140,7 @@ func loadResource(path string) (interface{}, string, string, error) {
 
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		return nil, "", "", fmt.Errorf("can not read file '%s': %w", path, err)
+		return nil, "", "", err
 	}
 
 	r, kind, guid, err := loader.UnmarshalResource(data)

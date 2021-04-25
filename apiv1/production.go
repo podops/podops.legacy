@@ -10,6 +10,7 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/auth"
 	"github.com/podops/podops/backend"
+	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/platform"
 )
 
@@ -30,7 +31,7 @@ func ProductionEndpoint(c echo.Context) error {
 	// validate and normalize the name
 	showName := strings.ToLower(strings.TrimSpace(req.Name))
 	if !podops.ValidResourceName(showName) {
-		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid name '%s'", showName))
+		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgInvalidParameter, showName))
 	}
 	// create a new production
 	clientID, _ := auth.GetClientID(ctx, c.Request())

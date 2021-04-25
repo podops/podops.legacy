@@ -141,7 +141,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		payload = &show
 
 		if prod != show.GUID() {
-			return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(":prod and GUID do not match. expected '%s', got '%s'", prod, show.GUID()))
+			return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgParametersMismatch, prod, show.GUID()))
 		}
 
 		// update the PRODUCTION entry based on resource
@@ -176,7 +176,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		payload = &episode
 
 		if prod != episode.Parent() {
-			return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(":prod and GUID do not match. expected '%s', got '%s'", prod, episode.Parent()))
+			return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgParametersMismatch, prod, episode.Parent()))
 		}
 
 		// ensure images and media files
@@ -192,7 +192,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 			return platform.ErrorResponse(c, http.StatusBadRequest, err)
 		}
 	} else {
-		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("unsupported kind '%s'", kind))
+		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgUnsupportedType, kind))
 	}
 
 	if err := backend.WriteResourceContent(ctx, location, createFlag, forceFlag, payload); err != nil {

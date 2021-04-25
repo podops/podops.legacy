@@ -9,6 +9,7 @@ import (
 	"github.com/fupas/commons/pkg/util"
 
 	"github.com/podops/podops"
+	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/platform"
 )
 
@@ -56,7 +57,7 @@ func LogoutAccount(ctx context.Context, realm, clientID string) error {
 		return err
 	}
 	if account == nil {
-		return fmt.Errorf("account %s.%s not found", realm, clientID)
+		return fmt.Errorf(errordef.MsgAccountNotFound, fmt.Sprintf("%s.%s", realm, clientID))
 	}
 
 	auth, err := LookupAuthorization(ctx, account.Realm, account.ClientID)
@@ -82,7 +83,7 @@ func BlockAccount(ctx context.Context, realm, clientID string) error {
 		return err
 	}
 	if account == nil {
-		return fmt.Errorf("account %s.%s not found", realm, clientID)
+		return fmt.Errorf(errordef.MsgAccountNotFound, fmt.Sprintf("%s.%s", realm, clientID))
 	}
 
 	auth, err := LookupAuthorization(ctx, account.Realm, account.ClientID)
@@ -129,7 +130,7 @@ func ConfirmLoginChallenge(ctx context.Context, token string) (*Account, int, er
 	// FIXME add a mutex
 
 	if token == "" {
-		return nil, http.StatusUnauthorized, fmt.Errorf("Invalid token")
+		return nil, http.StatusUnauthorized, errordef.ErrNoToken
 	}
 
 	account, err := FindAccountByToken(ctx, token)

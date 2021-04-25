@@ -2,7 +2,6 @@ package cdn
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -69,7 +68,7 @@ func SyncResource(ctx context.Context, prod, src string) int {
 	bkt := cs.Storage().Bucket(podops.BucketProduction)
 	reader, err := bkt.Object(relPath).NewReader(ctx)
 	if err != nil {
-		platform.ReportError(fmt.Errorf("can not transfer '%s': %v", src, err))
+		platform.ReportError(err)
 		return http.StatusBadRequest
 	}
 
@@ -78,7 +77,7 @@ func SyncResource(ctx context.Context, prod, src string) int {
 	os.MkdirAll(filepath.Dir(path), os.ModePerm) // make sure sub-folders exist
 	out, err := os.Create(path)
 	if err != nil {
-		platform.ReportError(fmt.Errorf("can not transfer '%s': %v", src, err))
+		platform.ReportError(err)
 		return http.StatusBadRequest
 	}
 	defer out.Close()
@@ -86,7 +85,7 @@ func SyncResource(ctx context.Context, prod, src string) int {
 	// transfer the file
 	_, err = io.Copy(out, reader)
 	if err != nil {
-		platform.ReportError(fmt.Errorf("can not transfer '%s': %v", src, err))
+		platform.ReportError(err)
 		return http.StatusBadRequest
 	}
 

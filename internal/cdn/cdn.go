@@ -8,6 +8,7 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
+	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/platform"
 )
 
@@ -18,7 +19,7 @@ func FeedEndpoint(c echo.Context) error { // FIXME not needed !
 
 	name := c.Param("name")
 	if name == "" {
-		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':name'"))
+		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
 	prod, err := backend.FindProductionByName(platform.NewHttpContext(c), name)
@@ -27,7 +28,7 @@ func FeedEndpoint(c echo.Context) error { // FIXME not needed !
 	}
 
 	if prod == nil {
-		return platform.ErrorResponse(c, http.StatusNotFound, fmt.Errorf("can not find '%s/feed.xml'", name))
+		return platform.ErrorResponse(c, http.StatusNotFound, errordef.ErrNoSuchProduction)
 	}
 
 	redirectTo := fmt.Sprintf("%s/%s/feed.xml", podops.DefaultStorageEndpoint, prod.GUID)

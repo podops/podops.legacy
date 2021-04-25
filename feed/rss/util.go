@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"time"
+
+	"github.com/podops/podops/internal/errordef"
 )
 
 var parseDuration = func(duration int64) string {
@@ -46,7 +48,7 @@ var encoder = func(w io.Writer, o interface{}) error {
 	e := xml.NewEncoder(w)
 	e.Indent("", "  ")
 	if err := e.Encode(o); err != nil {
-		return fmt.Errorf("channel.encoder: error %v", err)
+		return errordef.ErrBuildFailed
 	}
 	return nil
 }

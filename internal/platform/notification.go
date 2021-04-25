@@ -11,11 +11,11 @@ import (
 )
 
 func SendEmail(sender, recipient, subject, body string) error {
-	domain := env.GetString("EMAIL_DOMAIN", "") // FIXME
+	domain := env.GetString("EMAIL_DOMAIN", "") // FIXME. Check this on startup and not here.
 	if domain == "" {
 		return fmt.Errorf("invalid email configuration")
 	}
-	apiKey := env.GetString("EMAIL_API_KEY", "") // FIXME
+	apiKey := env.GetString("EMAIL_API_KEY", "") // FIXME. Check this on startup and not here.
 	if apiKey == "" {
 		return fmt.Errorf("invalid email configuration")
 	}

@@ -12,25 +12,26 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/backend"
+	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/metadata"
-	p "github.com/podops/podops/internal/platform"
+	"github.com/podops/podops/internal/platform"
 )
 
 // UploadEndpoint implements content upload
 func UploadEndpoint(c echo.Context) error {
-	ctx := p.NewHttpContext(c)
+	ctx := platform.NewHttpContext(c)
 
 	mr, err := c.Request().MultipartReader()
 	if err != nil {
-		return p.ErrorResponse(c, http.StatusInternalServerError, err)
+		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	prod := c.Param("prod")
 	if prod == "" {
-		return p.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':prod'"))
+		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
 	if err := apiv1.AuthorizeAccessProduction(ctx, c, apiv1.ScopeResourceWrite, prod); err != nil {
-		return p.ErrorResponse(c, http.StatusUnauthorized, err)
+		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	for {
@@ -39,7 +40,7 @@ func UploadEndpoint(c echo.Context) error {
 			break
 		}
 		if err != nil {
-			return p.ErrorResponse(c, http.StatusInternalServerError, err)
+			return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 
 		if part.FormName() == "asset" {
@@ -49,19 +50,19 @@ func UploadEndpoint(c echo.Context) error {
 			os.MkdirAll(filepath.Dir(path), os.ModePerm) // make sure sub-folders exist
 			out, err := os.Create(path)
 			if err != nil {
-				return p.ErrorResponse(c, http.StatusInternalServerError, err)
+				return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
 			defer out.Close()
 
 			if _, err := io.Copy(out, part); err != nil {
-				return p.ErrorResponse(c, http.StatusInternalServerError, err)
+				return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
 			out.Close() // force close to have attributes like size etc correct
 
 			// extract the metadata from the file
 			meta, err := metadata.ExtractMetadataFromFile(path)
 			if err != nil {
-				return p.ErrorResponse(c, http.StatusInternalServerError, err)
+				return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
 			meta.GUID = metadata.FingerprintURI(prod, meta.Name)
 			meta.ParentGUID = prod
@@ -69,13 +70,13 @@ func UploadEndpoint(c echo.Context) error {
 
 			// update the inventory
 			if err := backend.UpdateAsset(ctx, meta, prod, location, podops.ResourceTypeLocal); err != nil {
-				return p.ErrorResponse(c, http.StatusInternalServerError, err)
+				return platform.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
 		}
 	}
 
 	// track api access for billing etc
-	p.TrackEvent(c.Request(), "api", "upload", prod, 1)
+	platform.TrackEvent(c.Request(), "api", "upload", prod, 1)
 
 	return c.NoContent(http.StatusCreated)
 }

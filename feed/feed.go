@@ -14,6 +14,7 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/feed/rss"
+	"github.com/podops/podops/internal/errordef"
 	pl "github.com/podops/podops/internal/platform"
 )
 
@@ -38,7 +39,7 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 		return err
 	}
 	if p == nil {
-		return fmt.Errorf("can not find '%s'", production)
+		return fmt.Errorf(errordef.MsgResourceNotFound, production)
 	}
 
 	if err = backend.ValidateProduction(ctx, production); err != nil {
@@ -49,7 +50,7 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 		p.BuildDate = 0 // FIXME BuildDate is the only flag we currently have to mark a production as VALID
 		backend.UpdateProduction(ctx, p)
 
-		return fmt.Errorf("can not build feed")
+		return errordef.ErrFeedFailed
 	}
 
 	// list all episodes, excluding future (i.e. unpublished) ones, descending order
@@ -62,7 +63,7 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 	}
 
 	if len(er) == 0 {
-		return fmt.Errorf("can not build feed without episodes")
+		return errordef.ErrFeedFailed
 	}
 
 	// read all episodes

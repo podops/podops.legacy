@@ -14,6 +14,7 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/feed"
+	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/platform"
 )
 
@@ -44,11 +45,11 @@ func BuildFeedEndpoint(c echo.Context) error {
 		return platform.ErrorResponse(c, http.StatusNotFound, err)
 	}
 	if p == nil {
-		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid guid '%s'", req.GUID))
+		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgInvalidGUID, req.GUID))
 	}
 
 	if err := feed.Build(ctx, req.GUID, validateOnly); err != nil {
-		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("error building feed '%s': %v", req.GUID, err))
+		return platform.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	if !validateOnly {

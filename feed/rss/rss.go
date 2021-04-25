@@ -10,6 +10,7 @@ import (
 	"unicode/utf8"
 
 	a "github.com/podops/podops"
+	"github.com/podops/podops/internal/errordef"
 )
 
 // iTunes Specifications: https://help.apple.com/itc/podcasts_connect/#/itcb54353390
@@ -290,7 +291,7 @@ func (p *Channel) Bytes() []byte {
 // Encode writes the bytes to the io.Writer stream in RSS 2.0 specification.
 func (p *Channel) Encode(w io.Writer) error {
 	if _, err := w.Write([]byte("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")); err != nil {
-		return fmt.Errorf("channel.Encode: error: %v", err)
+		return errordef.ErrBuildFailed
 	}
 
 	atomLink := ""

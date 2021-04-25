@@ -49,7 +49,7 @@ func NewClient(ctx context.Context, token string, opts ...*ClientOption) (*Clien
 
 func New(ctx context.Context, o *ClientOption) (*Client, error) {
 	if o == nil || !o.IsValid() {
-		return nil, errordef.ErrInvalidConfiguration
+		return nil, errordef.ErrInvalidClientConfiguration
 	}
 	return &Client{
 		opts:      o,

@@ -149,7 +149,7 @@ func LoginConfirmationEndpoint(c echo.Context) error {
 
 	token := c.Param("token")
 	if token == "" {
-		return platform.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid route, expected ':token"))
+		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
 	account, status, err := ConfirmLoginChallenge(ctx, token)

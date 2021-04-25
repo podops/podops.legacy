@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/podops/podops/auth"
+	"github.com/podops/podops/internal/errordef"
 
 	"github.com/urfave/cli/v2"
 )
@@ -41,7 +42,7 @@ func LoginCommand(c *cli.Context) error {
 			fmt.Println("Login error, logout first.") // FIXME better text
 			return nil
 		default:
-			return fmt.Errorf("api error %d", status)
+			return fmt.Errorf(errordef.MsgStatus, status)
 		}
 	} else {
 		fmt.Println("error: missing email")
@@ -85,7 +86,7 @@ func AuthCommand(c *cli.Context) error {
 		fmt.Println("Invalid token")
 		return nil
 	default:
-		return fmt.Errorf("api error %d", status)
+		return fmt.Errorf(errordef.MsgStatus, status)
 	}
 
 }
@@ -95,7 +96,7 @@ func LogoutCommand(c *cli.Context) error {
 
 	m := loadNetrc().FindMachine(machineEntry)
 	if m == nil {
-		return fmt.Errorf("cli error")
+		return fmt.Errorf(errordef.MsgCLIError)
 	}
 	request := auth.AuthorizationRequest{
 		Realm:  client.Realm(),
@@ -111,7 +112,7 @@ func LogoutCommand(c *cli.Context) error {
 		clearLogin()
 		fmt.Println("Logout successful.")
 	} else {
-		return fmt.Errorf("api error %d", status)
+		return fmt.Errorf(errordef.MsgStatus, status)
 	}
 
 	return nil

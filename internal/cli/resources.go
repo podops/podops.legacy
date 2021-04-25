@@ -12,6 +12,7 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
+	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/metadata"
 )
 
@@ -62,6 +63,7 @@ func GetResourcesCommand(c *cli.Context) error {
 			}
 		}
 	} else {
+		// GITHUB ISSUE #10
 		guid := c.Args().First()
 
 		var rsrc interface{}
@@ -86,7 +88,7 @@ func GetResourcesCommand(c *cli.Context) error {
 func CreateCommand(c *cli.Context) error {
 
 	if c.NArg() != 1 {
-		return fmt.Errorf("wrong number of arguments: expected 1, got %d", c.NArg())
+		return fmt.Errorf(errordef.MsgArgumentCountMismatch, 1, c.NArg())
 	}
 	path := c.Args().First()
 	force := c.Bool("force")
@@ -109,7 +111,7 @@ func CreateCommand(c *cli.Context) error {
 func UpdateCommand(c *cli.Context) error {
 
 	if c.NArg() != 1 {
-		return fmt.Errorf("wrong number of arguments: expected 1, got %d", c.NArg())
+		return fmt.Errorf(errordef.MsgArgumentCountMismatch, 1, c.NArg())
 	}
 	path := c.Args().First()
 	force := c.Bool("force")
@@ -132,7 +134,7 @@ func UpdateCommand(c *cli.Context) error {
 func DeleteResourcesCommand(c *cli.Context) error {
 
 	if c.NArg() != 2 {
-		return fmt.Errorf("wrong number of arguments: expected 2, got %d", c.NArg())
+		return fmt.Errorf(errordef.MsgArgumentCountMismatch, 2, c.NArg())
 	}
 
 	prod := getProduction(c)
@@ -201,7 +203,7 @@ func TemplateCommand(c *cli.Context) error {
 func UploadCommand(c *cli.Context) error {
 
 	if c.NArg() != 1 {
-		return fmt.Errorf("wrong number of arguments: expected 1, got %d", c.NArg())
+		return fmt.Errorf(errordef.MsgArgumentCountMismatch, 1, c.NArg())
 	}
 
 	prod := getProduction(c)

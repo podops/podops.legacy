@@ -14,6 +14,7 @@ import (
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/auth"
 	"github.com/podops/podops/backend"
+	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/metadata"
 	"github.com/podops/podops/internal/platform"
 )
@@ -52,7 +53,7 @@ func ImportResource(ctx context.Context, prod, src string) int {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		platform.ReportError(fmt.Errorf("can not retrieve '%s': %s", src, resp.Status))
+		platform.ReportError(fmt.Errorf(errordef.MsgErrUploadingResource, src))
 		return http.StatusBadRequest
 	}
 
@@ -72,7 +73,7 @@ func ImportResource(ctx context.Context, prod, src string) int {
 	os.MkdirAll(filepath.Dir(path), os.ModePerm) // make sure sub-folders exist
 	out, err := os.Create(path)
 	if err != nil {
-		platform.ReportError(fmt.Errorf("can not transfer '%s': %v", src, err))
+		platform.ReportError(err)
 		return http.StatusBadRequest
 	}
 	defer out.Close()
@@ -83,11 +84,11 @@ func ImportResource(ctx context.Context, prod, src string) int {
 
 	// error handling & verification
 	if err != nil {
-		platform.ReportError(fmt.Errorf("can not transfer '%s': %v", src, err))
+		platform.ReportError(err)
 		return http.StatusBadRequest
 	}
 	if l != meta.Size {
-		platform.ReportError(fmt.Errorf("error transfering '%s': expected %d, reveived %d", src, meta.Size, l))
+		platform.ReportError(fmt.Errorf(errordef.MsgErrUploadingResource, src))
 		return http.StatusBadRequest
 	}
 
@@ -101,7 +102,7 @@ func ImportResource(ctx context.Context, prod, src string) int {
 
 	// update the inventory
 	if err := backend.UpdateAsset(ctx, meta, prod, relPath, podops.ResourceTypeImport); err != nil {
-		platform.ReportError(fmt.Errorf("error updating inventory: %v", err))
+		platform.ReportError(err)
 		return http.StatusBadRequest
 	}
 

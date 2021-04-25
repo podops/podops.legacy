@@ -6,6 +6,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/podops/podops"
+	"github.com/podops/podops/internal/errordef"
 )
 
 type (
@@ -29,7 +30,7 @@ func UnmarshalResource(data []byte) (interface{}, string, string, error) {
 	r, _ := LoadGenericResource(data)
 	loader := resourceLoaders[r.Kind]
 	if loader == nil {
-		return nil, "", "", fmt.Errorf("unsupported resource '%s'", r.Kind)
+		return nil, "", "", fmt.Errorf(errordef.MsgInvalidResource, r.Kind)
 	}
 
 	resource, guid, err := loader(data)
@@ -45,7 +46,7 @@ func LoadGenericResource(data []byte) (*podops.GenericResource, error) {
 
 	err := yaml.Unmarshal([]byte(data), &r)
 	if err != nil {
-		return nil, fmt.Errorf("can not parse resource: %w", err)
+		return nil, err
 	}
 	return &r, nil
 }
@@ -55,7 +56,7 @@ func loadShowResource(data []byte) (interface{}, string, error) {
 
 	err := yaml.Unmarshal([]byte(data), &show)
 	if err != nil {
-		return nil, "", fmt.Errorf("can not parse resource: %w", err)
+		return nil, "", err
 	}
 
 	// FIXME validate before write, not on every read!
@@ -74,7 +75,7 @@ func loadEpisodeResource(data []byte) (interface{}, string, error) {
 
 	err := yaml.Unmarshal([]byte(data), &episode)
 	if err != nil {
-		return nil, "", fmt.Errorf("can not parse resource: %w", err)
+		return nil, "", err
 	}
 
 	// FIXME validate before write, not on every read!
