@@ -45,11 +45,11 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
-    - name: foo
+    - name: rename latest builds
       run: |
-        pwd
-        ls -la
-        ls -la latest
+        cp -f latest/po-linux-$VERSION.gz latest/po-linux-latest.gz
+        cp -f latest/po-mac-$VERSION.gz latest/po-mac-latest.gz
+        cp -f latest/po-win-$VERSION.zip latest-po-win-latest.zip
 
     - name: upload archives
       uses: google-github-actions/upload-cloud-storage@main
