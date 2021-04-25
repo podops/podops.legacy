@@ -15,9 +15,9 @@ To use Podops, you need an API access key for `https://api.podops.dev`. To get y
 ### Download the binary
 Download the latest binary for your system:
 
-* [Linux/amd64](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-linux-0.9.7.gz)
-* [MacOS/amd64](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-mac-0.9.7.gz)
-* [Windows](https://storage.googleapis.com/cdn.podops.dev/downloads/cli-0.9.7/po-win-0.9.7.zip)
+* [Linux/amd64](https://storage.googleapis.com/cdn.podops.dev/downloads/latest/po-linux-latest.gz)
+* [MacOS/amd64](https://storage.googleapis.com/cdn.podops.dev/downloads/latest/po-mac-latest.gz)
+* [Windows](https://storage.googleapis.com/cdn.podops.dev/downloads/latest/po-win-1.0.0.zip)
 
 Unpack the archive and place the `po` binary in a directory that is on your `$PATH`. Verify that the command line tool is accessible:
 
