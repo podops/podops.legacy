@@ -29,8 +29,7 @@ const (
 
 // New instantiates a podcast with required parameters.
 //
-// Nil-able fields are optional but recommended as they are formatted
-// to the expected proper formats.
+// Nil-able fields are optional but recommended as they are formatted to the expected proper formats.
 func New(title, link, description string, pubDate, lastBuildDate *time.Time) Channel {
 	return Channel{
 		Title:         title,

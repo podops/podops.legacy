@@ -7,12 +7,15 @@ import (
 type (
 	// Production is the parent struct of all other resources.
 	Production struct {
-		Name      string `json:"name" binding:"required"`
-		GUID      string `json:"guid,omitempty"`
-		Owner     string `json:"owner"`
-		Title     string `json:"title"`
-		Summary   string `json:"summary"`
-		BuildDate int64  `json:"build_date"`
+		Name    string `json:"name" binding:"required"`
+		GUID    string `json:"guid,omitempty"`
+		Owner   string `json:"owner"`
+		Title   string `json:"title"`
+		Summary string `json:"summary"`
+		// metadata
+		Published         bool  `json:"published"`           // the production is only visible if TRUE
+		LatestPublishDate int64 `json:"latest_publish_date"` // the timestamp of the most recent published episode
+		BuildDate         int64 `json:"build_date"`          // the timestamp of the build
 		// internal
 		Created int64 `json:"-"`
 		Updated int64 `json:"-"`

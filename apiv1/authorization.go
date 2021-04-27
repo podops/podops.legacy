@@ -81,16 +81,3 @@ func AuthorizeAccessResource(ctx context.Context, c echo.Context, scope, claim s
 
 	return nil
 }
-
-// ValidateNotEmpty test all provided values to be not empty
-func ValidateNotEmpty(claims ...string) bool {
-	if len(claims) == 0 {
-		return false
-	}
-	for _, s := range claims {
-		if s == "" {
-			return false
-		}
-	}
-	return true
-}

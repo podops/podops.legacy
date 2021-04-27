@@ -44,7 +44,7 @@ var (
 // DefaultClientOptions returns a default configuration bases on ENV variables
 func DefaultClientOptions() *ClientOption {
 	o := ClientOption{
-		Token:           env.GetString("PODOPS_API_TOKEN", ""),
+		Token:           env.GetString("PODOPS_API_KEY", ""),
 		APIEndpoint:     DefaultAPIEndpoint,
 		CDNEndpoint:     DefaultCDNEndpoint,
 		DefaultEndpoint: DefaultEndpoint,

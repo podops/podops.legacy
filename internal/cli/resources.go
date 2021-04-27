@@ -63,7 +63,7 @@ func GetResourcesCommand(c *cli.Context) error {
 			}
 		}
 	} else {
-		// GITHUB ISSUE #10
+		// GITHUB_ISSUE #10
 		guid := c.Args().First()
 
 		var rsrc interface{}

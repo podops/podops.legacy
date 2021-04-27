@@ -6,8 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// FIXME check for unused routes and namespaces
-
 const (
 	// NamespacePrefix namespace for the client and CLI
 	NamespacePrefix = "/a/v1"

@@ -15,6 +15,7 @@ const (
 	MsgErrSyncingResource   = "error syncing '%s'"
 
 	MsgArgumentCountMismatch = "args: expected %d, got %d"
+	MsgMissingArgument       = "missing argument '%s'"
 
 	MsgInvalidGUID        = "invalid guid '%s'"
 	MsgInvalidParameter   = "invalid parameter '%s'"

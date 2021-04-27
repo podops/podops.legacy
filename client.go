@@ -23,9 +23,7 @@ type (
 		opts              *ClientOption
 		defaultProduction string
 		// internal for now
-		validated bool
-		valid     bool
-		realm     string
+		realm string
 	}
 )
 
@@ -37,7 +35,7 @@ func NewClient(ctx context.Context, token string, opts ...*ClientOption) (*Clien
 
 	co := DefaultClientOptions()
 	if len(opts) != 0 {
-		co = co.Merge(opts[0]) // FIXME we assume only 1 opts is provided!
+		co = co.Merge(opts[0]) // QA we assume only 1 opts is provided!
 	}
 
 	if token != "" {
@@ -52,28 +50,14 @@ func New(ctx context.Context, o *ClientOption) (*Client, error) {
 		return nil, errordef.ErrInvalidClientConfiguration
 	}
 	return &Client{
-		opts:      o,
-		validated: false,
-		valid:     false,
-		realm:     "podops",
+		opts:  o,
+		realm: "podops",
 	}, nil
 }
 
 // IsValid checks if all configuration parameters are provided
 func (cl *Client) IsValid() bool {
-	if cl.validated {
-		return cl.valid
-	}
-	cl.validated = true
-	// verify the opts first
-	if !cl.opts.IsValid() {
-		cl.valid = false
-		return false
-	}
-
-	cl.valid = true // FIXME try to verify the token against the API ?
-
-	return true
+	return cl.opts.IsValid()
 }
 
 func (cl *Client) SetProduction(production string) {

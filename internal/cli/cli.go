@@ -135,9 +135,8 @@ func storeDefaultProduction(production string) error {
 	return ioutil.WriteFile(podops.DefaultConfigPath(), data, 0644)
 }
 
+// GITHUB_ISSUE #15
 func loadResource(path string) (interface{}, string, string, error) {
-	// FIXME: only local yaml is supported at the moment !
-
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, "", "", err

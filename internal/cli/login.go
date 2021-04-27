@@ -16,6 +16,8 @@ const (
 	authEndpoint   = "/_a/auth"
 )
 
+// FIXME replace all the messages with consts
+
 // LoginCommand logs into the service
 func LoginCommand(c *cli.Context) error {
 	email := c.Args().First()
@@ -39,13 +41,13 @@ func LoginCommand(c *cli.Context) error {
 			fmt.Println("Login verificaction sent. Check your inbox.")
 			return nil
 		case http.StatusForbidden:
-			fmt.Println("Login error, logout first.") // FIXME better text
+			fmt.Println("Already logged-in, use 'po logout' first.")
 			return nil
 		default:
 			return fmt.Errorf(errordef.MsgStatus, status)
 		}
 	} else {
-		fmt.Println("error: missing email")
+		fmt.Println(errordef.MsgMissingArgument, "EMAIL")
 	}
 
 	return nil
@@ -55,7 +57,7 @@ func LoginCommand(c *cli.Context) error {
 func AuthCommand(c *cli.Context) error {
 
 	if c.Args().Len() != 2 {
-		fmt.Println("error: missing parameters")
+		fmt.Println(errordef.MsgArgumentCountMismatch, 2, c.Args().Len())
 		return nil
 	}
 

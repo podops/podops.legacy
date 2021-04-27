@@ -135,10 +135,10 @@ func UpdateAsset(ctx context.Context, meta *metadata.Metadata, production, locat
 		r.Updated = util.Timestamp()
 
 		if meta.IsImage() {
-			r.ImageURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location) // FIXME validate this, what about external assets?
+			r.ImageURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location)
 			r.ImageRel = rel
 		} else {
-			r.EnclosureURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location) // FIXME validate this, what about external assets?
+			r.EnclosureURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location)
 			r.EnclosureRel = rel
 		}
 
@@ -161,10 +161,10 @@ func UpdateAsset(ctx context.Context, meta *metadata.Metadata, production, locat
 	}
 
 	if meta.IsImage() {
-		rsrc.ImageURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location) // FIXME validate this, what about external assets?
+		rsrc.ImageURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location)
 		rsrc.ImageRel = rel
 	} else {
-		rsrc.EnclosureURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location) // FIXME validate this, what about external assets?
+		rsrc.EnclosureURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location)
 		rsrc.EnclosureRel = rel
 	}
 
@@ -185,7 +185,7 @@ func DeleteResource(ctx context.Context, prod, kind, guid string) error {
 	}
 
 	if err := platform.DataStore().Delete(ctx, resourceKey(r.GUID)); err != nil {
-		return err // FIXME put r back if this fails?
+		return err
 	}
 
 	// validate the production after deleting a resource
@@ -194,7 +194,9 @@ func DeleteResource(ctx context.Context, prod, kind, guid string) error {
 		if err != nil {
 			return err
 		}
-		p.BuildDate = 0 // FIXME BuildDate is the only flag we currently have to mark a production as VALID
+		p.BuildDate = 0
+		p.Published = false
+		p.LatestPublishDate = 0
 		UpdateProduction(ctx, p)
 	}
 
@@ -258,7 +260,7 @@ func GetResourceContent(ctx context.Context, guid string) (interface{}, error) {
 			URI:   r.GetPublicLocation(),
 			Title: r.Name,
 			Type:  meta.ContentType,
-			Size:  int(meta.Size), // GITHUB ISSUE #10
+			Size:  int(meta.Size), // GITHUB_ISSUE #10
 			Rel:   podops.ResourceTypeLocal,
 		}
 		return &asset, nil
@@ -282,7 +284,7 @@ func GetResourceContent(ctx context.Context, guid string) (interface{}, error) {
 		}
 		episode := rsrc.(*podops.Episode)
 		episode.Enclosure.URI = r.EnclosureURI
-		episode.Enclosure.Size = int(meta.Size) // GITHUB ISSUE #10
+		episode.Enclosure.Size = int(meta.Size) // GITHUB_ISSUE #10
 		episode.Description.Duration = int(meta.Duration)
 
 		return episode, nil

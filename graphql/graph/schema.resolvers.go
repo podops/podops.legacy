@@ -36,7 +36,7 @@ func (r *queryResolver) Show(ctx context.Context, name *string, limit int) (*mod
 		platform.ReportError(err)
 		return nil, err
 	}
-	if p.BuildDate == 0 {
+	if !p.Published {
 		return nil, nil // Nope, can't access as it's not public yet
 	}
 

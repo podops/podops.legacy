@@ -15,9 +15,8 @@ import (
 )
 
 const (
-	endpoint = "http://localhost:8080"
-	realm    = "podops"
-	userID   = "me@podops.dev"
+	realm  = "podops"
+	userID = "me@podops.dev"
 
 	loginRequestRoute      = "/login"
 	loginConfirmationRoute = "/login/:token"
@@ -27,7 +26,6 @@ const (
 
 // Scenario 1: new account, login, account confirmation, token swap
 func TestLoginScenario1(t *testing.T) {
-	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 	cleaner()
 
@@ -47,7 +45,6 @@ func TestLoginScenario1(t *testing.T) {
 
 // Scenario 2: new account, login, duplicate login request
 func TestLoginScenario2(t *testing.T) {
-	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
@@ -69,7 +66,6 @@ func TestLoginScenario2(t *testing.T) {
 
 // Scenario 3: new account, login, duplicate account confirmation
 func TestLoginScenario3(t *testing.T) {
-	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
@@ -88,7 +84,6 @@ func TestLoginScenario3(t *testing.T) {
 
 // Scenario 4: new account, login, account confirmation, duplicate token swap
 func TestLoginScenario4(t *testing.T) {
-	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
@@ -108,7 +103,6 @@ func TestLoginScenario4(t *testing.T) {
 
 // Scenario 5: new account, login, invalid confirmation
 func TestLoginScenario5(t *testing.T) {
-	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
@@ -118,7 +112,6 @@ func TestLoginScenario5(t *testing.T) {
 
 // Scenario 6: new account, login, account confirmation, various invalid token swaps
 func TestLoginScenario6(t *testing.T) {
-	// FIXME podops.DefaultAPIEndpoint = endpoint
 	t.Cleanup(cleaner)
 
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account

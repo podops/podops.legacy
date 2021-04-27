@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/fupas/commons/pkg/validate"
 	cs "github.com/fupas/platform/pkg/platform"
 	"github.com/labstack/echo/v4"
 
@@ -49,7 +50,7 @@ func DeleteTaskEndpoint(c echo.Context) error {
 	prod := c.Param("prod")
 	location := c.QueryParam("l")
 
-	if !apiv1.ValidateNotEmpty(prod, location) {
+	if !validate.NotEmpty(prod, location) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, prod); err != nil {

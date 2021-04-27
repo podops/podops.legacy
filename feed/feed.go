@@ -2,7 +2,6 @@ package feed
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -47,7 +46,10 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 		if err != nil {
 			return err
 		}
-		p.BuildDate = 0 // FIXME BuildDate is the only flag we currently have to mark a production as VALID
+		p.BuildDate = 0
+		p.Published = false
+		p.LatestPublishDate = 0
+
 		backend.UpdateProduction(ctx, p)
 
 		return errordef.ErrFeedFailed
@@ -117,6 +119,14 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 		return err
 	}
 
+	// source data should be OK by now, we can update the metadata
+	p.BuildDate = util.Timestamp()
+	p.Published = true
+	p.LatestPublishDate = er[0].Published
+	if err := backend.UpdateProduction(ctx, p); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -125,7 +135,7 @@ func TransformToPodcast(s *podops.Show) (*rss.Channel, error) {
 	now := time.Now()
 
 	// basics
-	pf := rss.New(s.Description.Title, s.Description.Link.URI, s.Description.Summary, &now, &now) // FIXME remove timestamps
+	pf := rss.New(s.Description.Title, s.Description.Link.URI, s.Description.Summary, &now, &now)
 	// details
 	pf.AddSummary(s.Description.Summary)
 	if s.Description.Author == "" {
@@ -150,7 +160,7 @@ func TransformToPodcast(s *podops.Show) (*rss.Channel, error) {
 	if t == podops.ShowTypeEpisodic || t == podops.ShowTypeSerial {
 		pf.IType = t
 	} else {
-		return nil, errors.New("Show type must be 'Episodic' or 'Serial' ")
+		return nil, errordef.ErrInvalidParameters
 	}
 	if s.Metadata.Labels[podops.LabelBlock] == "yes" {
 		pf.IBlock = "yes"

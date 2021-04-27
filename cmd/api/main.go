@@ -67,8 +67,24 @@ func init() {
 	// initialize the platform first
 	projectID := env.GetString("PROJECT_ID", "")
 	if projectID == "" {
-		log.Fatal("Missing variable 'PROJECT_ID'")
+		log.Fatal("Missing env variable 'PROJECT_ID'")
 	}
+	if !env.Assert("PODOPS_API_KEY") {
+		log.Fatal("Missing env variable 'PODOPS_API_KEY'")
+	}
+	if !env.Assert("LOCATION_ID") {
+		log.Fatal("Missing env variable 'LOCATION_ID'")
+	}
+	if !env.Assert("DEFAULT_QUEUE") {
+		log.Fatal("Missing env variable 'DEFAULT_QUEUE'")
+	}
+	if !env.Assert("EMAIL_DOMAIN") {
+		log.Fatal("Missing env variable 'EMAIL_DOMAIN'")
+	}
+	if !env.Assert("EMAIL_API_KEY") {
+		log.Fatal("Missing env variable 'EMAIL_API_KEY'")
+	}
+
 	serviceName := env.GetString("SERVICE_NAME", "default")
 
 	client, err := platform.NewClient(context.Background(), gcp.NewErrorReporting(context.TODO(), projectID, serviceName))

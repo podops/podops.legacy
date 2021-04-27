@@ -128,7 +128,7 @@ func invoke(token string, req *http.Request, response interface{}) (int, error) 
 	return resp.StatusCode, nil
 }
 
-// FIXME this implementation does not work for VERY large files !
+// GITHUB_ISSUE #13
 
 // Creates a new file upload http request with optional extra params
 func upload(url, cmd, token, guid, form, path string) (*http.Request, error) {

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/fupas/commons/pkg/util"
+	"github.com/fupas/commons/pkg/validate"
 	"github.com/labstack/echo/v4"
 
 	"github.com/podops/podops"
@@ -47,7 +48,7 @@ func GetResourceEndpoint(c echo.Context) error {
 	kind := c.Param("kind")
 	guid := c.Param("id")
 
-	if !ValidateNotEmpty(prod, kind, guid) {
+	if !validate.NotEmpty(prod, kind, guid) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
@@ -76,7 +77,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 	prod := c.Param("prod")
 	kind := c.Param("kind")
 
-	if !ValidateNotEmpty(prod, kind) {
+	if !validate.NotEmpty(prod, kind) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
@@ -113,7 +114,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		action = "rsrc_update"
 	}
 
-	if !ValidateNotEmpty(prod, kind, guid) {
+	if !validate.NotEmpty(prod, kind, guid) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
@@ -204,6 +205,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 }
 
 // DeleteResourceEndpoint deletes a resource and its .yaml file
+// GITHUB_ISSUE #14
 func DeleteResourceEndpoint(c echo.Context) error {
 	ctx := platform.NewHttpContext(c)
 
@@ -211,14 +213,13 @@ func DeleteResourceEndpoint(c echo.Context) error {
 	kind := c.Param("kind")
 	guid := c.Param("id")
 
-	// FIXME implement cascading deletes
 	/*
 		forceFlag := false
 		if strings.ToLower(c.QueryParam("f")) == "true" {
 			forceFlag = true
 		}
 	*/
-	if !ValidateNotEmpty(prod, kind, guid) {
+	if !validate.NotEmpty(prod, kind, guid) {
 		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 	if err := AuthorizeAccessResource(ctx, c, ScopeResourceWrite, guid); err != nil {

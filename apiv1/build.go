@@ -8,7 +8,6 @@ import (
 	"google.golang.org/genproto/googleapis/cloud/tasks/v2"
 
 	"github.com/fupas/commons/pkg/env"
-	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
 
 	"github.com/podops/podops"
@@ -53,12 +52,6 @@ func BuildFeedEndpoint(c echo.Context) error {
 	}
 
 	if !validateOnly {
-		// update the PRODUCTION record
-		p.BuildDate = util.Timestamp()
-		if err := backend.UpdateProduction(ctx, p); err != nil {
-			return platform.ErrorResponse(c, http.StatusBadRequest, err)
-		}
-
 		// dispatch a request for background sync
 		ir := podops.SyncRequest{
 			GUID:   req.GUID,
