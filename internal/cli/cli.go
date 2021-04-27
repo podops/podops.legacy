@@ -12,10 +12,10 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/fupas/commons/pkg/netrc"
 	"github.com/urfave/cli/v2"
 
 	"github.com/podops/podops"
-	"github.com/podops/podops/internal/cli/netrc"
 	"github.com/podops/podops/internal/loader"
 )
 

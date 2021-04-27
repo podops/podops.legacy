@@ -5,8 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/fupas/commons/pkg/env"
-
-	"github.com/podops/podops/internal/cli/netrc"
+	"github.com/fupas/commons/pkg/netrc"
 )
 
 const (
