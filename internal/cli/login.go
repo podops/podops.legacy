@@ -35,13 +35,13 @@ func LoginCommand(c *cli.Context) error {
 
 		switch status {
 		case http.StatusCreated:
-			fmt.Println("New account created. Check your inbox and confirm the email address.")
+			fmt.Println(errordef.MsgCLINewAccount)
 			return nil
 		case http.StatusNoContent:
-			fmt.Println("Login verificaction sent. Check your inbox.")
+			fmt.Println(errordef.MsgCLILoginVerification)
 			return nil
 		case http.StatusForbidden:
-			fmt.Println("Already logged-in, use 'po logout' first.")
+			fmt.Println(errordef.MsgCLILoginError)
 			return nil
 		default:
 			return fmt.Errorf(errordef.MsgStatus, status)
@@ -57,7 +57,7 @@ func LoginCommand(c *cli.Context) error {
 func AuthCommand(c *cli.Context) error {
 
 	if c.Args().Len() != 2 {
-		fmt.Println(errordef.MsgArgumentCountMismatch, 2, c.Args().Len())
+		printMsg(errordef.MsgArgumentCountMismatch, 2, c.Args().Len())
 		return nil
 	}
 
@@ -76,19 +76,19 @@ func AuthCommand(c *cli.Context) error {
 	switch status {
 	case http.StatusOK:
 		if err := storeLogin(response.UserID, response.Token); err != nil {
-			fmt.Println("Error updating config.")
+			fmt.Println(errordef.MsgCLIErrorUpdateConfig)
 			return nil
 		}
-		fmt.Println("Sucessfully authenticated.")
+		fmt.Println(errordef.MsgCLIAuthSuccess)
 		return nil
 	case http.StatusUnauthorized:
-		fmt.Println("Token is expired")
+		fmt.Println(errordef.MsgCLITokenExpired)
 		return nil
 	case http.StatusNotFound:
-		fmt.Println("Invalid token")
+		fmt.Println(errordef.MsgCLITokenInvalid)
 		return nil
 	default:
-		return fmt.Errorf(errordef.MsgStatus, status)
+		return fmt.Errorf(errordef.MsgCLIStatus, status)
 	}
 
 }
@@ -112,9 +112,9 @@ func LogoutCommand(c *cli.Context) error {
 
 	if status == http.StatusNoContent {
 		clearLogin()
-		fmt.Println("Logout successful.")
+		fmt.Println(errordef.MsgCLILogout)
 	} else {
-		return fmt.Errorf(errordef.MsgStatus, status)
+		return fmt.Errorf(errordef.MsgCLIStatus, status)
 	}
 
 	return nil

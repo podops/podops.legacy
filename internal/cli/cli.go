@@ -186,3 +186,8 @@ func printError(c *cli.Context, err error) {
 	msg := fmt.Sprintf("%s: %v", c.Command.Name, strings.ToLower(err.Error()))
 	fmt.Println(msg)
 }
+
+// printMsg is used for all the cli output
+func printMsg(format string, a ...interface{}) {
+	fmt.Println(fmt.Sprintf(format, a...))
+}
