@@ -32,7 +32,7 @@ func TestLoginScenario1(t *testing.T) {
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
 
 	account := getAccount(t)
-	loginStep2(t, account.Ext1, http.StatusNoContent, true) // confirm the new account, send auth token
+	loginStep2(t, account.Ext1, http.StatusTemporaryRedirect, true) // confirm the new account, send auth token
 
 	account = getAccount(t)
 	loginStep3(t, realm, userID, account.ClientID, account.Ext2, AccountActive, http.StatusOK, true) // exchange auth token for a permanent token
@@ -56,7 +56,7 @@ func TestLoginScenario2(t *testing.T) {
 	// requires a new token
 	assert.NotEqual(t, account1.Ext1, account2.Ext1)
 
-	loginStep2(t, account2.Ext1, http.StatusNoContent, true) // confirm the new account, send auth token
+	loginStep2(t, account2.Ext1, http.StatusTemporaryRedirect, true) // confirm the new account, send auth token
 
 	account3 := getAccount(t)
 	loginStep3(t, realm, userID, account3.ClientID, account3.Ext2, AccountActive, http.StatusOK, true) // exchange auth token for a permanent token
@@ -73,8 +73,8 @@ func TestLoginScenario3(t *testing.T) {
 	account := getAccount(t)
 	token := account.Ext1
 
-	loginStep2(t, token, http.StatusNoContent, true)    // confirm the new account, send auth token
-	loginStep2(t, token, http.StatusUnauthorized, true) // confirm again
+	loginStep2(t, token, http.StatusTemporaryRedirect, true) // confirm the new account, send auth token
+	loginStep2(t, token, http.StatusUnauthorized, true)      // confirm again
 
 	account = getAccount(t)
 	loginStep3(t, realm, userID, account.ClientID, account.Ext2, AccountActive, http.StatusOK, true) // exchange auth token for a permanent token
@@ -89,7 +89,7 @@ func TestLoginScenario4(t *testing.T) {
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
 
 	account := getAccount(t)
-	loginStep2(t, account.Ext1, http.StatusNoContent, true) // confirm the new account, send auth token
+	loginStep2(t, account.Ext1, http.StatusTemporaryRedirect, true) // confirm the new account, send auth token
 
 	account = getAccount(t)
 	token := account.Ext2
@@ -117,7 +117,7 @@ func TestLoginScenario6(t *testing.T) {
 	loginStep1(t, http.StatusCreated) // new account, request login, create the account
 
 	account := getAccount(t)
-	loginStep2(t, account.Ext1, http.StatusNoContent, true) // confirm the new account, send auth token
+	loginStep2(t, account.Ext1, http.StatusTemporaryRedirect, true) // confirm the new account, send auth token
 
 	account = getAccount(t)
 	loginStep3(t, "", "", "", "", AccountLoggedOut, http.StatusBadRequest, false)

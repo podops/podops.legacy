@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
 	"github.com/stretchr/testify/assert"
+	"github.com/txsvc/spa/pkg/timestamp"
 )
 
 const (
@@ -61,7 +61,7 @@ func TestUpdateAccount(t *testing.T) {
 	if assert.NoError(t, err) {
 		assert.NotNil(t, account1)
 
-		now := util.Timestamp()
+		now := timestamp.Now()
 		account1.Confirmed = now
 		err = UpdateAccount(context.TODO(), account1)
 

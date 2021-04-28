@@ -9,8 +9,8 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	"github.com/fupas/commons/pkg/util"
 	ds "github.com/fupas/platform/pkg/platform"
+	"github.com/txsvc/spa/pkg/timestamp"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
@@ -21,7 +21,7 @@ import (
 
 func (r *queryResolver) Show(ctx context.Context, name *string, limit int) (*model.Show, error) {
 
-	now := util.Timestamp()
+	now := timestamp.Now()
 
 	data, err := r.ShowLoader.Load(ctx, *name)
 	if err != nil {
@@ -79,7 +79,7 @@ func (r *queryResolver) Episode(ctx context.Context, guid *string) (*model.Episo
 		platform.ReportError(err)
 		return nil, err
 	}
-	if published == 0 || published > util.Timestamp() {
+	if published == 0 || published > timestamp.Now() {
 		return nil, nil // Nope, can't access as it's not public yet
 	}
 

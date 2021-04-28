@@ -5,10 +5,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/txsvc/spa/pkg/id"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v2"
-
-	"github.com/fupas/commons/pkg/util"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
@@ -172,7 +171,7 @@ func TemplateCommand(c *cli.Context) error {
 	}
 	guid := c.String("guid")
 	if guid == "" {
-		guid, _ = util.ShortUUID()
+		guid, _ = id.ShortUUID()
 	}
 	parentGUID := c.String("parent")
 	if parentGUID == "" {

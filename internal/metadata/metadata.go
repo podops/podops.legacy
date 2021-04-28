@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fupas/commons/pkg/util"
 	"github.com/tcolgate/mp3"
+	"github.com/txsvc/spa/pkg/id"
 )
 
 const (
@@ -138,12 +138,12 @@ func CalculateLength(path string) (int64, error) {
 
 // FingerprintURI creates a unique uri based on the input
 func FingerprintURI(parent, uri string) string {
-	return util.Checksum(parent + uri)
+	return id.Checksum(parent + uri)
 }
 
 // FingerprintWithExt creates a unique uri based on the input
 func FingerprintWithExt(parent, uri string) string {
-	id := util.Checksum(parent + uri)
+	id := id.Checksum(parent + uri)
 	parts := strings.Split(uri, ".")
 	if len(parts) == 0 {
 		return id

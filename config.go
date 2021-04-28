@@ -4,8 +4,8 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/fupas/commons/pkg/env"
-	"github.com/fupas/commons/pkg/netrc"
+	"github.com/txsvc/spa/pkg/env"
+	"github.com/txsvc/spa/pkg/netrc"
 )
 
 const (

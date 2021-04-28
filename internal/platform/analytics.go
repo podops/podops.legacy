@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/fupas/commons/pkg/env"
-	"github.com/fupas/commons/pkg/util"
 	"github.com/labstack/echo/v4"
+	"github.com/txsvc/spa/pkg/env"
+	"github.com/txsvc/spa/pkg/id"
 )
 
 const (
@@ -101,7 +101,7 @@ func PostToAnalytics(request *http.Request, values *map[string]string) error {
 
 	ip := request.RemoteAddr
 	userAgent := request.UserAgent()
-	uid := util.Fingerprint(userAgent + ip)
+	uid := id.Fingerprint(userAgent + ip)
 	path := request.URL.Path
 	dl := request.Host + request.RequestURI
 

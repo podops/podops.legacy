@@ -7,10 +7,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/fupas/commons/pkg/env"
 	"github.com/fupas/platform"
-	svc "github.com/fupas/platform/pkg/http"
 	gcp "github.com/fupas/platform/provider/google"
+	"github.com/txsvc/spa/pkg/env"
+	"github.com/txsvc/spa/pkg/server"
 
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/cdn"
@@ -63,6 +63,6 @@ func init() {
 }
 
 func main() {
-	service := svc.NewServer(setup, shutdown, nil)
+	service := server.New(setup, shutdown, nil)
 	service.StartBlocking()
 }

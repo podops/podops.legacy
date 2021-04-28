@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/fupas/commons/pkg/util"
-	"github.com/fupas/commons/pkg/validate"
 	"github.com/labstack/echo/v4"
+	"github.com/txsvc/spa/pkg/timestamp"
+	"github.com/txsvc/spa/pkg/validate"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
@@ -154,7 +154,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		// the attributes we copy from the .yaml
 		p.Title = show.Description.Title
 		p.Summary = show.Description.Summary
-		p.Updated = util.Timestamp()
+		p.Updated = timestamp.Now()
 
 		if err := backend.UpdateProduction(ctx, p); err != nil {
 			return platform.ErrorResponse(c, http.StatusBadRequest, err)

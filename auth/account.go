@@ -5,8 +5,9 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
+	"github.com/txsvc/spa/pkg/id"
+	"github.com/txsvc/spa/pkg/timestamp"
 )
 
 const (
@@ -27,7 +28,6 @@ const (
 )
 
 type (
-
 	// Account represents an account for a user or client (e.g. API, bot)
 	Account struct {
 		Realm    string `json:"realm"`     // KEY
@@ -51,9 +51,9 @@ type (
 
 // CreateAccount creates an new account within a given realm
 func CreateAccount(ctx context.Context, realm, userID string) (*Account, error) {
-	now := util.Timestamp()
-	token, _ := util.ShortUUID()
-	uid, _ := util.ShortUUID() // FIXME verify that uid is unique
+	now := timestamp.Now()
+	token, _ := id.ShortUUID()
+	uid, _ := id.ShortUUID() // FIXME verify that uid is unique
 
 	account := Account{
 		Realm:     realm,
@@ -61,7 +61,7 @@ func CreateAccount(ctx context.Context, realm, userID string) (*Account, error) 
 		ClientID:  uid,
 		Status:    AccountUnconfirmed,
 		Ext1:      token,
-		Expires:   util.IncT(util.Timestamp(), DefaultAuthenticationExpiration),
+		Expires:   timestamp.IncT(timestamp.Now(), ac.authenticationExpiration),
 		Confirmed: 0,
 		Created:   now,
 		Updated:   now,
@@ -114,7 +114,7 @@ func FindAccountByToken(ctx context.Context, token string) (*Account, error) {
 
 func UpdateAccount(ctx context.Context, account *Account) error {
 	k := accountKey(account.Realm, account.ClientID)
-	account.Updated = util.Timestamp()
+	account.Updated = timestamp.Now()
 
 	if _, err := platform.DataStore().Put(ctx, k, account); err != nil {
 		return err

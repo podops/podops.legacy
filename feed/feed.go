@@ -7,8 +7,8 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
+	"github.com/txsvc/spa/pkg/timestamp"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
@@ -56,9 +56,10 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 	}
 
 	// list all episodes, excluding future (i.e. unpublished) ones, descending order
-	// FIXME filter for other flags, e.g. Block = true
+
 	var er []*podops.Resource
-	now := util.Timestamp()
+	now := timestamp.Now()
+
 	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", production).Filter("Kind =", podops.ResourceEpisode).Filter("Published <", now).Filter("Published >", 0).Order("-Published"), &er); err != nil {
 		pl.ReportError(err)
 		return err
@@ -75,6 +76,7 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 		if err != nil {
 			return err
 		}
+		// FIXME filter for other flags, e.g. Block = true
 		episodes[i] = e.(*podops.Episode)
 	}
 
@@ -105,11 +107,10 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 	}
 
 	if validateOnly {
-		fmt.Printf(feed.String())
-		return nil
+		return nil // no errors so far, the feed is valid
 	}
 
-	// dump the feed to the CDN location
+	// dump the feed to the CDN
 	obj := platform.Storage().Bucket(podops.BucketProduction).Object(fmt.Sprintf("%s/feed.xml", production))
 	writer := obj.NewWriter(ctx)
 	if _, err := writer.Write(feed.Bytes()); err != nil {
@@ -120,7 +121,7 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 	}
 
 	// source data should be OK by now, we can update the metadata
-	p.BuildDate = util.Timestamp()
+	p.BuildDate = timestamp.Now()
 	p.Published = true
 	p.LatestPublishDate = er[0].Published
 	if err := backend.UpdateProduction(ctx, p); err != nil {

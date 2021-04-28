@@ -7,10 +7,11 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
+	"github.com/txsvc/spa/pkg/id"
+	"github.com/txsvc/spa/pkg/timestamp"
 )
 
 const (
@@ -37,9 +38,9 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 	}
 
 	// create a new production
-	id, _ := util.ShortUUID()
+	id, _ := id.ShortUUID()
 	production := strings.ToLower(id)
-	now := util.Timestamp()
+	now := timestamp.Now()
 
 	prod := podops.Production{
 		GUID:    production,

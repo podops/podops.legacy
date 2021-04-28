@@ -14,9 +14,9 @@ import (
 	"google.golang.org/genproto/googleapis/cloud/tasks/v2"
 	"gopkg.in/yaml.v2"
 
-	"github.com/fupas/commons/pkg/env"
-	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
+	"github.com/txsvc/spa/pkg/env"
+	"github.com/txsvc/spa/pkg/timestamp"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
@@ -104,13 +104,13 @@ func UpdateResource(ctx context.Context, name, guid, kind, production, location 
 		r.Name = name
 		r.ParentGUID = production
 		r.Location = location
-		r.Updated = util.Timestamp()
+		r.Updated = timestamp.Now()
 
 		return updateResource(ctx, r)
 	}
 
 	// create a new inventory entry
-	now := util.Timestamp()
+	now := timestamp.Now()
 	rsrc := podops.Resource{
 		Name:       name,
 		GUID:       guid,
@@ -132,7 +132,7 @@ func UpdateAsset(ctx context.Context, meta *metadata.Metadata, production, locat
 		r.Name = meta.Name
 		r.ParentGUID = production
 		r.Location = location
-		r.Updated = util.Timestamp()
+		r.Updated = timestamp.Now()
 
 		if meta.IsImage() {
 			r.ImageURI = fmt.Sprintf("%s/%s", podops.DefaultStorageEndpoint, location)
@@ -149,7 +149,7 @@ func UpdateAsset(ctx context.Context, meta *metadata.Metadata, production, locat
 	}
 
 	// create a new inventory entry
-	now := util.Timestamp()
+	now := timestamp.Now()
 	rsrc := podops.Resource{
 		Name:       meta.Name,
 		GUID:       meta.GUID,
@@ -382,13 +382,13 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 		r.Summary = show.Description.Summary
 		r.ImageURI = show.Image.ResolveURI(podops.DefaultStorageEndpoint, show.GUID())
 		r.ImageRel = show.Image.Rel
-		r.Updated = util.Timestamp()
+		r.Updated = timestamp.Now()
 
 		return updateResource(ctx, r)
 	}
 
 	// create a new inventory entry
-	now := util.Timestamp()
+	now := timestamp.Now()
 	rsrc := podops.Resource{
 		Name:       show.Metadata.Name,
 		GUID:       show.GUID(),
@@ -441,13 +441,13 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 		r.EnclosureRel = episode.Enclosure.Rel
 		r.ImageURI = episode.Image.ResolveURI(podops.DefaultStorageEndpoint, episode.Parent())
 		r.ImageRel = episode.Image.Rel
-		r.Updated = util.Timestamp()
+		r.Updated = timestamp.Now()
 
 		return updateResource(ctx, r)
 	}
 
 	// create a new inventory entry
-	now := util.Timestamp()
+	now := timestamp.Now()
 	index, _ := strconv.ParseInt(episode.Metadata.Labels[podops.LabelEpisode], 10, 64)
 
 	rsrc := podops.Resource{

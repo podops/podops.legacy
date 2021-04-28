@@ -8,8 +8,9 @@ import (
 	"cloud.google.com/go/datastore"
 	"github.com/labstack/echo/v4"
 
-	"github.com/fupas/commons/pkg/util"
 	"github.com/fupas/platform/pkg/platform"
+	"github.com/txsvc/spa/pkg/id"
+	"github.com/txsvc/spa/pkg/timestamp"
 
 	"github.com/podops/podops/internal/errordef"
 )
@@ -30,8 +31,12 @@ const (
 	// DefaultAuthorizationExpiration in days
 	DefaultAuthorizationExpiration = 90
 
+	// other defaults
+	DefaultTokenType = "user" // other possibilities: app, bot, ...
+
 	// default scopes
 	ScopeAPIAdmin = "api:admin"
+	DefaultScope  = "api:read,api:write"
 )
 
 type (
@@ -57,10 +62,35 @@ type (
 		ClientID string `json:"client_id"`
 		Token    string `json:"token"`
 	}
+
+	// CreateAuthorizationFunc creates a new Authorization that is application/service specific
+	CreateAuthorizationFunc func(*Account, *AuthorizationRequest) *Authorization
+	// AccountNotificationFunc sends a notification, e.g. email
+	AccountNotificationFunc func(context.Context, *Account) error
+
+	AuthProvider struct {
+		createAuthorization        CreateAuthorizationFunc
+		accountConfirmNotification AccountNotificationFunc
+		tokenNotification          AccountNotificationFunc
+		authenticationExpiration   int // minutes
+		authorizationExpiration    int // days
+	}
 )
 
-func namedKey(part1, part2 string) string {
-	return part1 + "." + part2
+var ac *AuthProvider
+
+func init() {
+	ac = New()
+}
+
+func New() *AuthProvider {
+	return &AuthProvider{
+		createAuthorization:        CreateSimpleAuthorization,
+		accountConfirmNotification: SendAccountChallenge,
+		tokenNotification:          SendAuthToken,
+		authenticationExpiration:   DefaultAuthenticationExpiration,
+		authorizationExpiration:    DefaultAuthorizationExpiration,
+	}
 }
 
 // IsValid verifies that the Authorization is still valid, i.e. is not expired and not revoked.
@@ -68,7 +98,7 @@ func (a *Authorization) IsValid() bool {
 	if a.Revoked {
 		return false
 	}
-	if a.Expires < util.Timestamp() {
+	if a.Expires < timestamp.Now() {
 		return false
 	}
 	return true
@@ -150,15 +180,6 @@ func CheckAuthorization(ctx context.Context, c echo.Context, scope string) (*Aut
 	return auth, nil
 }
 
-func hasScope(scopes, scope string) bool {
-	if scopes == "" || scope == "" {
-		return false // empty inputs should never evalute to true
-	}
-
-	// FIXME this is a VERY naiv implementation
-	return strings.Contains(scopes, scope)
-}
-
 // LookupAuthorization looks for an authorization
 func LookupAuthorization(ctx context.Context, realm, clientID string) (*Authorization, error) {
 	var auth Authorization
@@ -213,7 +234,43 @@ func UpdateAuthorization(ctx context.Context, auth *Authorization) error {
 	return err
 }
 
+func CreateDefaultAuthorization(account *Account, req *AuthorizationRequest) *Authorization {
+	now := timestamp.Now()
+
+	auth := Authorization{
+		ClientID:  account.ClientID,
+		Realm:     req.Realm,
+		Token:     CreateSimpleToken(),
+		TokenType: DefaultTokenType,
+		UserID:    req.UserID,
+		Scope:     DefaultScope,
+		Revoked:   false,
+		Expires:   now + (DefaultAuthorizationExpiration * 86400),
+		Created:   now,
+		Updated:   now,
+	}
+	return &auth
+}
+
+func CreateSimpleToken() string {
+	token, _ := id.UUID()
+	return token
+}
+
 // authorizationKey creates a datastore key for a workspace authorization based on the team_id.
 func authorizationKey(realm, client string) *datastore.Key {
 	return datastore.NameKey(DatastoreAuthorizations, namedKey(realm, client), nil)
+}
+
+func namedKey(part1, part2 string) string {
+	return part1 + "." + part2
+}
+
+func hasScope(scopes, scope string) bool {
+	if scopes == "" || scope == "" {
+		return false // empty inputs should never evalute to true
+	}
+
+	// FIXME this is a VERY naiv implementation
+	return strings.Contains(scopes, scope)
 }

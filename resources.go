@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fupas/commons/pkg/util"
 	"github.com/podops/podops/internal/metadata"
+	"github.com/txsvc/spa/pkg/id"
 )
 
 const (
@@ -333,6 +333,6 @@ func DefaultEpisode(name, parentName, guid, parent, portal, cdn string) *Episode
 }
 
 func CreateGUID() string {
-	guid, _ := util.ShortUUID()
+	guid, _ := id.ShortUUID()
 	return guid
 }
