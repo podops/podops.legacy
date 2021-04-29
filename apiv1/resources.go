@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/txsvc/spa/pkg/timestamp"
-	"github.com/txsvc/spa/pkg/validate"
+	"github.com/txsvc/platform/pkg/timestamp"
+	"github.com/txsvc/platform/pkg/validate"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"

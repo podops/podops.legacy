@@ -6,7 +6,7 @@ import (
 
 	"github.com/fupas/platform/pkg/platform"
 	"github.com/stretchr/testify/assert"
-	"github.com/txsvc/spa/pkg/timestamp"
+	"github.com/txsvc/platform/pkg/timestamp"
 )
 
 const (

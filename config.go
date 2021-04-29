@@ -4,8 +4,8 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/txsvc/spa/pkg/env"
-	"github.com/txsvc/spa/pkg/netrc"
+	"github.com/txsvc/platform/pkg/env"
+	"github.com/txsvc/platform/pkg/netrc"
 )
 
 const (

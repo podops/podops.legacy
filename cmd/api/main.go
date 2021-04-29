@@ -7,10 +7,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/fupas/platform"
-	gcp "github.com/fupas/platform/provider/google"
-	"github.com/txsvc/spa/pkg/env"
-	"github.com/txsvc/spa/pkg/server"
+	"github.com/txsvc/platform"
+	"github.com/txsvc/platform/pkg/env"
+	"github.com/txsvc/platform/pkg/server"
+	"github.com/txsvc/platform/provider/google"
 
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/auth"
@@ -65,8 +65,7 @@ func shutdown(*echo.Echo) {
 
 func init() {
 	// initialize the platform first
-	projectID := env.GetString("PROJECT_ID", "")
-	if projectID == "" {
+	if !env.Assert("PROJECT_ID") {
 		log.Fatal("Missing env variable 'PROJECT_ID'")
 	}
 	if !env.Assert("PODOPS_API_KEY") {
@@ -85,13 +84,12 @@ func init() {
 		log.Fatal("Missing env variable 'EMAIL_API_KEY'")
 	}
 
-	serviceName := env.GetString("SERVICE_NAME", "default")
-
-	client, err := platform.NewClient(context.Background(), gcp.NewErrorReporting(context.TODO(), projectID, serviceName))
+	er := platform.PlatformOpts{ID: "platform.google.errorreporting", Type: platform.ProviderTypeErrorReporter, Impl: google.NewErrorReporter}
+	p, err := platform.InitPlatform(context.Background(), er)
 	if err != nil {
 		log.Fatal("error initializing the platform services")
 	}
-	platform.RegisterGlobally(client)
+	platform.RegisterPlatform(p)
 }
 
 func main() {

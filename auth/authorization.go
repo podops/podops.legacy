@@ -9,8 +9,8 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/fupas/platform/pkg/platform"
-	"github.com/txsvc/spa/pkg/id"
-	"github.com/txsvc/spa/pkg/timestamp"
+	"github.com/txsvc/platform/pkg/id"
+	"github.com/txsvc/platform/pkg/timestamp"
 
 	"github.com/podops/podops/internal/errordef"
 )

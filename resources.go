@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/podops/podops/internal/metadata"
-	"github.com/txsvc/spa/pkg/id"
+	"github.com/txsvc/platform/pkg/id"
 )
 
 const (

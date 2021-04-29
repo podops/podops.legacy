@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/txsvc/spa/pkg/env"
-	"github.com/txsvc/spa/pkg/timestamp"
+	"github.com/txsvc/platform/pkg/env"
+	"github.com/txsvc/platform/pkg/timestamp"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/platform"

@@ -15,8 +15,8 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/fupas/platform/pkg/platform"
-	"github.com/txsvc/spa/pkg/env"
-	"github.com/txsvc/spa/pkg/timestamp"
+	"github.com/txsvc/platform/pkg/env"
+	"github.com/txsvc/platform/pkg/timestamp"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"

@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/tcolgate/mp3"
-	"github.com/txsvc/spa/pkg/id"
+	"github.com/txsvc/platform/pkg/id"
 )
 
 const (

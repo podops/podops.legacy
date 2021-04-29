@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/txsvc/spa/pkg/env"
+	"github.com/txsvc/platform/pkg/env"
 )
 
 /*

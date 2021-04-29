@@ -8,7 +8,7 @@ import (
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 
-	"github.com/txsvc/spa/pkg/env"
+	"github.com/txsvc/platform/pkg/env"
 )
 
 var (

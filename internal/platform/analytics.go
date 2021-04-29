@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/txsvc/spa/pkg/env"
-	"github.com/txsvc/spa/pkg/id"
+	"github.com/txsvc/platform/pkg/env"
+	"github.com/txsvc/platform/pkg/id"
 )
 
 const (

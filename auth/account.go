@@ -6,8 +6,8 @@ import (
 	"cloud.google.com/go/datastore"
 
 	"github.com/fupas/platform/pkg/platform"
-	"github.com/txsvc/spa/pkg/id"
-	"github.com/txsvc/spa/pkg/timestamp"
+	"github.com/txsvc/platform/pkg/id"
+	"github.com/txsvc/platform/pkg/timestamp"
 )
 
 const (

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/txsvc/spa/pkg/id"
-	"github.com/txsvc/spa/pkg/timestamp"
+	"github.com/txsvc/platform/pkg/id"
+	"github.com/txsvc/platform/pkg/timestamp"
 
 	"github.com/podops/podops/internal/errordef"
 )

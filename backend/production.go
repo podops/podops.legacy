@@ -10,8 +10,8 @@ import (
 	"github.com/fupas/platform/pkg/platform"
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
-	"github.com/txsvc/spa/pkg/id"
-	"github.com/txsvc/spa/pkg/timestamp"
+	"github.com/txsvc/platform/pkg/id"
+	"github.com/txsvc/platform/pkg/timestamp"
 )
 
 const (

@@ -6,7 +6,7 @@ import (
 
 	"github.com/mailgun/mailgun-go/v4"
 
-	"github.com/txsvc/spa/pkg/env"
+	"github.com/txsvc/platform/pkg/env"
 )
 
 func SendEmail(sender, recipient, subject, body string) error {

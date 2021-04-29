@@ -9,7 +9,7 @@ import (
 
 	cs "github.com/fupas/platform/pkg/platform"
 	"github.com/labstack/echo/v4"
-	"github.com/txsvc/spa/pkg/validate"
+	"github.com/txsvc/platform/pkg/validate"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
