@@ -10,8 +10,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/txsvc/platform/pkg/server"
+
 	"github.com/podops/podops/internal/errordef"
-	"github.com/podops/podops/internal/platform"
 )
 
 // Get is used to request data from the API. No payload, only queries!
@@ -108,7 +109,7 @@ func invoke(token string, req *http.Request, response interface{}) (int, error) 
 	if resp.StatusCode > http.StatusNoContent {
 		if response != nil {
 			// as we expect a response, there might be a StatusObject
-			status := platform.StatusObject{}
+			status := server.StatusObject{}
 			err = json.NewDecoder(resp.Body).Decode(&status)
 			if err != nil {
 				return resp.StatusCode, fmt.Errorf(errordef.MsgStatus, resp.StatusCode)

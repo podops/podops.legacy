@@ -53,6 +53,7 @@ func init() {
 		log.Fatal("Missing env variable 'PROJECT_ID'")
 	}
 
+	// FIXME
 	er := platform.PlatformOpts{ID: "platform.google.errorreporting", Type: platform.ProviderTypeErrorReporter, Impl: google.NewErrorReporter}
 	p, err := platform.InitPlatform(context.Background(), er)
 	if err != nil {

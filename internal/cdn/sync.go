@@ -9,13 +9,14 @@ import (
 
 	cs "github.com/fupas/platform/pkg/platform"
 	"github.com/labstack/echo/v4"
+	"github.com/txsvc/platform"
+	"github.com/txsvc/platform/pkg/server"
 	"github.com/txsvc/platform/pkg/validate"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/auth"
 	"github.com/podops/podops/internal/errordef"
-	"github.com/podops/podops/internal/platform"
 )
 
 // SyncTaskEndpoint syncs files between the cloud storage and the CDN
@@ -33,10 +34,10 @@ func SyncTaskEndpoint(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	ctx := platform.NewHttpContext(c)
+	ctx := platform.NewHttpContext(c.Request())
 
 	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, req.GUID); err != nil {
-		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
+		return server.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	status := SyncResource(ctx, req.GUID, req.Source)
@@ -45,17 +46,17 @@ func SyncTaskEndpoint(c echo.Context) error {
 
 // DeleteTaskEndpoint removes a file from the CDN
 func DeleteTaskEndpoint(c echo.Context) error {
-	ctx := platform.NewHttpContext(c)
+	ctx := platform.NewHttpContext(c.Request())
 
 	prod := c.Param("prod")
 	location := c.QueryParam("l")
 
 	if !validate.NotEmpty(prod, location) {
-		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
+		return server.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, prod); err != nil {
 		// validate against production only, the resource is already gone by now
-		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
+		return server.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	status := DeleteResource(ctx, location)

@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 
 	"github.com/labstack/echo/v4"
+	"github.com/txsvc/platform"
+	"github.com/txsvc/platform/pkg/server"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
@@ -16,7 +18,6 @@ import (
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/metadata"
-	"github.com/podops/podops/internal/platform"
 )
 
 // ImportTaskEndpoint implements async file import from a remote source into the CDN
@@ -34,10 +35,10 @@ func ImportTaskEndpoint(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	ctx := platform.NewHttpContext(c)
+	ctx := platform.NewHttpContext(c.Request())
 
 	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, req.GUID); err != nil {
-		return platform.ErrorResponse(c, http.StatusUnauthorized, err)
+		return server.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	status := ImportResource(ctx, req.GUID, req.Source)

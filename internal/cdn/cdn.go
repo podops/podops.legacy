@@ -5,11 +5,13 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/txsvc/platform"
+	"github.com/txsvc/platform/pkg/server"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/errordef"
-	"github.com/podops/podops/internal/platform"
+	lp "github.com/podops/podops/internal/platform"
 )
 
 // FIXME move this to the caddy handler ?
@@ -19,22 +21,22 @@ func FeedEndpoint(c echo.Context) error { // FIXME not needed !
 
 	name := c.Param("name")
 	if name == "" {
-		return platform.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
+		return server.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
-	prod, err := backend.FindProductionByName(platform.NewHttpContext(c), name)
+	prod, err := backend.FindProductionByName(platform.NewHttpContext(c.Request()), name)
 	if err != nil {
-		return platform.ErrorResponse(c, http.StatusInternalServerError, err)
+		return server.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	if prod == nil {
-		return platform.ErrorResponse(c, http.StatusNotFound, errordef.ErrNoSuchProduction)
+		return server.ErrorResponse(c, http.StatusNotFound, errordef.ErrNoSuchProduction)
 	}
 
 	redirectTo := fmt.Sprintf("%s/%s/feed.xml", podops.DefaultStorageEndpoint, prod.GUID)
 
 	// track the event
-	platform.TrackEvent(c.Request(), "cdn", "feed", prod.GUID, 1)
+	lp.TrackEvent(c.Request(), "cdn", "feed", prod.GUID, 1)
 
 	return c.Redirect(http.StatusTemporaryRedirect, redirectTo)
 }
