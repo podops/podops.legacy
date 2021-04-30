@@ -3,12 +3,13 @@ package auth
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/mailgun/mailgun-go/v4"
 	"github.com/txsvc/platform/pkg/env"
 	"github.com/txsvc/platform/pkg/timestamp"
 
 	"github.com/podops/podops"
-	"github.com/podops/podops/internal/platform"
 )
 
 const (
@@ -39,7 +40,7 @@ func SendAccountChallenge(ctx context.Context, account *Account) error {
 
 	url := fmt.Sprintf("%s/login/%s", podops.DefaultAPIEndpoint, account.Ext1)
 
-	if err := platform.SendEmail(env.GetString("EMAIL_FROM", "hello@podops.dev"), account.UserID, "Confirm your account", url); err != nil {
+	if err := SendEmail(env.GetString("EMAIL_FROM", "hello@podops.dev"), account.UserID, "Confirm your account", url); err != nil {
 		return err
 	}
 	return nil
@@ -49,7 +50,25 @@ func SendAccountChallenge(ctx context.Context, account *Account) error {
 func SendAuthToken(ctx context.Context, account *Account) error {
 	// FIXME this is not done, just a crude implementation
 
-	if err := platform.SendEmail(env.GetString("EMAIL_FROM", "hello@podops.dev"), account.UserID, "Your confirmation token", account.Ext2); err != nil {
+	if err := SendEmail(env.GetString("EMAIL_FROM", "hello@podops.dev"), account.UserID, "Your confirmation token", account.Ext2); err != nil {
+		return err
+	}
+	return nil
+}
+
+func SendEmail(sender, recipient, subject, body string) error {
+	domain := env.GetString("EMAIL_DOMAIN", "")
+	apiKey := env.GetString("EMAIL_API_KEY", "")
+
+	mg := mailgun.NewMailgun(domain, apiKey)
+	mg.SetAPIBase(mailgun.APIBaseEU)
+
+	message := mg.NewMessage(sender, subject, body, recipient)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
+
+	_, _, err := mg.Send(ctx, message)
+	if err != nil {
 		return err
 	}
 	return nil

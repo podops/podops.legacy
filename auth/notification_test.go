@@ -1,4 +1,4 @@
-package platform
+package auth
 
 import (
 	"testing"
