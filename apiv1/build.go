@@ -15,7 +15,6 @@ import (
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/feed"
 	"github.com/podops/podops/internal/errordef"
-	lp "github.com/podops/podops/internal/platform"
 )
 
 var (
@@ -72,7 +71,7 @@ func BuildFeedEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	lp.TrackEvent(c.Request(), "api", "build", p.GUID, 1)
+	platform.Logger("metrics").Log("api.build", "production", p.GUID)
 
 	resp := podops.BuildRequest{
 		GUID:         req.GUID,

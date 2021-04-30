@@ -13,7 +13,6 @@ import (
 	"github.com/podops/podops/auth"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/errordef"
-	lp "github.com/podops/podops/internal/platform"
 )
 
 // ProductionEndpoint creates an new show and does all the background setup
@@ -47,7 +46,9 @@ func ProductionEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	lp.TrackEvent(c.Request(), "api", "prod_create", p.GUID, 1)
+	// track api access for billing etc
+	platform.Logger("metrics").Log("api.production.create", "production", p.GUID)
+
 	return api.StandardResponse(c, http.StatusCreated, p)
 }
 
@@ -66,6 +67,8 @@ func ListProductionsEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	lp.TrackEvent(c.Request(), "api", "prod_list", clientID, 1)
+	// track api access for billing etc
+	platform.Logger("metrics").Log("api.production.list", "owner", clientID)
+
 	return api.StandardResponse(c, http.StatusOK, &podops.ProductionList{Productions: productions})
 }

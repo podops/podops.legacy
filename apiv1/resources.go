@@ -14,7 +14,6 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/errordef"
-	lp "github.com/podops/podops/internal/platform"
 )
 
 // FindResourceEndpoint returns a resource
@@ -38,7 +37,9 @@ func FindResourceEndpoint(c echo.Context) error {
 		return api.StandardResponse(c, http.StatusNotFound, nil)
 	}
 
-	lp.TrackEvent(c.Request(), "api", "rsrc_find", guid, 1)
+	// track api access for billing etc
+	platform.Logger("metrics").Log("api.resource.find", "resource", guid)
+
 	return api.StandardResponse(c, http.StatusOK, resource)
 }
 
@@ -68,7 +69,9 @@ func GetResourceEndpoint(c echo.Context) error {
 		return api.StandardResponse(c, http.StatusNotFound, nil)
 	}
 
-	lp.TrackEvent(c.Request(), "api", "rsrc_get", fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
+	// track api access for billing etc
+	platform.Logger("metrics").Log("api.resource.get", "production", prod, "resource", guid)
+
 	return api.StandardResponse(c, http.StatusOK, resource)
 }
 
@@ -92,7 +95,9 @@ func ListResourcesEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	lp.TrackEvent(c.Request(), "api", "rsrc_list", fmt.Sprintf("%s/%s", prod, kind), 1)
+	// track api access for billing etc
+	platform.Logger("metrics").Log("api.resource.list", "production", prod, "resource", kind)
+
 	return api.StandardResponse(c, http.StatusOK, &podops.ResourceList{Resources: l})
 }
 
@@ -100,7 +105,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 func UpdateResourceEndpoint(c echo.Context) error {
 	ctx := platform.NewHttpContext(c.Request())
 	createFlag := true // c.Request().Method == POST, default
-	action := "rsrc_create"
+	action := "api.resource.create"
 
 	prod := c.Param("prod")
 	kind := c.Param("kind")
@@ -113,7 +118,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 
 	if c.Request().Method == "PUT" {
 		createFlag = false
-		action = "rsrc_update"
+		action = "api.resource.update"
 	}
 
 	if !validate.NotEmpty(prod, kind, guid) {
@@ -202,7 +207,9 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	lp.TrackEvent(c.Request(), "api", action, fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
+	// track api access for billing etc
+	platform.Logger("metrics").Log(action, "production", prod, "resource", guid)
+
 	return api.StandardResponse(c, http.StatusCreated, nil)
 }
 
@@ -232,6 +239,8 @@ func DeleteResourceEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
-	lp.TrackEvent(c.Request(), "api", "rsrc_delete", fmt.Sprintf("%s/%s/%s", prod, kind, guid), 1)
+	// track api access for billing etc
+	platform.Logger("metrics").Log("api.resource.delete", "production", prod, "resource", guid)
+
 	return c.NoContent(http.StatusNoContent)
 }

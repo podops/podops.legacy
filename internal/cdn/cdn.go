@@ -11,7 +11,6 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/errordef"
-	lp "github.com/podops/podops/internal/platform"
 )
 
 // FIXME move this to the caddy handler ?
@@ -35,8 +34,8 @@ func FeedEndpoint(c echo.Context) error { // FIXME not needed !
 
 	redirectTo := fmt.Sprintf("%s/%s/feed.xml", podops.DefaultStorageEndpoint, prod.GUID)
 
-	// track the event
-	lp.TrackEvent(c.Request(), "cdn", "feed", prod.GUID, 1)
+	// track api access for billing etc
+	platform.Logger("metrics").Log("cdn.feed", "production", prod.GUID)
 
 	return c.Redirect(http.StatusTemporaryRedirect, redirectTo)
 }

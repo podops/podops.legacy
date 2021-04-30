@@ -16,8 +16,6 @@ import (
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/metadata"
-
-	lp "github.com/podops/podops/internal/platform"
 )
 
 // UploadEndpoint implements content upload
@@ -75,11 +73,11 @@ func UploadEndpoint(c echo.Context) error {
 			if err := backend.UpdateAsset(ctx, meta, prod, location, podops.ResourceTypeLocal); err != nil {
 				return api.ErrorResponse(c, http.StatusInternalServerError, err)
 			}
+
+			// track api access for billing etc
+			platform.Logger("metrics").Log("api.upload", "production", meta.ParentGUID, "resource", meta.GUID)
 		}
 	}
-
-	// track api access for billing etc
-	lp.TrackEvent(c.Request(), "api", "upload", prod, 1)
 
 	return c.NoContent(http.StatusCreated)
 }
