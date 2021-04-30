@@ -8,6 +8,7 @@ import (
 	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
 	taskspb "google.golang.org/genproto/googleapis/cloud/tasks/v2"
 
+	p "github.com/txsvc/platform"
 	"github.com/txsvc/platform/pkg/env"
 )
 
@@ -24,7 +25,7 @@ func CreateHttpTask(ctx context.Context, method taskspb.HttpMethod, handler, tok
 
 	client, err := cloudtasks.NewClient(ctx)
 	if err != nil {
-		ReportError(err)
+		p.ReportError(err)
 		return nil, err
 	}
 	defer client.Close()

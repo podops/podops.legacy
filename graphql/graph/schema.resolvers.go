@@ -10,13 +10,13 @@ import (
 	"cloud.google.com/go/datastore"
 
 	ds "github.com/fupas/platform/pkg/platform"
+	"github.com/txsvc/platform"
 	"github.com/txsvc/platform/pkg/timestamp"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/graphql/graph/generated"
 	"github.com/podops/podops/graphql/graph/model"
-	"github.com/podops/podops/internal/platform"
 )
 
 func (r *queryResolver) Show(ctx context.Context, name *string, limit int) (*model.Show, error) {

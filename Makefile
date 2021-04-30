@@ -27,6 +27,10 @@ test:
 	cd graphql && go test
 	cd internal/platform && go test
 	cd auth && go test
+
+.PHONY: test_coverage
+test_coverage:
+	go test `go list ./... | grep -v cmd` -coverprofile=coverage.txt -covermode=atomic
 	
 build_cdn: cmd/cdn/main.go
 	cd cmd/cdn && ${TARGET_LINUX} go build -o svc main.go && docker build -t ${CONTAINER_REGISTRY}/cdn . && docker push ${CONTAINER_REGISTRY}/cdn

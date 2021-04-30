@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	p "github.com/txsvc/platform"
 	"github.com/txsvc/platform/pkg/env"
 	"github.com/txsvc/platform/pkg/id"
 )
@@ -70,7 +71,7 @@ func PageViewMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		v["ds"] = "web"
 
 		if err := PostToAnalytics(c.Request(), &v); err != nil {
-			ReportError(err)
+			p.ReportError(err)
 			return err
 		}
 
@@ -90,7 +91,7 @@ func TrackEvent(request *http.Request, category, action, label string, value int
 	v["ds"] = appID
 
 	if err := PostToAnalytics(request, &v); err != nil {
-		ReportError(err)
+		p.ReportError(err)
 		return err
 	}
 	return nil
@@ -151,7 +152,7 @@ func upload() {
 		if err == nil && resp != nil {
 			resp.Body.Close()
 		} else {
-			ReportError(err)
+			p.ReportError(err)
 		}
 	}
 }
