@@ -84,10 +84,8 @@ func init() {
 		log.Fatal("Missing env variable 'EMAIL_API_KEY'")
 	}
 
-	// FIXME
-	er := platform.PlatformOpts{ID: "platform.google.errorreporting", Type: platform.ProviderTypeErrorReporter, Impl: google.NewErrorReporter}
-	cx := platform.PlatformOpts{ID: "platform.google.context", Type: platform.ProviderTypeHttpContext, Impl: google.NewAppEngineContextProvider}
-	p, err := platform.InitPlatform(context.Background(), er, cx)
+	// FIXME InitDefaultPlatform
+	p, err := platform.InitPlatform(context.Background(), google.GoogleErrorReportingConfig, google.AppEngineContextConfig, google.GoogleCloudTaskConfig)
 	if err != nil {
 		log.Fatal("error initializing the platform services")
 	}

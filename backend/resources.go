@@ -11,18 +11,19 @@ import (
 
 	"cloud.google.com/go/datastore"
 	"cloud.google.com/go/storage"
-	"google.golang.org/genproto/googleapis/cloud/tasks/v2"
+
 	"gopkg.in/yaml.v2"
 
-	"github.com/fupas/platform/pkg/platform"
+	ds "github.com/fupas/platform/pkg/platform"
+	"github.com/txsvc/platform"
 	"github.com/txsvc/platform/pkg/env"
+	"github.com/txsvc/platform/pkg/tasks"
 	"github.com/txsvc/platform/pkg/timestamp"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/loader"
 	"github.com/podops/podops/internal/metadata"
-	p "github.com/podops/podops/internal/platform"
 )
 
 const (
@@ -61,7 +62,7 @@ func NormalizeKind(kind string) (string, error) {
 func GetResource(ctx context.Context, guid string) (*podops.Resource, error) {
 	var r podops.Resource
 
-	if err := platform.DataStore().Get(ctx, resourceKey(guid), &r); err != nil {
+	if err := ds.DataStore().Get(ctx, resourceKey(guid), &r); err != nil {
 		if err == datastore.ErrNoSuchEntity {
 			return nil, nil // not found is not an error
 		}
@@ -74,7 +75,7 @@ func GetResource(ctx context.Context, guid string) (*podops.Resource, error) {
 func FindResource(ctx context.Context, production, name string) (*podops.Resource, error) {
 	var r []*podops.Resource
 
-	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Filter("Name =", name), &r); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Filter("Name =", name), &r); err != nil {
 		return nil, err
 	}
 	if r == nil {
@@ -184,7 +185,7 @@ func DeleteResource(ctx context.Context, prod, kind, guid string) error {
 		return errordef.ErrNoSuchResource
 	}
 
-	if err := platform.DataStore().Delete(ctx, resourceKey(r.GUID)); err != nil {
+	if err := ds.DataStore().Delete(ctx, resourceKey(r.GUID)); err != nil {
 		return err
 	}
 
@@ -219,7 +220,7 @@ func ListResources(ctx context.Context, production, kind string) ([]*podops.Reso
 	}
 
 	if _kind == podops.ResourceALL {
-		if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Order("-Created"), &r); err != nil {
+		if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Order("-Created"), &r); err != nil {
 			return nil, err
 		}
 	} else if _kind == podops.ResourceShow {
@@ -229,7 +230,7 @@ func ListResources(ctx context.Context, production, kind string) ([]*podops.Reso
 			r = append(r, show)
 		}
 	} else {
-		if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Filter("Kind =", _kind).Order("-Created"), &r); err != nil {
+		if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreResources).Filter("ParentGUID =", production).Filter("Kind =", _kind).Order("-Created"), &r); err != nil {
 			return nil, err
 		}
 	}
@@ -298,7 +299,7 @@ func WriteResourceContent(ctx context.Context, path string, create, force bool, 
 
 	exists := true
 
-	bkt := platform.Storage().Bucket(podops.BucketProduction)
+	bkt := ds.Storage().Bucket(podops.BucketProduction)
 	obj := bkt.Object(path)
 
 	_, err := obj.Attrs(ctx)
@@ -331,7 +332,7 @@ func WriteResourceContent(ctx context.Context, path string, create, force bool, 
 // ReadResource reads a resource from the Cloud Storage
 func ReadResource(ctx context.Context, path string) (interface{}, string, string, error) {
 
-	bkt := platform.Storage().Bucket(podops.BucketProduction)
+	bkt := ds.Storage().Bucket(podops.BucketProduction)
 	reader, err := bkt.Object(path).NewReader(ctx)
 	if err != nil {
 		return nil, "", "", err
@@ -346,7 +347,7 @@ func ReadResource(ctx context.Context, path string) (interface{}, string, string
 
 // RemoveResource removes a resource from Cloud Storage
 func RemoveResource(ctx context.Context, location string) error {
-	bkt := platform.Storage().Bucket(podops.BucketProduction)
+	bkt := ds.Storage().Bucket(podops.BucketProduction)
 
 	obj := bkt.Object(location)
 	_, err := obj.Attrs(ctx)
@@ -360,9 +361,17 @@ func RemoveResource(ctx context.Context, location string) error {
 // RemoveAsset removes a asset from Cloud Storage
 func RemoveAsset(ctx context.Context, prod, location string) error {
 
-	uri := fmt.Sprintf("%s/%s?l=%s", syncTaskEndpoint, prod, url.QueryEscape(location))
+	//uri := fmt.Sprintf("%s/%s?l=%s", syncTaskEndpoint, prod, url.QueryEscape(location))
 	// dispatch a request for background deletion
-	_, err := p.CreateHttpTask(ctx, tasks.HttpMethod_DELETE, uri, env.GetString("PODOPS_API_KEY", ""), nil)
+	task := tasks.HttpTask{
+		Method:  tasks.HttpMethodDelete,
+		Request: fmt.Sprintf("%s/%s?l=%s", syncTaskEndpoint, prod, url.QueryEscape(location)),
+		Token:   env.GetString("PODOPS_API_KEY", ""),
+		Payload: nil,
+	}
+	err := platform.NewTask(task)
+
+	//_, err := p.CreateHttpTask(ctx, tasks.HttpMethod_DELETE, uri, env.GetString("PODOPS_API_KEY", ""), nil)
 
 	return err
 }
@@ -498,7 +507,14 @@ func EnsureAsset(ctx context.Context, production string, rsrc *podops.Asset) err
 			GUID:   production,
 			Source: rsrc.URI,
 		}
-		_, err = p.CreateHttpTask(ctx, tasks.HttpMethod_POST, importTaskEndpoint, env.GetString("PODOPS_API_KEY", ""), &ir)
+
+		task := tasks.HttpTask{
+			Method:  tasks.HttpMethodPost,
+			Request: importTaskEndpoint,
+			Token:   env.GetString("PODOPS_API_KEY", ""),
+			Payload: &ir,
+		}
+		err = platform.NewTask(task)
 		if err != nil {
 			return err
 		}
@@ -532,7 +548,7 @@ func pingURL(url string) (http.Header, error) {
 
 // updateResource does what the name suggests
 func updateResource(ctx context.Context, r *podops.Resource) error {
-	if _, err := platform.DataStore().Put(ctx, resourceKey(r.GUID), r); err != nil {
+	if _, err := ds.DataStore().Put(ctx, resourceKey(r.GUID), r); err != nil {
 		return err
 	}
 	return nil
