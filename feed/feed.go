@@ -7,14 +7,14 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	"github.com/fupas/platform/pkg/platform"
+	ds "github.com/fupas/platform/pkg/platform"
+	"github.com/txsvc/platform"
 	"github.com/txsvc/platform/pkg/timestamp"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/feed/rss"
 	"github.com/podops/podops/internal/errordef"
-	pl "github.com/podops/podops/internal/platform"
 )
 
 var mediaTypeMap map[string]rss.EnclosureType
@@ -60,8 +60,8 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 	var er []*podops.Resource
 	now := timestamp.Now()
 
-	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", production).Filter("Kind =", podops.ResourceEpisode).Filter("Published <", now).Filter("Published >", 0).Order("-Published"), &er); err != nil {
-		pl.ReportError(err)
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", production).Filter("Kind =", podops.ResourceEpisode).Filter("Published <", now).Filter("Published >", 0).Order("-Published"), &er); err != nil {
+		platform.ReportError(err)
 		return err
 	}
 
@@ -111,7 +111,7 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 	}
 
 	// dump the feed to the CDN
-	obj := platform.Storage().Bucket(podops.BucketProduction).Object(fmt.Sprintf("%s/feed.xml", production))
+	obj := ds.Storage().Bucket(podops.BucketProduction).Object(fmt.Sprintf("%s/feed.xml", production))
 	writer := obj.NewWriter(ctx)
 	if _, err := writer.Write(feed.Bytes()); err != nil {
 		return err
