@@ -9,7 +9,7 @@ import (
 
 	"github.com/txsvc/platform"
 	"github.com/txsvc/platform/pkg/env"
-	"github.com/txsvc/platform/pkg/server"
+	"github.com/txsvc/platform/pkg/http"
 	"github.com/txsvc/platform/provider/google"
 
 	"github.com/podops/podops/apiv1"
@@ -63,6 +63,6 @@ func init() {
 }
 
 func main() {
-	service := server.New(setup, shutdown, nil)
+	service := http.New(setup, shutdown, nil)
 	service.StartBlocking()
 }

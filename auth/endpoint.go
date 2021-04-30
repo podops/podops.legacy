@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/txsvc/platform"
-	"github.com/txsvc/platform/pkg/server"
+	"github.com/txsvc/platform/pkg/api"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
@@ -29,15 +29,15 @@ func LoginRequestEndpoint(c echo.Context) error {
 
 	err := c.Bind(req)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	if req.Realm == "" || req.UserID == "" {
-		return server.ErrorResponse(c, http.StatusBadRequest, err)
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	account, err := FindAccountByUserID(ctx, req.Realm, req.UserID)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	// new account
@@ -45,12 +45,12 @@ func LoginRequestEndpoint(c echo.Context) error {
 		// #1: create a new account
 		account, err = CreateAccount(ctx, req.Realm, req.UserID)
 		if err != nil {
-			return server.ErrorResponse(c, http.StatusInternalServerError, err)
+			return api.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 		// #2: send the confirmation link
 		err = ac.accountConfirmNotification(ctx, account)
 		if err != nil {
-			return server.ErrorResponse(c, http.StatusInternalServerError, err)
+			return api.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 		// status 201: new account
 		return c.NoContent(http.StatusCreated)
@@ -61,29 +61,29 @@ func LoginRequestEndpoint(c echo.Context) error {
 		// #1: update the expiration timestamp
 		account, err = ResetAccountChallenge(ctx, account)
 		if err != nil {
-			return server.ErrorResponse(c, http.StatusInternalServerError, err)
+			return api.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 		// #2: send the account confirmation link
 		err = ac.accountConfirmNotification(ctx, account)
 		if err != nil {
-			return server.ErrorResponse(c, http.StatusInternalServerError, err)
+			return api.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 		// status 201: new account
 		return c.NoContent(http.StatusCreated)
 	}
 	if account.Status != 0 {
 		// status 403: only logged-out and confirmed users can proceed, do nothing otherwise
-		return server.ErrorResponse(c, http.StatusForbidden, err)
+		return api.ErrorResponse(c, http.StatusForbidden, err)
 	}
 
 	// create and send the auth token
 	account, err = ResetAuthToken(ctx, account)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	err = ac.tokenNotification(ctx, account)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	// status 204: existing account, email with token sent
@@ -100,10 +100,10 @@ func LogoutRequestEndpoint(c echo.Context) error {
 
 	err := c.Bind(req)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	if req.Realm == "" || req.UserID == "" {
-		return server.ErrorResponse(c, http.StatusBadRequest, err)
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	token, err := GetBearerToken(c.Request())
@@ -112,18 +112,18 @@ func LogoutRequestEndpoint(c echo.Context) error {
 	}
 	auth, err := FindAuthorizationByToken(ctx, token)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusBadRequest, err)
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 	if auth.UserID != req.UserID || auth.Realm != req.Realm {
-		return server.ErrorResponse(c, http.StatusBadRequest, err)
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	account, err := LookupAccount(ctx, auth.Realm, auth.ClientID)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	if account == nil {
-		return server.ErrorResponse(c, http.StatusBadRequest, err)
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	if account.Status < 0 {
@@ -132,7 +132,7 @@ func LogoutRequestEndpoint(c echo.Context) error {
 	// if we made until here, logout shoud be OK
 	account.Status = AccountLoggedOut
 	if err := UpdateAccount(ctx, account); err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	return c.NoContent(http.StatusNoContent)
 }
@@ -150,22 +150,22 @@ func LoginConfirmationEndpoint(c echo.Context) error {
 
 	token := c.Param("token")
 	if token == "" {
-		return server.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
+		return api.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
 	account, status, err := ConfirmLoginChallenge(ctx, token)
 	if status != http.StatusNoContent {
-		return server.ErrorResponse(c, status, err)
+		return api.ErrorResponse(c, status, err)
 	}
 
 	account, err = ResetAuthToken(ctx, account)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	err = ac.tokenNotification(ctx, account)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	// status 307: account is confirmed, email with auth token sent, redirect now
@@ -184,20 +184,20 @@ func GetAuthorizationEndpoint(c echo.Context) error {
 
 	err := c.Bind(req)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	if req.Token == "" || req.Realm == "" || req.UserID == "" {
-		return server.ErrorResponse(c, http.StatusBadRequest, err)
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	auth, status, err := exchangeToken(ctx, req, c.Request().RemoteAddr)
 	if status != http.StatusOK {
-		return server.ErrorResponse(c, status, err)
+		return api.ErrorResponse(c, status, err)
 	}
 
 	req.Token = auth.Token
 	req.ClientID = auth.ClientID
 
-	return server.StandardResponse(c, status, req)
+	return api.StandardResponse(c, status, req)
 }

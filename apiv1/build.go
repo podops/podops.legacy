@@ -9,8 +9,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/txsvc/platform"
+	"github.com/txsvc/platform/pkg/api"
 	"github.com/txsvc/platform/pkg/env"
-	"github.com/txsvc/platform/pkg/server"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
@@ -30,10 +30,10 @@ func BuildFeedEndpoint(c echo.Context) error {
 	ctx := platform.NewHttpContext(c.Request())
 
 	if err := c.Bind(req); err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 	if err := AuthorizeAccessProduction(ctx, c, ScopeProductionBuild, req.GUID); err != nil {
-		return server.ErrorResponse(c, http.StatusUnauthorized, err)
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	validateOnly := false
@@ -43,14 +43,14 @@ func BuildFeedEndpoint(c echo.Context) error {
 
 	p, err := backend.GetProduction(ctx, req.GUID)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusNotFound, err)
+		return api.ErrorResponse(c, http.StatusNotFound, err)
 	}
 	if p == nil {
-		return server.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgInvalidGUID, req.GUID))
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgInvalidGUID, req.GUID))
 	}
 
 	if err := feed.Build(ctx, req.GUID, validateOnly); err != nil {
-		return server.ErrorResponse(c, http.StatusBadRequest, err)
+		return api.ErrorResponse(c, http.StatusBadRequest, err)
 	}
 
 	if !validateOnly {
@@ -74,5 +74,5 @@ func BuildFeedEndpoint(c echo.Context) error {
 		FeedAliasURL: fmt.Sprintf("%s/s/%s/feed.xml", podops.DefaultEndpoint, p.Name),
 	}
 
-	return server.StandardResponse(c, http.StatusCreated, &resp)
+	return api.StandardResponse(c, http.StatusCreated, &resp)
 }

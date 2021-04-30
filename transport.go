@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/txsvc/platform/pkg/server"
+	"github.com/txsvc/platform/pkg/api"
 
 	"github.com/podops/podops/internal/errordef"
 )
@@ -109,7 +109,7 @@ func invoke(token string, req *http.Request, response interface{}) (int, error) 
 	if resp.StatusCode > http.StatusNoContent {
 		if response != nil {
 			// as we expect a response, there might be a StatusObject
-			status := server.StatusObject{}
+			status := api.StatusObject{}
 			err = json.NewDecoder(resp.Body).Decode(&status)
 			if err != nil {
 				return resp.StatusCode, fmt.Errorf(errordef.MsgStatus, resp.StatusCode)

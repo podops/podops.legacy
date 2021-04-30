@@ -10,7 +10,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/txsvc/platform"
-	"github.com/txsvc/platform/pkg/server"
+	"github.com/txsvc/platform/pkg/api"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
@@ -38,7 +38,7 @@ func ImportTaskEndpoint(c echo.Context) error {
 	ctx := platform.NewHttpContext(c.Request())
 
 	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, req.GUID); err != nil {
-		return server.ErrorResponse(c, http.StatusUnauthorized, err)
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	status := ImportResource(ctx, req.GUID, req.Source)

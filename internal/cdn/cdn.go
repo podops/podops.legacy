@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/txsvc/platform"
-	"github.com/txsvc/platform/pkg/server"
+	"github.com/txsvc/platform/pkg/api"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
@@ -21,16 +21,16 @@ func FeedEndpoint(c echo.Context) error { // FIXME not needed !
 
 	name := c.Param("name")
 	if name == "" {
-		return server.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
+		return api.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 
 	prod, err := backend.FindProductionByName(platform.NewHttpContext(c.Request()), name)
 	if err != nil {
-		return server.ErrorResponse(c, http.StatusInternalServerError, err)
+		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	if prod == nil {
-		return server.ErrorResponse(c, http.StatusNotFound, errordef.ErrNoSuchProduction)
+		return api.ErrorResponse(c, http.StatusNotFound, errordef.ErrNoSuchProduction)
 	}
 
 	redirectTo := fmt.Sprintf("%s/%s/feed.xml", podops.DefaultStorageEndpoint, prod.GUID)

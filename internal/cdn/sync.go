@@ -10,7 +10,7 @@ import (
 	cs "github.com/fupas/platform/pkg/platform"
 	"github.com/labstack/echo/v4"
 	"github.com/txsvc/platform"
-	"github.com/txsvc/platform/pkg/server"
+	"github.com/txsvc/platform/pkg/api"
 	"github.com/txsvc/platform/pkg/validate"
 
 	"github.com/podops/podops"
@@ -37,7 +37,7 @@ func SyncTaskEndpoint(c echo.Context) error {
 	ctx := platform.NewHttpContext(c.Request())
 
 	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, req.GUID); err != nil {
-		return server.ErrorResponse(c, http.StatusUnauthorized, err)
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	status := SyncResource(ctx, req.GUID, req.Source)
@@ -52,11 +52,11 @@ func DeleteTaskEndpoint(c echo.Context) error {
 	location := c.QueryParam("l")
 
 	if !validate.NotEmpty(prod, location) {
-		return server.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
+		return api.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
 	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, prod); err != nil {
 		// validate against production only, the resource is already gone by now
-		return server.ErrorResponse(c, http.StatusUnauthorized, err)
+		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
 	status := DeleteResource(ctx, location)

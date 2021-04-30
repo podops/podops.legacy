@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/txsvc/platform/pkg/server"
+	"github.com/txsvc/platform/pkg/api"
 
 	"github.com/podops/podops/internal/errordef"
 )
@@ -93,7 +93,7 @@ func (cl *Client) CreateResource(production, kind, guid string, force bool, rsrc
 		return http.StatusBadRequest, errordef.ErrInvalidParameters
 	}
 
-	resp := server.StatusObject{}
+	resp := api.StatusObject{}
 	status, err := post(cl.opts.APIEndpoint, fmt.Sprintf(updateResourceRoute, production, kind, guid, force), cl.opts.Token, rsrc, &resp)
 
 	if err != nil {
@@ -171,7 +171,7 @@ func (cl *Client) UpdateResource(production, kind, guid string, force bool, rsrc
 		return http.StatusBadRequest, errordef.ErrInvalidParameters
 	}
 
-	resp := server.StatusObject{}
+	resp := api.StatusObject{}
 	status, err := put(cl.opts.APIEndpoint, fmt.Sprintf(updateResourceRoute, production, kind, guid, force), cl.opts.Token, rsrc, &resp)
 
 	if err != nil {
