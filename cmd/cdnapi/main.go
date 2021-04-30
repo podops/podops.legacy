@@ -54,7 +54,7 @@ func init() {
 	}
 
 	// FIXME InitDefaultPlatform
-	p, err := platform.InitPlatform(context.Background(), google.GoogleErrorReportingConfig, platform.DefaultContextConfig)
+	p, err := platform.InitPlatform(context.Background(), google.GoogleErrorReportingConfig, platform.DefaultContextConfig, google.GoogleCloudLoggingConfig)
 	if err != nil {
 		log.Fatal("error initializing the platform services")
 	}
