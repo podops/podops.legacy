@@ -14,6 +14,7 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 )
 
 // FindResourceEndpoint returns a resource
@@ -149,7 +150,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		payload = &show
 
 		if prod != show.GUID() {
-			return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgParametersMismatch, prod, show.GUID()))
+			return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(messagedef.MsgParameterMismatch, prod, show.GUID()))
 		}
 
 		// update the PRODUCTION entry based on resource
@@ -184,7 +185,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 		payload = &episode
 
 		if prod != episode.Parent() {
-			return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgParametersMismatch, prod, episode.Parent()))
+			return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(messagedef.MsgParameterMismatch, prod, episode.Parent()))
 		}
 
 		// ensure images and media files
@@ -200,7 +201,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 			return api.ErrorResponse(c, http.StatusBadRequest, err)
 		}
 	} else {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgUnsupportedType, kind))
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(messagedef.MsgResourceUnsupportedKind, kind))
 	}
 
 	if err := backend.WriteResourceContent(ctx, location, createFlag, forceFlag, payload); err != nil {

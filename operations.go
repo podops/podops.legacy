@@ -9,6 +9,7 @@ import (
 	"github.com/txsvc/platform/pkg/api"
 
 	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 )
 
 const (
@@ -113,7 +114,7 @@ func (cl *Client) GetResource(production, kind, guid string, rsrc interface{}) e
 
 	status, err := get(cl.opts.APIEndpoint, fmt.Sprintf(getResourceRoute, production, kind, guid), cl.opts.Token, rsrc)
 	if status == http.StatusBadRequest {
-		return fmt.Errorf(errordef.MsgResourceNotFound, fmt.Sprintf("%s/%s-%s", production, kind, guid))
+		return fmt.Errorf(messagedef.MsgResourceNotFound, fmt.Sprintf("%s/%s-%s", production, kind, guid))
 	}
 	if err != nil {
 		return err
@@ -133,7 +134,7 @@ func (cl *Client) FindResource(guid string, rsrc interface{}) error {
 
 	status, err := get(cl.opts.APIEndpoint, fmt.Sprintf(findResourceRoute, guid), cl.opts.Token, rsrc)
 	if status == http.StatusBadRequest {
-		return fmt.Errorf(errordef.MsgResourceNotFound, guid)
+		return fmt.Errorf(messagedef.MsgResourceNotFound, guid)
 	}
 	if err != nil {
 		return err
@@ -246,7 +247,7 @@ func (cl *Client) Upload(production, path string, force bool) error {
 	resp.Body.Close()
 
 	if resp.StatusCode > http.StatusNoContent {
-		return fmt.Errorf(errordef.MsgErrUploadingResource, fmt.Sprintf("%s:%s", path, resp.Status))
+		return fmt.Errorf(messagedef.MsgResourceUploadError, fmt.Sprintf("%s:%s", path, resp.Status))
 	}
 
 	return nil

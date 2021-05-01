@@ -12,7 +12,7 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/auth"
 	"github.com/podops/podops/backend"
-	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 )
 
 // ProductionEndpoint creates an new show and does all the background setup
@@ -32,7 +32,7 @@ func ProductionEndpoint(c echo.Context) error {
 	// validate and normalize the name
 	showName := strings.ToLower(strings.TrimSpace(req.Name))
 	if !podops.ValidResourceName(showName) {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgInvalidParameter, showName))
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(messagedef.MsgParameterIsInvalid, showName))
 	}
 	// create a new production
 	clientID, _ := auth.GetClientID(ctx, c.Request())

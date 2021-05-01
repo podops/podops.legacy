@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/podops/podops"
-	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 	"github.com/urfave/cli/v2"
 )
 
@@ -49,7 +49,7 @@ func ListProductionsCommand(c *cli.Context) error {
 	}
 
 	if len(l.Productions) == 0 {
-		fmt.Println(errordef.MsgCLIProductionsNotFound)
+		fmt.Println(messagedef.MsgNoProductionsFound)
 	} else {
 		fmt.Println(productionListing("ID", "NAME", "TITLE", false))
 		for _, details := range l.Productions {
@@ -74,7 +74,7 @@ func SetProductionCommand(c *cli.Context) error {
 	}
 
 	if len(l.Productions) == 0 {
-		fmt.Println(errordef.MsgCLIProductionsNotFound)
+		fmt.Println(messagedef.MsgNoProductionsFound)
 		return nil
 	}
 
@@ -82,7 +82,7 @@ func SetProductionCommand(c *cli.Context) error {
 	if production == "" {
 		// print the current show if one has been selected
 		if client.DefaultProduction() == "" {
-			fmt.Println(errordef.MsgCLIErrorNoProductionSet)
+			fmt.Println(messagedef.MsgErrorNoProduction)
 			return nil
 		}
 		for _, details := range l.Productions {
@@ -93,7 +93,7 @@ func SetProductionCommand(c *cli.Context) error {
 				return nil
 			}
 		}
-		fmt.Println(errordef.MsgCLIErrorNoProductionSet)
+		fmt.Println(messagedef.MsgErrorNoProduction)
 		return nil
 	}
 
@@ -107,7 +107,7 @@ func SetProductionCommand(c *cli.Context) error {
 		}
 	}
 
-	printMsg(errordef.MsgCLIErrorCanNotSet)
+	printMsg(messagedef.MsgErrorCanNotSetProduction)
 	return nil
 }
 
@@ -121,6 +121,6 @@ func BuildCommand(c *cli.Context) error {
 		return err
 	}
 
-	printMsg(errordef.MsgCLIBuild, prod, build.FeedAliasURL)
+	printMsg(messagedef.MsgBuildSuccess, prod, build.FeedAliasURL)
 	return nil
 }

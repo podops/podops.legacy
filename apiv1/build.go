@@ -14,7 +14,7 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/feed"
-	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 )
 
 var (
@@ -44,7 +44,7 @@ func BuildFeedEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusNotFound, err)
 	}
 	if p == nil {
-		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(errordef.MsgInvalidGUID, req.GUID))
+		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(messagedef.MsgResourceInvalidGUID, req.GUID))
 	}
 
 	if err := feed.Build(ctx, req.GUID, validateOnly); err != nil {

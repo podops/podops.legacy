@@ -8,8 +8,8 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/graphql/graph/model"
-	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/loader"
+	"github.com/podops/podops/internal/messagedef"
 )
 
 // This file will not be regenerated automatically.
@@ -29,7 +29,7 @@ func LoadShow(ctx context.Context, key string) (interface{}, error) {
 		return nil, err
 	}
 	if p == nil {
-		return nil, fmt.Errorf(errordef.MsgResourceNotFound, key)
+		return nil, fmt.Errorf(messagedef.MsgResourceNotFound, key)
 	}
 
 	s, err := backend.GetResourceContent(ctx, p.GUID)
@@ -37,7 +37,7 @@ func LoadShow(ctx context.Context, key string) (interface{}, error) {
 		return nil, err
 	}
 	if s == nil {
-		return nil, fmt.Errorf(errordef.MsgResourceNotFound, key)
+		return nil, fmt.Errorf(messagedef.MsgResourceNotFound, key)
 	}
 	show := s.(*podops.Show)
 
@@ -87,7 +87,7 @@ func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 		return nil, err
 	}
 	if r == nil {
-		return nil, fmt.Errorf(errordef.MsgResourceNotFound, key)
+		return nil, fmt.Errorf(messagedef.MsgResourceNotFound, key)
 	}
 	p, err := backend.GetProduction(ctx, r.ParentGUID)
 	if err != nil {

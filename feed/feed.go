@@ -15,6 +15,7 @@ import (
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/feed/rss"
 	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 )
 
 var mediaTypeMap map[string]rss.EnclosureType
@@ -38,7 +39,7 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 		return err
 	}
 	if p == nil {
-		return fmt.Errorf(errordef.MsgResourceNotFound, production)
+		return fmt.Errorf(messagedef.MsgResourceNotFound, production)
 	}
 
 	if err = backend.ValidateProduction(ctx, production); err != nil {

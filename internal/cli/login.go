@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/podops/podops/auth"
-	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 
 	"github.com/urfave/cli/v2"
 )
@@ -35,19 +35,19 @@ func LoginCommand(c *cli.Context) error {
 
 		switch status {
 		case http.StatusCreated:
-			fmt.Println(errordef.MsgCLINewAccount)
+			fmt.Println(messagedef.MsgLoginNewAccount)
 			return nil
 		case http.StatusNoContent:
-			fmt.Println(errordef.MsgCLILoginVerification)
+			fmt.Println(messagedef.MsgLoginVerification)
 			return nil
 		case http.StatusForbidden:
-			fmt.Println(errordef.MsgCLILoginError)
+			fmt.Println(messagedef.MsgLoginError)
 			return nil
 		default:
-			return fmt.Errorf(errordef.MsgStatus, status)
+			return fmt.Errorf(messagedef.MsgStatus, status)
 		}
 	} else {
-		fmt.Println(errordef.MsgMissingArgument, "EMAIL")
+		fmt.Println(messagedef.MsgArgumentMissing, "EMAIL")
 	}
 
 	return nil
@@ -57,7 +57,7 @@ func LoginCommand(c *cli.Context) error {
 func AuthCommand(c *cli.Context) error {
 
 	if c.Args().Len() != 2 {
-		printMsg(errordef.MsgArgumentCountMismatch, 2, c.Args().Len())
+		printMsg(messagedef.MsgArgumentCountMismatch, 2, c.Args().Len())
 		return nil
 	}
 
@@ -76,19 +76,19 @@ func AuthCommand(c *cli.Context) error {
 	switch status {
 	case http.StatusOK:
 		if err := storeLogin(response.UserID, response.Token); err != nil {
-			fmt.Println(errordef.MsgCLIErrorUpdateConfig)
+			fmt.Println(messagedef.MsgErrorUpdatingConfig)
 			return nil
 		}
-		fmt.Println(errordef.MsgCLIAuthSuccess)
+		fmt.Println(messagedef.MsgAuthenticationSuccess)
 		return nil
 	case http.StatusUnauthorized:
-		fmt.Println(errordef.MsgCLITokenExpired)
+		fmt.Println(messagedef.MsgAuthenticationTokenExpired)
 		return nil
 	case http.StatusNotFound:
-		fmt.Println(errordef.MsgCLITokenInvalid)
+		fmt.Println(messagedef.MsgAuthenticationTokenInvalid)
 		return nil
 	default:
-		return fmt.Errorf(errordef.MsgCLIStatus, status)
+		return fmt.Errorf(messagedef.MsgStatus, status)
 	}
 
 }
@@ -98,7 +98,7 @@ func LogoutCommand(c *cli.Context) error {
 
 	m := loadNetrc().FindMachine(machineEntry)
 	if m == nil {
-		return fmt.Errorf(errordef.MsgCLIError)
+		return fmt.Errorf(messagedef.MsgClientError)
 	}
 	request := auth.AuthorizationRequest{
 		Realm:  client.Realm(),
@@ -112,9 +112,9 @@ func LogoutCommand(c *cli.Context) error {
 
 	if status == http.StatusNoContent {
 		clearLogin()
-		fmt.Println(errordef.MsgCLILogout)
+		fmt.Println(messagedef.MsgLogoutSuccess)
 	} else {
-		return fmt.Errorf(errordef.MsgCLIStatus, status)
+		return fmt.Errorf(messagedef.MsgStatus, status)
 	}
 
 	return nil

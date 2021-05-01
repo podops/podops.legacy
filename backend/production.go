@@ -10,6 +10,7 @@ import (
 	"github.com/fupas/platform/pkg/platform"
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 	"github.com/txsvc/platform/pkg/id"
 	"github.com/txsvc/platform/pkg/timestamp"
 )
@@ -32,7 +33,7 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 	if p != nil {
 		if p.Owner != clientID {
 			// do not access someone else's production
-			return nil, fmt.Errorf(errordef.MsgResourceAlreadyExists, name)
+			return nil, fmt.Errorf(messagedef.MsgResourceAlreadyExists, name)
 		}
 		return p, nil
 	}

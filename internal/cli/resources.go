@@ -11,7 +11,7 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
-	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 	"github.com/podops/podops/internal/metadata"
 )
 
@@ -42,7 +42,7 @@ func GetResourcesCommand(c *cli.Context) error {
 		}
 
 		if len(l.Resources) == 0 {
-			printMsg(errordef.MsgCLIResourcesNotFound)
+			printMsg(messagedef.MsgNoResourcesFound)
 		} else {
 			printMsg(assetListing("ID", "NAME", "KIND"))
 			for _, details := range l.Resources {
@@ -68,7 +68,7 @@ func GetResourcesCommand(c *cli.Context) error {
 		var rsrc interface{}
 		err := client.FindResource(guid, &rsrc)
 		if err != nil {
-			fmt.Println(errordef.MsgCLIResourcesNotFound)
+			fmt.Println(messagedef.MsgNoResourcesFound)
 			return nil
 		}
 
@@ -87,7 +87,7 @@ func GetResourcesCommand(c *cli.Context) error {
 func CreateCommand(c *cli.Context) error {
 
 	if c.NArg() != 1 {
-		return fmt.Errorf(errordef.MsgCLIArgumentCountMismatch, 1, c.NArg())
+		return fmt.Errorf(messagedef.MsgArgumentCountMismatch, 1, c.NArg())
 	}
 	path := c.Args().First()
 	force := c.Bool("force")
@@ -102,7 +102,7 @@ func CreateCommand(c *cli.Context) error {
 		return err
 	}
 
-	fmt.Println(errordef.MsgCLIResourceCreated, fmt.Sprintf("%s-%s", kind, guid))
+	fmt.Println(messagedef.MsgResourceCreated, fmt.Sprintf("%s-%s", kind, guid))
 	return nil
 }
 
@@ -110,7 +110,7 @@ func CreateCommand(c *cli.Context) error {
 func UpdateCommand(c *cli.Context) error {
 
 	if c.NArg() != 1 {
-		return fmt.Errorf(errordef.MsgCLIArgumentCountMismatch, 1, c.NArg())
+		return fmt.Errorf(messagedef.MsgArgumentCountMismatch, 1, c.NArg())
 	}
 	path := c.Args().First()
 	force := c.Bool("force")
@@ -125,7 +125,7 @@ func UpdateCommand(c *cli.Context) error {
 		return err
 	}
 
-	fmt.Println(errordef.MsgCLIResourceUpdated, fmt.Sprintf("%s-%s", kind, guid))
+	fmt.Println(messagedef.MsgResourceUpdated, fmt.Sprintf("%s-%s", kind, guid))
 	return nil
 }
 
@@ -133,7 +133,7 @@ func UpdateCommand(c *cli.Context) error {
 func DeleteResourcesCommand(c *cli.Context) error {
 
 	if c.NArg() != 2 {
-		return fmt.Errorf(errordef.MsgCLIArgumentCountMismatch, 2, c.NArg())
+		return fmt.Errorf(messagedef.MsgArgumentCountMismatch, 2, c.NArg())
 	}
 
 	prod := getProduction(c)
@@ -147,11 +147,11 @@ func DeleteResourcesCommand(c *cli.Context) error {
 	}
 
 	if status != http.StatusNoContent {
-		printMsg(errordef.MsgCLIErrorDeletingResource, fmt.Sprintf("%s/%s-%s", prod, kind, guid))
+		printMsg(messagedef.MsgResourceDeletingError, fmt.Sprintf("%s/%s-%s", prod, kind, guid))
 		return nil
 	}
 
-	printMsg(errordef.MsgCLIResourceDeleted, fmt.Sprintf("%s/%s-%s", prod, kind, guid))
+	printMsg(messagedef.MsgResourceDeleted, fmt.Sprintf("%s/%s-%s", prod, kind, guid))
 	return nil
 }
 
@@ -159,7 +159,7 @@ func DeleteResourcesCommand(c *cli.Context) error {
 func TemplateCommand(c *cli.Context) error {
 	template := c.Args().First()
 	if template != podops.ResourceShow && template != podops.ResourceEpisode {
-		printMsg(errordef.MsgCLIResourceUnknown, template)
+		printMsg(messagedef.MsgResourceUnknown, template)
 		return nil
 	}
 
@@ -202,7 +202,7 @@ func TemplateCommand(c *cli.Context) error {
 func UploadCommand(c *cli.Context) error {
 
 	if c.NArg() != 1 {
-		return fmt.Errorf(errordef.MsgCLIArgumentCountMismatch, 1, c.NArg())
+		return fmt.Errorf(messagedef.MsgArgumentCountMismatch, 1, c.NArg())
 	}
 
 	prod := getProduction(c)
@@ -214,6 +214,6 @@ func UploadCommand(c *cli.Context) error {
 		return err
 	}
 
-	fmt.Println(fmt.Sprintf(errordef.MsgCLIUploadedResource, name))
+	fmt.Println(fmt.Sprintf(messagedef.MsgResourceUploadSuccess, name))
 	return nil
 }

@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/podops/podops"
-	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 )
 
 type (
@@ -30,7 +30,7 @@ func UnmarshalResource(data []byte) (interface{}, string, string, error) {
 	r, _ := LoadGenericResource(data)
 	loader := resourceLoaders[r.Kind]
 	if loader == nil {
-		return nil, "", "", fmt.Errorf(errordef.MsgInvalidResource, r.Kind)
+		return nil, "", "", fmt.Errorf(messagedef.MsgResourceIsInvalid, r.Kind)
 	}
 
 	resource, guid, err := loader(data)

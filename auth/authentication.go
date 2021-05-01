@@ -9,6 +9,7 @@ import (
 	"github.com/txsvc/platform/pkg/timestamp"
 
 	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 )
 
 // ResetAccountChallenge creates a new confirmation token and resets the timer
@@ -43,7 +44,7 @@ func LogoutAccount(ctx context.Context, realm, clientID string) error {
 		return err
 	}
 	if account == nil {
-		return fmt.Errorf(errordef.MsgAccountNotFound, fmt.Sprintf("%s.%s", realm, clientID))
+		return fmt.Errorf(messagedef.MsgAuthenticationNotFound, fmt.Sprintf("%s.%s", realm, clientID))
 	}
 
 	auth, err := LookupAuthorization(ctx, account.Realm, account.ClientID)
@@ -68,7 +69,7 @@ func BlockAccount(ctx context.Context, realm, clientID string) error {
 		return err
 	}
 	if account == nil {
-		return fmt.Errorf(errordef.MsgAccountNotFound, fmt.Sprintf("%s.%s", realm, clientID))
+		return fmt.Errorf(messagedef.MsgAuthenticationNotFound, fmt.Sprintf("%s.%s", realm, clientID))
 	}
 
 	auth, err := LookupAuthorization(ctx, account.Realm, account.ClientID)

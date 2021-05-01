@@ -16,7 +16,7 @@ import (
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/auth"
 	"github.com/podops/podops/backend"
-	"github.com/podops/podops/internal/errordef"
+	"github.com/podops/podops/internal/messagedef"
 	"github.com/podops/podops/internal/metadata"
 )
 
@@ -54,7 +54,7 @@ func ImportResource(ctx context.Context, prod, src string) int {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		platform.ReportError(fmt.Errorf(errordef.MsgErrUploadingResource, src))
+		platform.ReportError(fmt.Errorf(messagedef.MsgResourceImportError, src))
 		return http.StatusBadRequest
 	}
 
@@ -89,7 +89,7 @@ func ImportResource(ctx context.Context, prod, src string) int {
 		return http.StatusBadRequest
 	}
 	if l != meta.Size {
-		platform.ReportError(fmt.Errorf(errordef.MsgErrUploadingResource, src))
+		platform.ReportError(fmt.Errorf(messagedef.MsgResourceImportError, src))
 		return http.StatusBadRequest
 	}
 

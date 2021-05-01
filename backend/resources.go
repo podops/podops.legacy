@@ -23,6 +23,7 @@ import (
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/loader"
+	"github.com/podops/podops/internal/messagedef"
 	"github.com/podops/podops/internal/metadata"
 )
 
@@ -53,7 +54,7 @@ func init() {
 func NormalizeKind(kind string) (string, error) {
 	k := resourceMap[strings.ToLower(kind)]
 	if k == "" {
-		return "", fmt.Errorf(errordef.MsgInvalidResource, kind)
+		return "", fmt.Errorf(messagedef.MsgResourceIsInvalid, kind)
 	}
 	return k, nil
 }
@@ -82,7 +83,7 @@ func FindResource(ctx context.Context, production, name string) (*podops.Resourc
 		return nil, nil
 	}
 	if len(r) > 1 {
-		return nil, fmt.Errorf(errordef.MsgResourceCountMismatch, 1, len(r))
+		return nil, fmt.Errorf(messagedef.MsgResourceInconsistentInventory, 1, len(r), production, name)
 	}
 
 	return r[0], nil
@@ -100,7 +101,7 @@ func UpdateResource(ctx context.Context, name, guid, kind, production, location 
 	if r != nil {
 		// resource already exists, just update the inventory
 		if r.Kind != _kind {
-			return fmt.Errorf(errordef.MsgResourceMismatch, r.Kind, _kind)
+			return fmt.Errorf(messagedef.MsgResourceKindMismatch, r.Kind, _kind)
 		}
 		r.Name = name
 		r.ParentGUID = production
@@ -309,10 +310,10 @@ func WriteResourceContent(ctx context.Context, path string, create, force bool, 
 
 	// some logic mangling here ...
 	if create && exists && !force { // create on an existing resource
-		return fmt.Errorf(errordef.MsgResourceAlreadyExists, path)
+		return fmt.Errorf(messagedef.MsgResourceAlreadyExists, path)
 	}
 	if !exists && !create && !force { // update on a missing resource
-		return fmt.Errorf(errordef.MsgResourceNotFound, path)
+		return fmt.Errorf(messagedef.MsgResourceNotFound, path)
 	}
 
 	data, err := yaml.Marshal(rsrc)
@@ -383,7 +384,7 @@ func UpdateShow(ctx context.Context, location string, show *podops.Show) error {
 	if r != nil {
 		// resource already exists, just update the inventory
 		if r.Kind != show.Kind {
-			return fmt.Errorf(errordef.MsgResourceMismatch, r.Kind, show.Kind)
+			return fmt.Errorf(messagedef.MsgResourceKindMismatch, r.Kind, show.Kind)
 		}
 		r.Name = show.Metadata.Name
 		r.Location = location
@@ -428,14 +429,14 @@ func UpdateEpisode(ctx context.Context, location string, episode *podops.Episode
 
 	if rn != nil && r != nil {
 		if rn.GUID != r.GUID {
-			return fmt.Errorf(errordef.MsgResourceNotFound, fmt.Sprintf("%s/%s", episode.Parent(), episode.Metadata.Name))
+			return fmt.Errorf(messagedef.MsgResourceNotFound, fmt.Sprintf("%s/%s", episode.Parent(), episode.Metadata.Name))
 		}
 	}
 
 	if r != nil {
 		// resource already exists, just update the inventory
 		if r.Kind != episode.Kind {
-			return fmt.Errorf(errordef.MsgResourceMismatch, r.Kind, episode.Kind)
+			return fmt.Errorf(messagedef.MsgResourceKindMismatch, r.Kind, episode.Kind)
 		}
 		index, _ := strconv.ParseInt(episode.Metadata.Labels[podops.LabelEpisode], 10, 64)
 
@@ -540,7 +541,7 @@ func pingURL(url string) (http.Header, error) {
 		defer resp.Body.Close()
 		// anything other than OK, Created, Accepted, NoContent is treated as an error
 		if resp.StatusCode > http.StatusNoContent {
-			return nil, fmt.Errorf(errordef.MsgInvalidResource, url)
+			return nil, fmt.Errorf(messagedef.MsgResourceIsInvalid, url)
 		}
 	}
 	return resp.Header.Clone(), nil
