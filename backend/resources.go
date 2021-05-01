@@ -25,6 +25,7 @@ import (
 	"github.com/podops/podops/internal/loader"
 	"github.com/podops/podops/internal/messagedef"
 	"github.com/podops/podops/internal/metadata"
+	"github.com/podops/podops/internal/transport"
 )
 
 const (
@@ -530,7 +531,7 @@ func pingURL(url string) (http.Header, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", podops.UserAgentString)
+	req.Header.Set("User-Agent", transport.UserAgentString)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

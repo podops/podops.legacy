@@ -6,7 +6,7 @@ import "fmt"
 
 Make sure to update version numbers in these locations also:
 
-- platform/tasks.go
+- internal/transport/transport.go
 - .github/*
 - podops-infra/inventory/*
 
@@ -27,6 +27,4 @@ const (
 var (
 	// VersionString is the canonical API description
 	VersionString string = fmt.Sprintf("%d.%d.%d", MajorVersion, MinorVersion, FixVersion)
-	// UserAgentString identifies any http request podops makes
-	UserAgentString string = fmt.Sprintf("PodOps %d.%d.%d", MajorVersion, MinorVersion, FixVersion)
 )

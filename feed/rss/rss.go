@@ -9,7 +9,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	a "github.com/podops/podops"
+	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
 )
 
@@ -36,7 +36,7 @@ func New(title, link, description string, pubDate, lastBuildDate *time.Time) Cha
 		ITitle:        title,
 		Link:          link,
 		Description:   description,
-		Generator:     fmt.Sprintf("PodOps %s (https://github.com/podops/podops)", a.VersionString),
+		Generator:     fmt.Sprintf("PodOps %s (https://github.com/podops/podops)", podops.VersionString),
 		PubDate:       parseDateRFC1123Z(pubDate),
 		LastBuildDate: parseDateRFC1123Z(lastBuildDate),
 		Language:      "en",

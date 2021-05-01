@@ -10,6 +10,7 @@ import (
 
 	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/messagedef"
+	"github.com/podops/podops/internal/transport"
 )
 
 const (
@@ -62,7 +63,7 @@ func (cl *Client) CreateProduction(name, title, summary string) (*Production, er
 	}
 
 	resp := Production{}
-	_, err := post(cl.opts.APIEndpoint, productionRoute, cl.opts.Token, &req, &resp)
+	_, err := transport.Post(cl.opts.APIEndpoint, productionRoute, cl.opts.Token, &req, &resp)
 
 	if err != nil {
 		return nil, err
@@ -78,7 +79,7 @@ func (cl *Client) Productions() (*ProductionList, error) {
 	}
 
 	var resp ProductionList
-	_, err := get(cl.opts.APIEndpoint, listProductionsRoute, cl.opts.Token, &resp)
+	_, err := transport.Get(cl.opts.APIEndpoint, listProductionsRoute, cl.opts.Token, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +96,7 @@ func (cl *Client) CreateResource(production, kind, guid string, force bool, rsrc
 	}
 
 	resp := api.StatusObject{}
-	status, err := post(cl.opts.APIEndpoint, fmt.Sprintf(updateResourceRoute, production, kind, guid, force), cl.opts.Token, rsrc, &resp)
+	status, err := transport.Post(cl.opts.APIEndpoint, fmt.Sprintf(updateResourceRoute, production, kind, guid, force), cl.opts.Token, rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -112,7 +113,7 @@ func (cl *Client) GetResource(production, kind, guid string, rsrc interface{}) e
 		return errordef.ErrInvalidParameters
 	}
 
-	status, err := get(cl.opts.APIEndpoint, fmt.Sprintf(getResourceRoute, production, kind, guid), cl.opts.Token, rsrc)
+	status, err := transport.Get(cl.opts.APIEndpoint, fmt.Sprintf(getResourceRoute, production, kind, guid), cl.opts.Token, rsrc)
 	if status == http.StatusBadRequest {
 		return fmt.Errorf(messagedef.MsgResourceNotFound, fmt.Sprintf("%s/%s-%s", production, kind, guid))
 	}
@@ -132,7 +133,7 @@ func (cl *Client) FindResource(guid string, rsrc interface{}) error {
 		return errordef.ErrInvalidParameters
 	}
 
-	status, err := get(cl.opts.APIEndpoint, fmt.Sprintf(findResourceRoute, guid), cl.opts.Token, rsrc)
+	status, err := transport.Get(cl.opts.APIEndpoint, fmt.Sprintf(findResourceRoute, guid), cl.opts.Token, rsrc)
 	if status == http.StatusBadRequest {
 		return fmt.Errorf(messagedef.MsgResourceNotFound, guid)
 	}
@@ -156,7 +157,7 @@ func (cl *Client) Resources(production, kind string) (*ResourceList, error) {
 	}
 
 	var resp ResourceList
-	_, err := get(cl.opts.APIEndpoint, fmt.Sprintf(listResourcesRoute, production, kind), cl.opts.Token, &resp)
+	_, err := transport.Get(cl.opts.APIEndpoint, fmt.Sprintf(listResourcesRoute, production, kind), cl.opts.Token, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +174,7 @@ func (cl *Client) UpdateResource(production, kind, guid string, force bool, rsrc
 	}
 
 	resp := api.StatusObject{}
-	status, err := put(cl.opts.APIEndpoint, fmt.Sprintf(updateResourceRoute, production, kind, guid, force), cl.opts.Token, rsrc, &resp)
+	status, err := transport.Put(cl.opts.APIEndpoint, fmt.Sprintf(updateResourceRoute, production, kind, guid, force), cl.opts.Token, rsrc, &resp)
 
 	if err != nil {
 		return status, err
@@ -190,7 +191,7 @@ func (cl *Client) DeleteResource(production, kind, guid string) (int, error) {
 		return http.StatusBadRequest, errordef.ErrInvalidParameters
 	}
 
-	status, err := delete(cl.opts.APIEndpoint, fmt.Sprintf(deleteResourceRoute, production, kind, guid), cl.opts.Token, nil)
+	status, err := transport.Delete(cl.opts.APIEndpoint, fmt.Sprintf(deleteResourceRoute, production, kind, guid), cl.opts.Token, nil)
 	if err != nil {
 		return status, err
 	}
@@ -211,7 +212,7 @@ func (cl *Client) Build(production string) (*BuildRequest, error) {
 	}
 	resp := BuildRequest{}
 
-	_, err := post(cl.opts.APIEndpoint, buildRoute, cl.opts.Token, &req, &resp)
+	_, err := transport.Post(cl.opts.APIEndpoint, buildRoute, cl.opts.Token, &req, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -228,11 +229,10 @@ func (cl *Client) Upload(production, path string, force bool) error {
 		return errordef.ErrInvalidParameters
 	}
 
-	req, err := upload(cl.opts.CDNEndpoint, uploadRoute, cl.opts.Token, production, "asset", path)
+	req, err := transport.Upload(cl.opts.CDNEndpoint, uploadRoute, cl.opts.Token, production, "asset", path)
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Set("User-Agent", UserAgentString)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

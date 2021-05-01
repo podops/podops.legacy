@@ -1,4 +1,4 @@
-package podops
+package transport
 
 import (
 	"bytes"
@@ -14,8 +14,22 @@ import (
 	"github.com/txsvc/platform/pkg/api"
 )
 
+const (
+	// MajorVersion of the API
+	majorVersion = 1
+	// MinorVersion of the API
+	minorVersion = 0
+	// FixVersion of the API
+	fixVersion = 1
+)
+
+var (
+	// UserAgentString identifies any http request podops makes
+	UserAgentString string = fmt.Sprintf("PodOps %d.%d.%d", majorVersion, minorVersion, fixVersion)
+)
+
 // Get is used to request data from the API. No payload, only queries!
-func get(url, cmd, token string, response interface{}) (int, error) {
+func Get(url, cmd, token string, response interface{}) (int, error) {
 	uri := url + cmd
 
 	req, err := http.NewRequest("GET", uri, nil)
@@ -27,7 +41,7 @@ func get(url, cmd, token string, response interface{}) (int, error) {
 }
 
 // Post is used to invoke an API method using http POST
-func post(url, cmd, token string, request, response interface{}) (int, error) {
+func Post(url, cmd, token string, request, response interface{}) (int, error) {
 	uri := url + cmd
 
 	m, err := json.Marshal(&request)
@@ -44,7 +58,7 @@ func post(url, cmd, token string, request, response interface{}) (int, error) {
 }
 
 // Put is used to invoke an API method using http PUT
-func put(url, cmd, token string, request, response interface{}) (int, error) {
+func Put(url, cmd, token string, request, response interface{}) (int, error) {
 	uri := url + cmd
 
 	m, err := json.Marshal(&request)
@@ -61,7 +75,7 @@ func put(url, cmd, token string, request, response interface{}) (int, error) {
 }
 
 // DELETE is used to request the deletion of a resource. Maybe apayload, no response!
-func delete(url, cmd, token string, request interface{}) (int, error) {
+func Delete(url, cmd, token string, request interface{}) (int, error) {
 	uri := url + cmd
 
 	if request != nil {
@@ -82,6 +96,42 @@ func delete(url, cmd, token string, request interface{}) (int, error) {
 	}
 	return invoke(token, req, nil)
 
+}
+
+// GITHUB_ISSUE #13
+
+// Creates a new file upload http request with optional extra params
+func Upload(url, cmd, token, guid, form, path string) (*http.Request, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	body := bytes.Buffer{}
+	writer := multipart.NewWriter(&body)
+	part, err := writer.CreateFormFile(form, filepath.Base(path))
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = io.Copy(part, file)
+	if err != nil {
+		return nil, err
+	}
+
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	uri := url + cmd + "/" + guid
+	req, err := http.NewRequest("POST", uri, &body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("User-Agent", UserAgentString)
+
+	return req, err
 }
 
 func invoke(token string, req *http.Request, response interface{}) (int, error) {
@@ -126,39 +176,4 @@ func invoke(token string, req *http.Request, response interface{}) (int, error) 
 	}
 
 	return resp.StatusCode, nil
-}
-
-// GITHUB_ISSUE #13
-
-// Creates a new file upload http request with optional extra params
-func upload(url, cmd, token, guid, form, path string) (*http.Request, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	body := bytes.Buffer{}
-	writer := multipart.NewWriter(&body)
-	part, err := writer.CreateFormFile(form, filepath.Base(path))
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = io.Copy(part, file)
-	if err != nil {
-		return nil, err
-	}
-
-	err = writer.Close()
-	if err != nil {
-		return nil, err
-	}
-
-	uri := url + cmd + "/" + guid
-	req, err := http.NewRequest("POST", uri, &body)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	req.Header.Set("Authorization", "Bearer "+token)
-
-	return req, err
 }

@@ -17,6 +17,7 @@ import (
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/loader"
+	"github.com/podops/podops/internal/transport"
 )
 
 const (
@@ -63,7 +64,7 @@ func post(url string, request, response interface{}) (int, error) {
 func invoke(req *http.Request, response interface{}) (int, error) {
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
-	req.Header.Set("User-Agent", podops.UserAgentString)
+	req.Header.Set("User-Agent", transport.UserAgentString)
 	if client.Token() != "" {
 		req.Header.Set("Authorization", "Bearer "+client.Token())
 	}
