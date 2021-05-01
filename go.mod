@@ -15,7 +15,7 @@ require (
 	github.com/mailgun/mailgun-go/v4 v4.4.1
 	github.com/stretchr/testify v1.6.1
 	github.com/tcolgate/mp3 v0.0.0-20170426193717-e79c5a46d300
-	github.com/txsvc/platform v0.9.4
+	github.com/txsvc/platform v0.9.5
 	github.com/urfave/cli/v2 v2.1.1
 	github.com/vektah/gqlparser/v2 v2.1.0
 	gopkg.in/yaml.v2 v2.3.0

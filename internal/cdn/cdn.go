@@ -35,7 +35,7 @@ func FeedEndpoint(c echo.Context) error { // FIXME not needed !
 	redirectTo := fmt.Sprintf("%s/%s/feed.xml", podops.DefaultStorageEndpoint, prod.GUID)
 
 	// track api access for billing etc
-	platform.Logger("metrics").Log("cdn.feed", "production", prod.GUID)
+	platform.Meter(platform.NewHttpContext(c.Request()), "cdn.feed", "production", prod.GUID)
 
 	return c.Redirect(http.StatusTemporaryRedirect, redirectTo)
 }

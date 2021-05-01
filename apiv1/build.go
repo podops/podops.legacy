@@ -71,7 +71,7 @@ func BuildFeedEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	platform.Logger("metrics").Log("api.build", "production", p.GUID)
+	platform.Meter(ctx, "api.build", "production", p.GUID)
 
 	resp := podops.BuildRequest{
 		GUID:         req.GUID,

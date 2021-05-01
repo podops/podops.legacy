@@ -75,7 +75,7 @@ func UploadEndpoint(c echo.Context) error {
 			}
 
 			// track api access for billing etc
-			platform.Logger("metrics").Log("api.upload", "production", meta.ParentGUID, "resource", meta.GUID)
+			platform.Meter(ctx, "api.upload", "production", meta.ParentGUID, "resource", meta.GUID)
 		}
 	}
 

@@ -39,7 +39,7 @@ func FindResourceEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	platform.Logger("metrics").Log("api.resource.find", "resource", guid)
+	platform.Meter(ctx, "api.resource.find", "resource", guid)
 
 	return api.StandardResponse(c, http.StatusOK, resource)
 }
@@ -71,7 +71,7 @@ func GetResourceEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	platform.Logger("metrics").Log("api.resource.get", "production", prod, "resource", guid)
+	platform.Meter(ctx, "api.resource.get", "production", prod, "resource", guid, "kind", kind)
 
 	return api.StandardResponse(c, http.StatusOK, resource)
 }
@@ -97,7 +97,7 @@ func ListResourcesEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	platform.Logger("metrics").Log("api.resource.list", "production", prod, "resource", kind)
+	platform.Meter(ctx, "api.resource.list", "production", prod, "kind", kind)
 
 	return api.StandardResponse(c, http.StatusOK, &podops.ResourceList{Resources: l})
 }
@@ -209,7 +209,7 @@ func UpdateResourceEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	platform.Logger("metrics").Log(action, "production", prod, "resource", guid)
+	platform.Meter(ctx, action, "production", prod, "resource", guid, "kind", kind)
 
 	return api.StandardResponse(c, http.StatusCreated, nil)
 }
@@ -241,7 +241,7 @@ func DeleteResourceEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	platform.Logger("metrics").Log("api.resource.delete", "production", prod, "resource", guid)
+	platform.Meter(ctx, "api.resource.delete", "production", prod, "resource", guid, "kind", kind)
 
 	return c.NoContent(http.StatusNoContent)
 }

@@ -47,7 +47,7 @@ func ProductionEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	platform.Logger("metrics").Log("api.production.create", "production", p.GUID)
+	platform.Meter(ctx, "api.production.create", "production", p.GUID)
 
 	return api.StandardResponse(c, http.StatusCreated, p)
 }
@@ -68,7 +68,7 @@ func ListProductionsEndpoint(c echo.Context) error {
 	}
 
 	// track api access for billing etc
-	platform.Logger("metrics").Log("api.production.list", "owner", clientID)
+	platform.Meter(ctx, "api.production.list", "owner", clientID)
 
 	return api.StandardResponse(c, http.StatusOK, &podops.ProductionList{Productions: productions})
 }
