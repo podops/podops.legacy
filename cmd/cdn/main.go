@@ -23,7 +23,7 @@ func init() {
 
 	local.InitDefaultProviders()
 	p := platform.DefaultPlatform()
-	err := p.RegisterProvider(google.GoogleErrorReportingConfig, true)
+	err := p.RegisterProviders(true, google.GoogleErrorReportingConfig)
 	if err != nil {
 		log.Fatal("error initializing the platform services")
 	}
