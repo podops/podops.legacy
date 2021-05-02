@@ -55,7 +55,7 @@ func init() {
 
 	local.InitDefaultProviders()
 	p := platform.DefaultPlatform()
-	err := p.RegisterProviders(true, google.GoogleErrorReportingConfig, google.GoogleCloudLoggingConfig)
+	err := p.RegisterProviders(true, google.GoogleErrorReportingConfig, google.GoogleCloudLoggingConfig, google.GoogleCloudMetricsConfig)
 	if err != nil {
 		log.Fatal("error initializing the platform services")
 	}
