@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 
 	"github.com/labstack/echo/v4"
-	"github.com/txsvc/platform"
-	"github.com/txsvc/platform/pkg/api"
+	"github.com/txsvc/platform/v2"
+	"github.com/txsvc/platform/v2/pkg/api"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"

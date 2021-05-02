@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/fupas/platform/pkg/platform"
+	ds "github.com/txsvc/platform/v2/pkg/datastore"
 )
 
 const (
@@ -220,10 +220,10 @@ func cleaner() {
 	account, err := FindAccountByUserID(context.TODO(), realm, userID)
 	if err == nil && account != nil {
 		a := authorizationKey(account.Realm, account.ClientID)
-		platform.DataStore().Delete(context.TODO(), a)
+		ds.DataStore().Delete(context.TODO(), a)
 
 		k := accountKey(realm, account.ClientID)
-		platform.DataStore().Delete(context.TODO(), k)
+		ds.DataStore().Delete(context.TODO(), k)
 	}
 }
 

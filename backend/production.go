@@ -7,12 +7,13 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	"github.com/fupas/platform/pkg/platform"
+	ds "github.com/txsvc/platform/v2/pkg/datastore"
+	"github.com/txsvc/platform/v2/pkg/id"
+	"github.com/txsvc/platform/v2/pkg/timestamp"
+
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/messagedef"
-	"github.com/txsvc/platform/pkg/id"
-	"github.com/txsvc/platform/pkg/timestamp"
 )
 
 const (
@@ -65,7 +66,7 @@ func CreateProduction(ctx context.Context, name, title, summary, clientID string
 func GetProduction(ctx context.Context, production string) (*podops.Production, error) {
 	var p podops.Production
 
-	if err := platform.DataStore().Get(ctx, productionKey(production), &p); err != nil {
+	if err := ds.DataStore().Get(ctx, productionKey(production), &p); err != nil {
 		if err == datastore.ErrNoSuchEntity {
 			return nil, nil // not found is not an error
 		}
@@ -81,7 +82,7 @@ func ValidateProduction(ctx context.Context, production string) error {
 	show := 0
 	assets := 0
 
-	err := platform.DataStore().Get(ctx, productionKey(production), &p)
+	err := ds.DataStore().Get(ctx, productionKey(production), &p)
 	if err != nil {
 		return err
 	}
@@ -115,7 +116,7 @@ func ValidateProduction(ctx context.Context, production string) error {
 
 // UpdateProduction does what the name suggests
 func UpdateProduction(ctx context.Context, p *podops.Production) error {
-	if _, err := platform.DataStore().Put(ctx, productionKey(p.GUID), p); err != nil {
+	if _, err := ds.DataStore().Put(ctx, productionKey(p.GUID), p); err != nil {
 		return err
 	}
 	return nil
@@ -124,7 +125,7 @@ func UpdateProduction(ctx context.Context, p *podops.Production) error {
 // FindProductionByName does a lookup using the productions name instead of its key
 func FindProductionByName(ctx context.Context, name string) (*podops.Production, error) {
 	var p []*podops.Production
-	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreProductions).Filter("Name =", name), &p); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreProductions).Filter("Name =", name), &p); err != nil {
 		return nil, err
 	}
 	if p == nil {
@@ -136,7 +137,7 @@ func FindProductionByName(ctx context.Context, name string) (*podops.Production,
 // FindProductionsByOwner returns all productions belonging to the same owner
 func FindProductionsByOwner(ctx context.Context, owner string) ([]*podops.Production, error) {
 	var p []*podops.Production
-	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreProductions).Filter("Owner =", owner), &p); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreProductions).Filter("Owner =", owner), &p); err != nil {
 		return nil, err
 	}
 	if p == nil {

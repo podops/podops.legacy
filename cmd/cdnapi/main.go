@@ -1,16 +1,16 @@
 package main
 
 import (
-	"context"
 	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/txsvc/platform"
-	"github.com/txsvc/platform/pkg/env"
-	"github.com/txsvc/platform/pkg/http"
-	"github.com/txsvc/platform/provider/google"
+	"github.com/txsvc/platform/v2"
+	"github.com/txsvc/platform/v2/pkg/env"
+	"github.com/txsvc/platform/v2/pkg/http"
+	"github.com/txsvc/platform/v2/provider/google"
+	"github.com/txsvc/platform/v2/provider/local"
 
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/internal/cdn"
@@ -53,12 +53,18 @@ func init() {
 		log.Fatal("Missing env variable 'PROJECT_ID'")
 	}
 
-	// FIXME InitDefaultPlatform
-	p, err := platform.InitPlatform(context.Background(), google.GoogleErrorReportingConfig, platform.DefaultContextConfig, google.GoogleCloudLoggingConfig)
+	local.InitDefaultProviders()
+	p := platform.DefaultPlatform()
+	err := p.RegisterProvider(google.GoogleErrorReportingConfig, true)
 	if err != nil {
 		log.Fatal("error initializing the platform services")
 	}
-	platform.RegisterPlatform(p)
+	err = p.RegisterProvider(google.GoogleCloudLoggingConfig, true)
+	if err != nil {
+		log.Fatal("error initializing the platform services")
+	}
+
+	platform.RegisterPlatform(p) // redundant, but in case we return a copy in the future ...
 }
 
 func main() {

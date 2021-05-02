@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/txsvc/platform/pkg/api"
+	"github.com/txsvc/platform/v2/pkg/api"
 
 	"github.com/podops/podops/internal/errordef"
 	"github.com/podops/podops/internal/messagedef"

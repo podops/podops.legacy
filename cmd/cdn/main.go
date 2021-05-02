@@ -1,14 +1,14 @@
 package main
 
 import (
-	"context"
 	"log"
 
 	caddycmd "github.com/caddyserver/caddy/v2/cmd"
 
-	"github.com/txsvc/platform"
-	"github.com/txsvc/platform/pkg/env"
-	"github.com/txsvc/platform/provider/google"
+	"github.com/txsvc/platform/v2"
+	"github.com/txsvc/platform/v2/pkg/env"
+	"github.com/txsvc/platform/v2/provider/google"
+	"github.com/txsvc/platform/v2/provider/local"
 
 	// plug in Caddy modules here
 	_ "github.com/caddyserver/caddy/v2/modules/standard"
@@ -21,12 +21,14 @@ func init() {
 		log.Fatal("Missing env variable 'PROJECT_ID'")
 	}
 
-	// FIXME InitDefaultPlatform
-	p, err := platform.InitPlatform(context.Background(), google.GoogleErrorReportingConfig)
+	local.InitDefaultProviders()
+	p := platform.DefaultPlatform()
+	err := p.RegisterProvider(google.GoogleErrorReportingConfig, true)
 	if err != nil {
 		log.Fatal("error initializing the platform services")
 	}
-	platform.RegisterPlatform(p)
+
+	platform.RegisterPlatform(p) // redundant, but in case we return a copy in the future ...
 }
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/txsvc/platform/pkg/id"
+	"github.com/txsvc/platform/v2/pkg/id"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v2"
 

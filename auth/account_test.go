@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/fupas/platform/pkg/platform"
 	"github.com/stretchr/testify/assert"
-	"github.com/txsvc/platform/pkg/timestamp"
+	ds "github.com/txsvc/platform/v2/pkg/datastore"
+	"github.com/txsvc/platform/v2/pkg/timestamp"
 )
 
 const (
@@ -18,7 +18,7 @@ func cleanup() {
 	account, _ := FindAccountByUserID(context.TODO(), accountTestRealm, accountTestUser)
 	if account != nil {
 		k := accountKey(accountTestRealm, account.ClientID)
-		platform.DataStore().Delete(context.TODO(), k)
+		ds.DataStore().Delete(context.TODO(), k)
 	}
 }
 

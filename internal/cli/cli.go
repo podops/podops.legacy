@@ -12,7 +12,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/txsvc/platform/pkg/netrc"
+	"github.com/txsvc/platform/v2/pkg/netrc"
 	"github.com/urfave/cli/v2"
 
 	"github.com/podops/podops"

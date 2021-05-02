@@ -1,16 +1,14 @@
 package main
 
 import (
-	"context"
 	"log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/txsvc/platform"
-	"github.com/txsvc/platform/pkg/env"
-	"github.com/txsvc/platform/pkg/http"
-	"github.com/txsvc/platform/provider/google"
+	"github.com/txsvc/platform/v2/pkg/env"
+	"github.com/txsvc/platform/v2/pkg/http"
+	"github.com/txsvc/platform/v2/provider/google"
 
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/auth"
@@ -84,12 +82,7 @@ func init() {
 		log.Fatal("Missing env variable 'EMAIL_API_KEY'")
 	}
 
-	// FIXME InitDefaultPlatform
-	p, err := platform.InitPlatform(context.Background(), google.GoogleErrorReportingConfig, google.AppEngineContextConfig, google.GoogleCloudTaskConfig, google.GoogleCloudLoggingConfig)
-	if err != nil {
-		log.Fatal("error initializing the platform services")
-	}
-	platform.RegisterPlatform(p)
+	google.InitDefaultGoogleProviders()
 }
 
 func main() {

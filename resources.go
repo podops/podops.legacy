@@ -5,8 +5,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/txsvc/platform/v2/pkg/id"
+
 	"github.com/podops/podops/internal/metadata"
-	"github.com/txsvc/platform/pkg/id"
 )
 
 const (

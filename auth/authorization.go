@@ -8,9 +8,9 @@ import (
 	"cloud.google.com/go/datastore"
 	"github.com/labstack/echo/v4"
 
-	"github.com/fupas/platform/pkg/platform"
-	"github.com/txsvc/platform/pkg/id"
-	"github.com/txsvc/platform/pkg/timestamp"
+	ds "github.com/txsvc/platform/v2/pkg/datastore"
+	"github.com/txsvc/platform/v2/pkg/id"
+	"github.com/txsvc/platform/v2/pkg/timestamp"
 
 	"github.com/podops/podops/internal/errordef"
 )
@@ -187,7 +187,7 @@ func LookupAuthorization(ctx context.Context, realm, clientID string) (*Authoriz
 
 	// FIXME add a cache ?
 
-	if err := platform.DataStore().Get(ctx, k, &auth); err != nil {
+	if err := ds.DataStore().Get(ctx, k, &auth); err != nil {
 		if err == datastore.ErrNoSuchEntity {
 			return nil, nil // Not finding one is not an error!
 		}
@@ -202,7 +202,7 @@ func FindAuthorizationByToken(ctx context.Context, token string) (*Authorization
 
 	// FIXME add a cache ?
 
-	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreAuthorizations).Filter("Token =", token), &auth); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreAuthorizations).Filter("Token =", token), &auth); err != nil {
 		return nil, err
 	}
 	if auth == nil {
@@ -219,7 +219,7 @@ func CreateAuthorization(ctx context.Context, auth *Authorization) error {
 
 	// we simply overwrite the existing authorization. If this is no desired, use GetAuthorization first,
 	// update the Authorization and then write it back.
-	_, err := platform.DataStore().Put(ctx, k, auth)
+	_, err := ds.DataStore().Put(ctx, k, auth)
 	return err
 }
 
@@ -230,7 +230,7 @@ func UpdateAuthorization(ctx context.Context, auth *Authorization) error {
 
 	// we simply overwrite the existing authorization. If this is no desired, use GetAuthorization first,
 	// update the Authorization and then write it back.
-	_, err := platform.DataStore().Put(ctx, k, auth)
+	_, err := ds.DataStore().Put(ctx, k, auth)
 	return err
 }
 

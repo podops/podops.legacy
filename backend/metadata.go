@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"cloud.google.com/go/datastore"
-	"github.com/fupas/platform/pkg/platform"
+	ds "github.com/txsvc/platform/v2/pkg/datastore"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"
@@ -21,7 +21,7 @@ const (
 func GetMetadata(ctx context.Context, guid string) (*metadata.Metadata, error) {
 	var m metadata.Metadata
 
-	if err := platform.DataStore().Get(ctx, metadataKey(guid), &m); err != nil {
+	if err := ds.DataStore().Get(ctx, metadataKey(guid), &m); err != nil {
 		if err == datastore.ErrNoSuchEntity {
 			return nil, nil // not found is not an error
 		}
@@ -54,7 +54,7 @@ func GetMetadataForResource(ctx context.Context, guid string) (*metadata.Metadat
 
 // UpdateMetadata does what the name suggests
 func UpdateMetadata(ctx context.Context, m *metadata.Metadata) error {
-	if _, err := platform.DataStore().Put(ctx, metadataKey(m.GUID), m); err != nil {
+	if _, err := ds.DataStore().Put(ctx, metadataKey(m.GUID), m); err != nil {
 		return err
 	}
 	return nil
@@ -70,7 +70,7 @@ func DeleteMetadata(ctx context.Context, guid string) error {
 		return errordef.ErrNoSuchResource
 	}
 
-	if err := platform.DataStore().Delete(ctx, metadataKey(m.GUID)); err != nil {
+	if err := ds.DataStore().Delete(ctx, metadataKey(m.GUID)); err != nil {
 		return err
 	}
 	return nil

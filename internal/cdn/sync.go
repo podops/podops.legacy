@@ -7,11 +7,11 @@ import (
 	"os"
 	"path/filepath"
 
-	cs "github.com/fupas/platform/pkg/platform"
 	"github.com/labstack/echo/v4"
-	"github.com/txsvc/platform"
-	"github.com/txsvc/platform/pkg/api"
-	"github.com/txsvc/platform/pkg/validate"
+	"github.com/txsvc/platform/v2"
+	"github.com/txsvc/platform/v2/pkg/api"
+	ds "github.com/txsvc/platform/v2/pkg/datastore"
+	"github.com/txsvc/platform/v2/pkg/validate"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
@@ -67,7 +67,7 @@ func DeleteTaskEndpoint(c echo.Context) error {
 func SyncResource(ctx context.Context, prod, src string) int {
 	relPath := prod + "/" + src
 
-	bkt := cs.Storage().Bucket(podops.BucketProduction)
+	bkt := ds.Storage().Bucket(podops.BucketProduction)
 	reader, err := bkt.Object(relPath).NewReader(ctx)
 	if err != nil {
 		platform.ReportError(err)

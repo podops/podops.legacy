@@ -7,9 +7,9 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	ds "github.com/fupas/platform/pkg/platform"
-	"github.com/txsvc/platform"
-	"github.com/txsvc/platform/pkg/timestamp"
+	"github.com/txsvc/platform/v2"
+	ds "github.com/txsvc/platform/v2/pkg/datastore"
+	"github.com/txsvc/platform/v2/pkg/timestamp"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"

@@ -10,8 +10,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/txsvc/platform/v2/pkg/api"
+
 	"github.com/podops/podops/internal/messagedef"
-	"github.com/txsvc/platform/pkg/api"
 )
 
 const (

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/mailgun/mailgun-go/v4"
-	"github.com/txsvc/platform/pkg/env"
-	"github.com/txsvc/platform/pkg/timestamp"
+	"github.com/txsvc/platform/v2/pkg/env"
+	"github.com/txsvc/platform/v2/pkg/timestamp"
 
 	"github.com/podops/podops"
 )

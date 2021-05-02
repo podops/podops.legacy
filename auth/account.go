@@ -5,9 +5,9 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	"github.com/fupas/platform/pkg/platform"
-	"github.com/txsvc/platform/pkg/id"
-	"github.com/txsvc/platform/pkg/timestamp"
+	ds "github.com/txsvc/platform/v2/pkg/datastore"
+	"github.com/txsvc/platform/v2/pkg/id"
+	"github.com/txsvc/platform/v2/pkg/timestamp"
 )
 
 const (
@@ -78,7 +78,7 @@ func LookupAccount(ctx context.Context, realm, clientID string) (*Account, error
 	var account Account
 	k := accountKey(realm, clientID)
 
-	err := platform.DataStore().Get(ctx, k, &account)
+	err := ds.DataStore().Get(ctx, k, &account)
 	if err != nil {
 		if err == datastore.ErrNoSuchEntity {
 			return nil, nil
@@ -91,7 +91,7 @@ func LookupAccount(ctx context.Context, realm, clientID string) (*Account, error
 // FindAccountUserID retrieves an account bases on the user id
 func FindAccountByUserID(ctx context.Context, realm, userID string) (*Account, error) {
 	var accounts []*Account
-	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreAccounts).Filter("Realm =", realm).Filter("UserID =", userID), &accounts); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreAccounts).Filter("Realm =", realm).Filter("UserID =", userID), &accounts); err != nil {
 		return nil, err
 	}
 	if accounts == nil {
@@ -103,7 +103,7 @@ func FindAccountByUserID(ctx context.Context, realm, userID string) (*Account, e
 // FindAccountByToken retrieves an account bases on either the temporary token or the auth token
 func FindAccountByToken(ctx context.Context, token string) (*Account, error) {
 	var accounts []*Account
-	if _, err := platform.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreAccounts).Filter("Ext1 =", token), &accounts); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreAccounts).Filter("Ext1 =", token), &accounts); err != nil {
 		return nil, err
 	}
 	if accounts == nil {
@@ -116,7 +116,7 @@ func UpdateAccount(ctx context.Context, account *Account) error {
 	k := accountKey(account.Realm, account.ClientID)
 	account.Updated = timestamp.Now()
 
-	if _, err := platform.DataStore().Put(ctx, k, account); err != nil {
+	if _, err := ds.DataStore().Put(ctx, k, account); err != nil {
 		return err
 	}
 	return nil
