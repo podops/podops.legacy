@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"cloud.google.com/go/datastore"
@@ -61,6 +62,9 @@ func (r *queryResolver) Show(ctx context.Context, name *string, limit int) (*mod
 		show.Episodes = episodes
 	}
 
+	// track api access for billing etc
+	platform.Meter(ctx, "graphql.show", "production", p.GUID)
+
 	return show, nil
 }
 
@@ -83,6 +87,9 @@ func (r *queryResolver) Episode(ctx context.Context, guid *string) (*model.Episo
 		return nil, nil // Nope, can't access as it's not public yet
 	}
 
+	// track api access for billing etc
+	platform.Meter(ctx, "graphql.episode", "episode", *guid)
+
 	return episode, nil
 }
 
@@ -95,7 +102,7 @@ func (r *queryResolver) Recent(ctx context.Context, limit int) ([]*model.Show, e
 		return nil, err
 	}
 
-	if sh == nil || len(sh) == 0 {
+	if len(sh) == 0 {
 		shows = make([]*model.Show, 0)
 		return shows, nil
 	}
@@ -109,6 +116,9 @@ func (r *queryResolver) Recent(ctx context.Context, limit int) ([]*model.Show, e
 		}
 		shows[i] = show.(*model.Show)
 	}
+
+	// track api access for billing etc
+	platform.Meter(ctx, "graphql.recent", "limit", fmt.Sprintf("%d", limit))
 
 	return shows, nil
 }

@@ -57,7 +57,7 @@ func LoadShow(ctx context.Context, key string) (interface{}, error) {
 		//Season: NOT USED
 	}
 
-	return &model.Show{
+	result := model.Show{
 		GUID:    p.GUID,
 		Name:    p.Name,
 		Created: strconv.FormatInt(p.Created, 10),
@@ -77,7 +77,9 @@ func LoadShow(ctx context.Context, key string) (interface{}, error) {
 		},
 		Image: show.Image.URI,
 		// Episodes are loaded by the schema.resolver implementation in order make use of the dataloader
-	}, nil
+	}
+
+	return &result, nil
 }
 
 // LoadEpisode loads an episode
@@ -112,7 +114,7 @@ func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 		Season:  int(season),
 	}
 
-	return &model.Episode{
+	result := model.Episode{
 		GUID:      episode.GUID(),
 		Name:      episode.Metadata.Name,
 		Created:   strconv.FormatInt(r.Created, 10),
@@ -136,7 +138,9 @@ func LoadEpisode(ctx context.Context, key string) (interface{}, error) {
 			Name:  p.Name,
 			Title: p.Title,
 		},
-	}, nil
+	}
+
+	return &result, nil
 }
 
 // CreateResolver returns a resolver for loading shows and episodes
