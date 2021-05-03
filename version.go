@@ -3,13 +3,10 @@ package podops
 import "fmt"
 
 /*
-
 Make sure to update version numbers in these locations also:
 
 - internal/transport/transport.go
 - .github/*
-- podops-infra/inventory/*
-
 */
 
 const (
@@ -21,7 +18,7 @@ const (
 	// MinorVersion of the API
 	MinorVersion = 0
 	// FixVersion of the API
-	FixVersion = 1
+	FixVersion = 2
 )
 
 var (

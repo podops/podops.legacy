@@ -15,13 +15,20 @@ import (
 	"github.com/podops/podops/internal/messagedef"
 )
 
+/*
+Make sure to update version numbers in these locations also:
+
+- version.go
+- .github/*
+*/
+
 const (
 	// MajorVersion of the API
 	majorVersion = 1
 	// MinorVersion of the API
 	minorVersion = 0
 	// FixVersion of the API
-	fixVersion = 1
+	fixVersion = 2
 )
 
 var (

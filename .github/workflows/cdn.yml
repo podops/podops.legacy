@@ -6,7 +6,7 @@ on:
 
 env:
   IMAGE_NAME: cdn
-  IMAGE_VERSION: 1.0.1
+  IMAGE_VERSION: 1.0.2
   REGISTRY: ${{ secrets.REGISTRY }}
   REGISTRY_HOSTNAME: eu.gcr.io
   GITHUB_SHA: ${{ github.sha }}

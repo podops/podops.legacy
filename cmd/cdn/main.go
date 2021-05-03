@@ -12,7 +12,7 @@ import (
 
 	// plug in Caddy modules here
 	_ "github.com/caddyserver/caddy/v2/modules/standard"
-	_ "github.com/podops/podops/internal/cdn"
+	_ "github.com/podops/podops/internal/cdn/modules"
 )
 
 func init() {
@@ -23,7 +23,7 @@ func init() {
 
 	local.InitDefaultProviders()
 	p := platform.DefaultPlatform()
-	err := p.RegisterProviders(true, google.GoogleErrorReportingConfig)
+	err := p.RegisterProviders(true, google.GoogleCloudLoggingConfig, google.GoogleCloudMetricsConfig)
 	if err != nil {
 		log.Fatal("error initializing the platform services")
 	}

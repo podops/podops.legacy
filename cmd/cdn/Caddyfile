@@ -9,7 +9,7 @@ localhost {
 	reverse_proxy /c/* localhost:8080
 	
 	route {
-		cdn_handler
+		cdn_storage
 		file_server
 	}
 	

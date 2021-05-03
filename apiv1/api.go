@@ -13,8 +13,6 @@ const (
 	GraphqlNamespacePrefix = "/q"
 	// AdminNamespacePrefix namespace for internal admin endpoints
 	AdminNamespacePrefix = "/_a"
-	// TaskNamespacePrefix namespace for internal Cloud Task callbacks
-	TaskNamespacePrefix = "/_t"
 	// WebhookNamespacePrefix namespace for webhook callbacks
 	WebhookNamespacePrefix = "/_w"
 
