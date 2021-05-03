@@ -5,11 +5,14 @@ CONTAINER_REGISTRY = eu.gcr.io/podops
 all: build_test cli api
 
 .PHONY: deploy_all
-deploy_all: build_test cli build_cdn build_cdnapi api deploy_services
+deploy_all: build_test cli build_services api deploy_services
 
 .PHONY: deploy_services
 deploy_services:
 	cd ../podops-infra && ansible-playbook -i inventory/podops.dev.yml playbooks/update_services.yml
+
+.PHONY: build_services
+build_services: build_cdn build_cdnapi
 
 .PHONY: build_test
 build_test:

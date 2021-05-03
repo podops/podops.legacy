@@ -32,14 +32,18 @@ func init() {
 func (m StorageModuleImpl) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddyhttp.Handler) error {
 
 	parts := strings.Split(r.RequestURI, "/")
-	if len(parts) > 1 {
-		prod := parts[0]
-		asset := parts[1]
+	if len(parts) > 2 {
+		// this assumes r.RequestURI starts with a "/" e.g. "/16304cda8338/bc982aa5.mp3"
+		prod := parts[1]
+		asset := parts[2]
+		userAgent := r.UserAgent()
+		remoteAddr := r.RemoteAddr
 		contentType := "unknown"
+		contentRange := r.Header.Get("Range")
 		size := "0"
 
 		// track api access for billing etc
-		platform.Meter(platform.NewHttpContext(r), "cdn.storage", "production", prod, "user-agent", r.UserAgent(), "remote_addr", r.RemoteAddr, "type", contentType, "name", asset, "size", size)
+		platform.Meter(platform.NewHttpContext(r), "cdn.storage", "production", prod, "user-agent", userAgent, "remote_addr", remoteAddr, "type", contentType, "range", contentRange, "name", asset, "size", size)
 	}
 
 	//os.Stdout.Write([]byte(r.RequestURI + "\n"))

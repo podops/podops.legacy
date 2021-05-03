@@ -20,7 +20,10 @@ storage.podops.dev {
         encode zstd gzip
         root * /data/storage
         
-        file_server
+        route {
+		cdn_storage
+		file_server
+	}
         log {
                 output file /data/caddy/logs/cdn.log
         }
