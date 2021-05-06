@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/txsvc/platform/v2/pkg/env"
-	"github.com/txsvc/platform/v2/pkg/http"
+	"github.com/txsvc/platform/v2/pkg/httpserver"
 	"github.com/txsvc/platform/v2/provider/google"
 
 	"github.com/podops/podops/apiv1"
@@ -82,10 +82,10 @@ func init() {
 		log.Fatal("Missing env variable 'EMAIL_API_KEY'")
 	}
 
-	google.InitDefaultGoogleProviders()
+	google.InitGoogleCloudPlatformProviders()
 }
 
 func main() {
-	service := http.New(setup, shutdown, nil)
+	service := httpserver.New(setup, shutdown, nil)
 	service.StartBlocking()
 }

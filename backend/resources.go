@@ -17,8 +17,8 @@ import (
 	"github.com/txsvc/platform/v2"
 	ds "github.com/txsvc/platform/v2/pkg/datastore"
 	"github.com/txsvc/platform/v2/pkg/env"
-	"github.com/txsvc/platform/v2/pkg/tasks"
 	"github.com/txsvc/platform/v2/pkg/timestamp"
+	"github.com/txsvc/platform/v2/tasks"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/errordef"

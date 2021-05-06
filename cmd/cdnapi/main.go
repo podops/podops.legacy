@@ -8,7 +8,7 @@ import (
 
 	"github.com/txsvc/platform/v2"
 	"github.com/txsvc/platform/v2/pkg/env"
-	"github.com/txsvc/platform/v2/pkg/http"
+	"github.com/txsvc/platform/v2/pkg/httpserver"
 	"github.com/txsvc/platform/v2/provider/google"
 	"github.com/txsvc/platform/v2/provider/local"
 
@@ -53,7 +53,7 @@ func init() {
 		log.Fatal("Missing env variable 'PROJECT_ID'")
 	}
 
-	local.InitDefaultProviders()
+	local.InitLocalProviders()
 	p := platform.DefaultPlatform()
 	err := p.RegisterProviders(true, google.GoogleErrorReportingConfig, google.GoogleCloudLoggingConfig, google.GoogleCloudMetricsConfig)
 	if err != nil {
@@ -64,6 +64,6 @@ func init() {
 }
 
 func main() {
-	service := http.New(setup, shutdown, nil)
+	service := httpserver.New(setup, shutdown, nil)
 	service.StartBlocking()
 }

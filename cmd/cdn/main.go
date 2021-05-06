@@ -21,7 +21,7 @@ func init() {
 		log.Fatal("Missing env variable 'PROJECT_ID'")
 	}
 
-	local.InitDefaultProviders()
+	local.InitLocalProviders()
 	p := platform.DefaultPlatform()
 	err := p.RegisterProviders(true, google.GoogleCloudLoggingConfig, google.GoogleCloudMetricsConfig)
 	if err != nil {

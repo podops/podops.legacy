@@ -9,7 +9,7 @@ import (
 	"github.com/txsvc/platform/v2"
 	"github.com/txsvc/platform/v2/pkg/api"
 	"github.com/txsvc/platform/v2/pkg/env"
-	"github.com/txsvc/platform/v2/pkg/tasks"
+	"github.com/txsvc/platform/v2/tasks"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
