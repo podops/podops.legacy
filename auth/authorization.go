@@ -36,7 +36,8 @@ const (
 
 	// default scopes
 	ScopeAPIAdmin = "api:admin"
-	DefaultScope  = "api:read,api:write"
+	// FIXME DefaultScope  = "api:read,api:write"
+	DefaultScope = "production:read,production:write,production:build,resource:read,resource:write"
 )
 
 type (
@@ -61,6 +62,7 @@ type (
 		UserID   string `json:"user_id" binding:"required"`
 		ClientID string `json:"client_id"`
 		Token    string `json:"token"`
+		Scope    string `json:"scope"`
 	}
 
 	// CreateAuthorizationFunc creates a new Authorization that is application/service specific
@@ -72,22 +74,24 @@ type (
 		createAuthorization        CreateAuthorizationFunc
 		accountConfirmNotification AccountNotificationFunc
 		tokenNotification          AccountNotificationFunc
+		defaultScope               string
 		authenticationExpiration   int // minutes
 		authorizationExpiration    int // days
 	}
 )
 
-var ac *AuthProvider
+var authProvider *AuthProvider
 
 func init() {
-	ac = New()
+	authProvider = NewAuthorizationProvider()
 }
 
-func New() *AuthProvider {
+func NewAuthorizationProvider() *AuthProvider {
 	return &AuthProvider{
-		createAuthorization:        CreateSimpleAuthorization,
+		createAuthorization:        NewAuthorization,
 		accountConfirmNotification: SendAccountChallenge,
 		tokenNotification:          SendAuthToken,
+		defaultScope:               DefaultScope,
 		authenticationExpiration:   DefaultAuthenticationExpiration,
 		authorizationExpiration:    DefaultAuthorizationExpiration,
 	}
@@ -180,6 +184,51 @@ func CheckAuthorization(ctx context.Context, c echo.Context, scope string) (*Aut
 	return auth, nil
 }
 
+func NewAuthorization(account *Account, req *AuthorizationRequest) *Authorization {
+	now := timestamp.Now()
+	scope := DefaultScope
+	if req.Scope != "" {
+		scope = req.Scope
+	}
+
+	auth := Authorization{
+		ClientID:  account.ClientID,
+		Realm:     req.Realm,
+		Token:     CreateSimpleToken(),
+		TokenType: DefaultTokenType,
+		UserID:    req.UserID,
+		Scope:     scope,
+		Revoked:   false,
+		Expires:   now + (DefaultAuthorizationExpiration * 86400),
+		Created:   now,
+		Updated:   now,
+	}
+	return &auth
+}
+
+// CreateAuthorization creates all data needed for the auth fu
+func CreateAuthorization(ctx context.Context, auth *Authorization) error {
+	k := authorizationKey(auth.Realm, auth.ClientID)
+
+	// FIXME add a cache ?
+
+	// we simply overwrite the existing authorization. If this is no desired, use GetAuthorization first,
+	// update the Authorization and then write it back.
+	_, err := ds.DataStore().Put(ctx, k, auth)
+	return err
+}
+
+// UpdateAuthorization updates all data needed for the auth fu
+func UpdateAuthorization(ctx context.Context, auth *Authorization) error {
+	k := authorizationKey(auth.Realm, auth.ClientID)
+	// FIXME add a cache ?
+
+	// we simply overwrite the existing authorization. If this is no desired, use GetAuthorization first,
+	// update the Authorization and then write it back.
+	_, err := ds.DataStore().Put(ctx, k, auth)
+	return err
+}
+
 // LookupAuthorization looks for an authorization
 func LookupAuthorization(ctx context.Context, realm, clientID string) (*Authorization, error) {
 	var auth Authorization
@@ -209,47 +258,6 @@ func FindAuthorizationByToken(ctx context.Context, token string) (*Authorization
 		return nil, nil
 	}
 	return auth[0], nil
-}
-
-// CreateAuthorization creates all data needed for the auth fu
-func CreateAuthorization(ctx context.Context, auth *Authorization) error {
-	k := authorizationKey(auth.Realm, auth.ClientID)
-
-	// FIXME add a cache ?
-
-	// we simply overwrite the existing authorization. If this is no desired, use GetAuthorization first,
-	// update the Authorization and then write it back.
-	_, err := ds.DataStore().Put(ctx, k, auth)
-	return err
-}
-
-// UpdateAuthorization updates all data needed for the auth fu
-func UpdateAuthorization(ctx context.Context, auth *Authorization) error {
-	k := authorizationKey(auth.Realm, auth.ClientID)
-	// FIXME add a cache ?
-
-	// we simply overwrite the existing authorization. If this is no desired, use GetAuthorization first,
-	// update the Authorization and then write it back.
-	_, err := ds.DataStore().Put(ctx, k, auth)
-	return err
-}
-
-func CreateDefaultAuthorization(account *Account, req *AuthorizationRequest) *Authorization {
-	now := timestamp.Now()
-
-	auth := Authorization{
-		ClientID:  account.ClientID,
-		Realm:     req.Realm,
-		Token:     CreateSimpleToken(),
-		TokenType: DefaultTokenType,
-		UserID:    req.UserID,
-		Scope:     DefaultScope,
-		Revoked:   false,
-		Expires:   now + (DefaultAuthorizationExpiration * 86400),
-		Created:   now,
-		Updated:   now,
-	}
-	return &auth
 }
 
 func CreateSimpleToken() string {

@@ -7,32 +7,9 @@ import (
 
 	"github.com/mailgun/mailgun-go/v4"
 	"github.com/txsvc/platform/v2/pkg/env"
-	"github.com/txsvc/platform/v2/pkg/timestamp"
 
 	"github.com/podops/podops"
 )
-
-const (
-	defaultPodopsScope = "production:read,production:write,production:build,resource:read,resource:write"
-)
-
-func CreateSimpleAuthorization(account *Account, req *AuthorizationRequest) *Authorization {
-	now := timestamp.Now()
-
-	auth := Authorization{
-		ClientID:  account.ClientID,
-		Realm:     req.Realm,
-		Token:     CreateSimpleToken(),
-		TokenType: DefaultTokenType,
-		UserID:    req.UserID,
-		Scope:     defaultPodopsScope,
-		Revoked:   false,
-		Expires:   now + (DefaultAuthorizationExpiration * 86400),
-		Created:   now,
-		Updated:   now,
-	}
-	return &auth
-}
 
 // SendAccountChallenge sends a notification to the user promting to confirm the account
 func SendAccountChallenge(ctx context.Context, account *Account) error {

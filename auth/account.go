@@ -61,7 +61,7 @@ func CreateAccount(ctx context.Context, realm, userID string) (*Account, error) 
 		ClientID:  uid,
 		Status:    AccountUnconfirmed,
 		Ext1:      token,
-		Expires:   timestamp.IncT(timestamp.Now(), ac.authenticationExpiration),
+		Expires:   timestamp.IncT(timestamp.Now(), authProvider.authenticationExpiration),
 		Confirmed: 0,
 		Created:   now,
 		Updated:   now,
@@ -88,6 +88,16 @@ func LookupAccount(ctx context.Context, realm, clientID string) (*Account, error
 	return &account, nil
 }
 
+func UpdateAccount(ctx context.Context, account *Account) error {
+	k := accountKey(account.Realm, account.ClientID)
+	account.Updated = timestamp.Now()
+
+	if _, err := ds.DataStore().Put(ctx, k, account); err != nil {
+		return err
+	}
+	return nil
+}
+
 // FindAccountUserID retrieves an account bases on the user id
 func FindAccountByUserID(ctx context.Context, realm, userID string) (*Account, error) {
 	var accounts []*Account
@@ -110,16 +120,6 @@ func FindAccountByToken(ctx context.Context, token string) (*Account, error) {
 		return nil, nil
 	}
 	return accounts[0], nil
-}
-
-func UpdateAccount(ctx context.Context, account *Account) error {
-	k := accountKey(account.Realm, account.ClientID)
-	account.Updated = timestamp.Now()
-
-	if _, err := ds.DataStore().Put(ctx, k, account); err != nil {
-		return err
-	}
-	return nil
 }
 
 func accountKey(realm, client string) *datastore.Key {

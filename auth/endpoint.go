@@ -48,7 +48,7 @@ func LoginRequestEndpoint(c echo.Context) error {
 			return api.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 		// #2: send the confirmation link
-		err = ac.accountConfirmNotification(ctx, account)
+		err = authProvider.accountConfirmNotification(ctx, account)
 		if err != nil {
 			return api.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
@@ -64,7 +64,7 @@ func LoginRequestEndpoint(c echo.Context) error {
 			return api.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
 		// #2: send the account confirmation link
-		err = ac.accountConfirmNotification(ctx, account)
+		err = authProvider.accountConfirmNotification(ctx, account)
 		if err != nil {
 			return api.ErrorResponse(c, http.StatusInternalServerError, err)
 		}
@@ -81,7 +81,7 @@ func LoginRequestEndpoint(c echo.Context) error {
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
-	err = ac.tokenNotification(ctx, account)
+	err = authProvider.tokenNotification(ctx, account)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
@@ -163,7 +163,7 @@ func LoginConfirmationEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
-	err = ac.tokenNotification(ctx, account)
+	err = authProvider.tokenNotification(ctx, account)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusInternalServerError, err)
 	}

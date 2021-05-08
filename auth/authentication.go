@@ -15,7 +15,7 @@ import (
 // ResetAccountChallenge creates a new confirmation token and resets the timer
 func ResetAccountChallenge(ctx context.Context, account *Account) (*Account, error) {
 	token, _ := id.ShortUUID()
-	account.Expires = timestamp.IncT(timestamp.Now(), ac.authenticationExpiration)
+	account.Expires = timestamp.IncT(timestamp.Now(), authProvider.authenticationExpiration)
 	account.Ext1 = token
 	account.Status = AccountUnconfirmed
 
@@ -28,7 +28,7 @@ func ResetAccountChallenge(ctx context.Context, account *Account) (*Account, err
 // ResetAuthToken creates a new authorization token and resets the timer
 func ResetAuthToken(ctx context.Context, account *Account) (*Account, error) {
 	token, _ := id.ShortUUID()
-	account.Expires = timestamp.IncT(timestamp.Now(), ac.authenticationExpiration)
+	account.Expires = timestamp.IncT(timestamp.Now(), authProvider.authenticationExpiration)
 	account.Ext2 = token
 	account.Status = AccountLoggedOut
 
@@ -140,10 +140,13 @@ func exchangeToken(ctx context.Context, req *AuthorizationRequest, loginFrom str
 		return nil, http.StatusInternalServerError, err // FIXME maybe use a different code here
 	}
 	if auth == nil {
-		auth = ac.createAuthorization(account, req)
+		if req.Scope == "" {
+			req.Scope = authProvider.defaultScope
+		}
+		auth = authProvider.createAuthorization(account, req)
 	}
 	auth.Token = CreateSimpleToken()
-	auth.Expires = now + (int64(ac.authorizationExpiration) * 86400)
+	auth.Expires = now + (int64(authProvider.authorizationExpiration) * 86400)
 	auth.Updated = now
 
 	err = CreateAuthorization(ctx, auth)
