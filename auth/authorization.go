@@ -16,9 +16,6 @@ import (
 )
 
 const (
-	// DatastoreAuthorizations collection AUTHORIZATION
-	DatastoreAuthorizations string = "AUTHORIZATIONS"
-
 	// AuthTypeSimpleToken constant token
 	AuthTypeSimpleToken = "token"
 	// AuthTypeJWT constant jwt
@@ -38,6 +35,9 @@ const (
 	ScopeAPIAdmin = "api:admin"
 	// FIXME DefaultScope  = "api:read,api:write"
 	DefaultScope = "production:read,production:write,production:build,resource:read,resource:write"
+
+	// DatastoreAuthorizations collection AUTHORIZATION
+	datastoreAuthorizations string = "AUTHORIZATIONS"
 )
 
 type (
@@ -67,10 +67,11 @@ type (
 
 	// CreateAuthorizationFunc creates a new Authorization that is application/service specific
 	CreateAuthorizationFunc func(*Account, *AuthorizationRequest) *Authorization
+
 	// AccountNotificationFunc sends a notification, e.g. email
 	AccountNotificationFunc func(context.Context, *Account) error
 
-	AuthProvider struct {
+	AuthorizationProvider struct {
 		createAuthorization        CreateAuthorizationFunc
 		accountConfirmNotification AccountNotificationFunc
 		tokenNotification          AccountNotificationFunc
@@ -80,14 +81,14 @@ type (
 	}
 )
 
-var authProvider *AuthProvider
+var authProvider *AuthorizationProvider
 
 func init() {
 	authProvider = NewAuthorizationProvider()
 }
 
-func NewAuthorizationProvider() *AuthProvider {
-	return &AuthProvider{
+func NewAuthorizationProvider() *AuthorizationProvider {
+	return &AuthorizationProvider{
 		createAuthorization:        NewAuthorization,
 		accountConfirmNotification: SendAccountChallenge,
 		tokenNotification:          SendAuthToken,
@@ -251,7 +252,7 @@ func FindAuthorizationByToken(ctx context.Context, token string) (*Authorization
 
 	// FIXME add a cache ?
 
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreAuthorizations).Filter("Token =", token), &auth); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(datastoreAuthorizations).Filter("Token =", token), &auth); err != nil {
 		return nil, err
 	}
 	if auth == nil {
@@ -267,7 +268,7 @@ func CreateSimpleToken() string {
 
 // authorizationKey creates a datastore key for a workspace authorization based on the team_id.
 func authorizationKey(realm, client string) *datastore.Key {
-	return datastore.NameKey(DatastoreAuthorizations, namedKey(realm, client), nil)
+	return datastore.NameKey(datastoreAuthorizations, namedKey(realm, client), nil)
 }
 
 func namedKey(part1, part2 string) string {

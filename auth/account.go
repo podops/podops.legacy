@@ -11,9 +11,6 @@ import (
 )
 
 const (
-	// DatastoreAccounts collection ACCOUNTS
-	DatastoreAccounts string = "ACCOUNTS"
-
 	// AccountActive indicates a confirmed account with a valid login
 	AccountActive = 1
 	// AccountLoggedOut indicates a confirmed account without a valid login
@@ -25,6 +22,9 @@ const (
 	AccountBlocked = -2
 	// AccountUnconfirmed well guess what?
 	AccountUnconfirmed = -3
+
+	// DatastoreAccounts collection ACCOUNTS
+	datastoreAccounts string = "ACCOUNTS"
 )
 
 type (
@@ -101,7 +101,7 @@ func UpdateAccount(ctx context.Context, account *Account) error {
 // FindAccountUserID retrieves an account bases on the user id
 func FindAccountByUserID(ctx context.Context, realm, userID string) (*Account, error) {
 	var accounts []*Account
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreAccounts).Filter("Realm =", realm).Filter("UserID =", userID), &accounts); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(datastoreAccounts).Filter("Realm =", realm).Filter("UserID =", userID), &accounts); err != nil {
 		return nil, err
 	}
 	if accounts == nil {
@@ -113,7 +113,7 @@ func FindAccountByUserID(ctx context.Context, realm, userID string) (*Account, e
 // FindAccountByToken retrieves an account bases on either the temporary token or the auth token
 func FindAccountByToken(ctx context.Context, token string) (*Account, error) {
 	var accounts []*Account
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreAccounts).Filter("Ext1 =", token), &accounts); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(datastoreAccounts).Filter("Ext1 =", token), &accounts); err != nil {
 		return nil, err
 	}
 	if accounts == nil {
@@ -123,5 +123,5 @@ func FindAccountByToken(ctx context.Context, token string) (*Account, error) {
 }
 
 func accountKey(realm, client string) *datastore.Key {
-	return datastore.NameKey(DatastoreAccounts, namedKey(realm, client), nil)
+	return datastore.NameKey(datastoreAccounts, namedKey(realm, client), nil)
 }
