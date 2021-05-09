@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/datastore"
-
 	"github.com/txsvc/platform/v2"
 	ds "github.com/txsvc/platform/v2/pkg/datastore"
 	"github.com/txsvc/platform/v2/pkg/timestamp"
@@ -58,10 +56,9 @@ func Build(ctx context.Context, production string, validateOnly bool) error {
 
 	// list all episodes, excluding future (i.e. unpublished) ones, descending order
 
-	var er []*podops.Resource
 	now := timestamp.Now()
-
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", production).Filter("Kind =", podops.ResourceEpisode).Filter("Published <", now).Filter("Published >", 0).Order("-Published"), &er); err != nil {
+	er, err := backend.ListPublishedEpisodes(ctx, production, now, 1)
+	if err != nil {
 		platform.ReportError(err)
 		return err
 	}

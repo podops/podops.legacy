@@ -18,7 +18,7 @@ import (
 
 const (
 	// DatastoreProductions collection PRODUCTION
-	DatastoreProductions = "PRODUCTIONS"
+	datastoreProductions = "PRODUCTIONS"
 )
 
 // CreateProduction initializes a new show and all its metadata
@@ -125,7 +125,7 @@ func UpdateProduction(ctx context.Context, p *podops.Production) error {
 // FindProductionByName does a lookup using the productions name instead of its key
 func FindProductionByName(ctx context.Context, name string) (*podops.Production, error) {
 	var p []*podops.Production
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreProductions).Filter("Name =", name), &p); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(datastoreProductions).Filter("Name =", name), &p); err != nil {
 		return nil, err
 	}
 	if p == nil {
@@ -137,7 +137,7 @@ func FindProductionByName(ctx context.Context, name string) (*podops.Production,
 // FindProductionsByOwner returns all productions belonging to the same owner
 func FindProductionsByOwner(ctx context.Context, owner string) ([]*podops.Production, error) {
 	var p []*podops.Production
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(DatastoreProductions).Filter("Owner =", owner), &p); err != nil {
+	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(datastoreProductions).Filter("Owner =", owner), &p); err != nil {
 		return nil, err
 	}
 	if p == nil {
@@ -147,5 +147,5 @@ func FindProductionsByOwner(ctx context.Context, owner string) ([]*podops.Produc
 }
 
 func productionKey(production string) *datastore.Key {
-	return datastore.NameKey(DatastoreProductions, production, nil)
+	return datastore.NameKey(datastoreProductions, production, nil)
 }

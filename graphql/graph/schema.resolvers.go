@@ -8,13 +8,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"cloud.google.com/go/datastore"
-
 	"github.com/txsvc/platform/v2"
-	ds "github.com/txsvc/platform/v2/pkg/datastore"
 	"github.com/txsvc/platform/v2/pkg/timestamp"
 
-	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/graphql/graph/generated"
 	"github.com/podops/podops/graphql/graph/model"
@@ -42,9 +38,8 @@ func (r *queryResolver) Show(ctx context.Context, name *string, limit int) (*mod
 	}
 
 	// list all episodes, excluding future (i.e. unpublished) ones, descending order
-	// FIXME filter for other flags, e.g. Block = true
-	var er []*podops.Resource
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreResources).Filter("ParentGUID =", show.GUID).Filter("Kind =", podops.ResourceEpisode).Filter("Published <", now).Filter("Published >", 0).Order("-Published").Limit(limit), &er); err != nil {
+	er, err := backend.ListPublishedEpisodes(ctx, show.GUID, now, limit)
+	if err != nil {
 		platform.ReportError(err)
 		return nil, err
 	}
@@ -94,10 +89,10 @@ func (r *queryResolver) Episode(ctx context.Context, guid *string) (*model.Episo
 }
 
 func (r *queryResolver) Recent(ctx context.Context, limit int) ([]*model.Show, error) {
-	var sh []*podops.Production
 	var shows []*model.Show
 
-	if _, err := ds.DataStore().GetAll(ctx, datastore.NewQuery(backend.DatastoreProductions).Filter("BuildDate >", 0).Order("-BuildDate").Limit(limit), &sh); err != nil {
+	sh, err := backend.ListRecentProductions(ctx, limit)
+	if err != nil {
 		platform.ReportError(err)
 		return nil, err
 	}

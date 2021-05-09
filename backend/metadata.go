@@ -14,7 +14,7 @@ import (
 
 const (
 	// DatastoreMetadata collection METADATA
-	DatastoreMetadata = "METADATA"
+	datastoreMetadata = "METADATA"
 )
 
 // GetMetadata retrieves the metadata for a resource
@@ -77,5 +77,5 @@ func DeleteMetadata(ctx context.Context, guid string) error {
 }
 
 func metadataKey(guid string) *datastore.Key {
-	return datastore.NameKey(DatastoreMetadata, guid, nil)
+	return datastore.NameKey(datastoreMetadata, guid, nil)
 }
