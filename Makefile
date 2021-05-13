@@ -39,6 +39,7 @@ api:
 .PHONY: cli
 cli:
 	cd cmd/cli && go build -o po cli.go && mv po /Users/turing/devel/go/bin/po
+	cd cmd/apiuser && go build -o pousr main.go && mv pousr /Users/turing/devel/go/bin/pousr
 	
 .PHONY: build_cdn
 build_cdn:
