@@ -6,11 +6,12 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+
 	"github.com/txsvc/platform/v2"
+	"github.com/txsvc/platform/v2/auth"
 	"github.com/txsvc/platform/v2/pkg/api"
 
 	"github.com/podops/podops"
-	"github.com/podops/podops/auth"
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/messagedef"
 )

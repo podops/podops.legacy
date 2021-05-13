@@ -27,9 +27,7 @@ test:
 	cd apiv1 && go test
 	cd internal/metadata && go test
 	cd graphql && go test
-	cd internal/platform && go test
-	cd auth && go test
-
+	
 .PHONY: test_coverage
 test_coverage:
 	go test `go list ./... | grep -v cmd` -coverprofile=coverage.txt -covermode=atomic

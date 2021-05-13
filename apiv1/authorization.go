@@ -5,7 +5,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/podops/podops/auth"
+	"github.com/txsvc/platform/v2/auth"
+
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/errordef"
 )

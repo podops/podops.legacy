@@ -9,13 +9,13 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/txsvc/platform/v2"
+	"github.com/txsvc/platform/v2/auth"
 	"github.com/txsvc/platform/v2/pkg/api"
 	ds "github.com/txsvc/platform/v2/pkg/datastore"
 	"github.com/txsvc/platform/v2/pkg/validate"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/apiv1"
-	"github.com/podops/podops/auth"
 	"github.com/podops/podops/internal/errordef"
 )
 

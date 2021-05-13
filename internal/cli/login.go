@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/podops/podops/auth"
+	"github.com/txsvc/platform/v2/auth"
+
 	"github.com/podops/podops/internal/messagedef"
 
 	"github.com/urfave/cli/v2"
