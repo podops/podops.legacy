@@ -3,6 +3,7 @@ package backend
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -16,6 +17,28 @@ import (
 	"github.com/podops/podops/internal/metadata"
 	"github.com/podops/podops/internal/transport"
 )
+
+var (
+	tp tasks.HttpTaskProvider
+)
+
+// implements lazy loading to give other parts of the code time to initialize the platform
+// before a first call to the authentication provider is made. This is why init() would not work.
+
+func background() tasks.HttpTaskProvider {
+	if tp != nil {
+		return tp
+	}
+	p, ok := platform.Provider(platform.ProviderTypeTask)
+	if !ok {
+		err := fmt.Errorf(platform.MsgMissingProvider, platform.ProviderTypeTask.String())
+		platform.ReportError(err)
+		log.Fatal(err) // this halts the process but there is no point because it would just crash later anyways
+	}
+	tp = p.(tasks.HttpTaskProvider)
+
+	return tp
+}
 
 // UpdateAsset updates the resource inventory
 func UpdateAsset(ctx context.Context, meta *metadata.Metadata, production, location, rel string) error {
@@ -79,9 +102,7 @@ func RemoveAsset(ctx context.Context, prod, location string) error {
 		Token:   env.GetString("PODOPS_API_KEY", ""),
 		Payload: nil,
 	}
-	err := platform.NewTask(task)
-
-	//_, err := p.CreateHttpTask(ctx, tasks.HttpMethod_DELETE, uri, env.GetString("PODOPS_API_KEY", ""), nil)
+	err := background().CreateHttpTask(ctx, task)
 
 	return err
 }
@@ -121,7 +142,8 @@ func EnsureAsset(ctx context.Context, production string, rsrc *podops.Asset) err
 			Token:   env.GetString("PODOPS_API_KEY", ""),
 			Payload: &ir,
 		}
-		err = platform.NewTask(task)
+
+		err = background().CreateHttpTask(ctx, task)
 		if err != nil {
 			return err
 		}

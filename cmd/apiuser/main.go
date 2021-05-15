@@ -78,7 +78,7 @@ func main() {
 			ClientID: acc.ClientID,
 			Scope:    authentication.ScopeAPIAdmin,
 		}
-		ath = authentication.NewAuthorization(acc, &req, expires)
+		ath = authentication.NewAuthorization(&req, expires)
 	}
 	ath.Token = authentication.CreateSimpleToken()
 	ath.TokenType = "api"
@@ -89,7 +89,7 @@ func main() {
 	}
 	ath.Updated = now
 
-	err = authentication.CreateAuthorization(ctx, ath)
+	err = authentication.UpdateAuthorization(ctx, ath)
 	if err != nil {
 		log.Fatal(err)
 	}

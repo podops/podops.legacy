@@ -2,6 +2,7 @@ package apiv1
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -20,7 +21,27 @@ import (
 var (
 	// full canonical route
 	syncTaskEndpoint string = podops.DefaultCDNEndpoint + "/_w/sync"
+
+	tp tasks.HttpTaskProvider
 )
+
+// implements lazy loading to give other parts of the code time to initialize the platform
+// before a first call to the authentication provider is made. This is why init() would not work.
+
+func background() tasks.HttpTaskProvider {
+	if tp != nil {
+		return tp
+	}
+	p, ok := platform.Provider(platform.ProviderTypeTask)
+	if !ok {
+		err := fmt.Errorf(platform.MsgMissingProvider, platform.ProviderTypeTask.String())
+		platform.ReportError(err)
+		log.Fatal(err) // this halts the process but there is no point because it would just crash later anyways
+	}
+	tp = p.(tasks.HttpTaskProvider)
+
+	return tp
+}
 
 // BuildFeedEndpoint starts the build of the feed
 func BuildFeedEndpoint(c echo.Context) error {
@@ -64,7 +85,8 @@ func BuildFeedEndpoint(c echo.Context) error {
 			Token:   env.GetString("PODOPS_API_KEY", ""),
 			Payload: &ir,
 		}
-		err := platform.NewTask(task)
+
+		err := background().CreateHttpTask(ctx, task)
 		if err != nil {
 			return err
 		}

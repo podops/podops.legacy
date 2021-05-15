@@ -24,14 +24,14 @@ type (
 )
 
 var (
-	PodopsAuthConfig platform.PlatformOpts = platform.WithProvider("platform.podops.auth", platform.ProviderTypeAuth, PodopsAuthProvider)
+	PodopsAuthConfig platform.PlatformOpts = platform.WithProvider("platform.podops.auth", platform.ProviderTypeAuthentication, PodopsAuthProvider)
 
 	// Interface guards
 	_ platform.GenericProvider              = (*authProviderImpl)(nil)
 	_ authentication.AuthenticationProvider = (*authProviderImpl)(nil)
 )
 
-func PodopsAuthProvider(ID string) interface{} {
+func PodopsAuthProvider() interface{} {
 	return &authProviderImpl{}
 }
 
@@ -57,20 +57,13 @@ func (a *authProviderImpl) ProvideAuthorizationToken(ctx context.Context, accoun
 	return nil
 }
 
-func (a *authProviderImpl) Scope() string {
-	return defaultScope
-}
-
-func (a *authProviderImpl) Endpoint() string {
-	return podops.DefaultEndpoint
-}
-
-func (a *authProviderImpl) AuthenticationExpiration() int {
-	return authentication.DefaultAuthenticationExpiration
-}
-
-func (a *authProviderImpl) AuthorizationExpiration() int {
-	return authentication.DefaultAuthorizationExpiration
+func (a *authProviderImpl) Options() *authentication.AuthenticationProviderOpts {
+	return &authentication.AuthenticationProviderOpts{
+		Scope:                    defaultScope,
+		Endpoint:                 podops.DefaultEndpoint,
+		AuthenticationExpiration: authentication.DefaultAuthenticationExpiration,
+		AuthorizationExpiration:  authentication.DefaultAuthorizationExpiration,
+	}
 }
 
 func SendEmail(sender, recipient, subject, body string) error {
