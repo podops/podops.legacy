@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/txsvc/platform/v2"
-	"github.com/txsvc/platform/v2/auth"
+	"github.com/txsvc/platform/v2/authentication"
 	"github.com/txsvc/platform/v2/pkg/api"
 
 	"github.com/podops/podops"
@@ -36,7 +36,7 @@ func ProductionEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusBadRequest, fmt.Errorf(messagedef.MsgParameterIsInvalid, showName))
 	}
 	// create a new production
-	clientID, _ := auth.GetClientID(ctx, c.Request())
+	clientID, _ := authentication.GetClientID(ctx, c.Request())
 	p, err := backend.CreateProduction(ctx, showName, req.Title, req.Summary, clientID)
 	if err != nil {
 		return api.ErrorResponse(c, http.StatusBadRequest, err)
@@ -61,7 +61,7 @@ func ListProductionsEndpoint(c echo.Context) error {
 		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
-	clientID, _ := auth.GetClientID(ctx, c.Request())
+	clientID, _ := authentication.GetClientID(ctx, c.Request())
 
 	productions, err := backend.FindProductionsByOwner(ctx, clientID)
 	if err != nil {

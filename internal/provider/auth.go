@@ -7,7 +7,7 @@ import (
 
 	"github.com/mailgun/mailgun-go/v4"
 	"github.com/txsvc/platform/v2"
-	"github.com/txsvc/platform/v2/auth"
+	"github.com/txsvc/platform/v2/authentication"
 	"github.com/txsvc/platform/v2/pkg/account"
 	"github.com/txsvc/platform/v2/pkg/env"
 
@@ -27,8 +27,8 @@ var (
 	PodopsAuthConfig platform.PlatformOpts = platform.WithProvider("platform.podops.auth", platform.ProviderTypeAuth, PodopsAuthProvider)
 
 	// Interface guards
-	_ platform.GenericProvider   = (*authProviderImpl)(nil)
-	_ auth.AuthorizationProvider = (*authProviderImpl)(nil)
+	_ platform.GenericProvider              = (*authProviderImpl)(nil)
+	_ authentication.AuthenticationProvider = (*authProviderImpl)(nil)
 )
 
 func PodopsAuthProvider(ID string) interface{} {
@@ -66,11 +66,11 @@ func (a *authProviderImpl) Endpoint() string {
 }
 
 func (a *authProviderImpl) AuthenticationExpiration() int {
-	return auth.DefaultAuthenticationExpiration
+	return authentication.DefaultAuthenticationExpiration
 }
 
 func (a *authProviderImpl) AuthorizationExpiration() int {
-	return auth.DefaultAuthorizationExpiration
+	return authentication.DefaultAuthorizationExpiration
 }
 
 func SendEmail(sender, recipient, subject, body string) error {

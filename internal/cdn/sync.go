@@ -9,7 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/txsvc/platform/v2"
-	"github.com/txsvc/platform/v2/auth"
+	"github.com/txsvc/platform/v2/authentication"
 	"github.com/txsvc/platform/v2/pkg/api"
 	ds "github.com/txsvc/platform/v2/pkg/datastore"
 	"github.com/txsvc/platform/v2/pkg/validate"
@@ -36,7 +36,7 @@ func SyncTaskEndpoint(c echo.Context) error {
 
 	ctx := platform.NewHttpContext(c.Request())
 
-	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, req.GUID); err != nil {
+	if err := apiv1.AuthorizeAccessProduction(ctx, c, authentication.ScopeAPIAdmin, req.GUID); err != nil {
 		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 
@@ -54,7 +54,7 @@ func DeleteTaskEndpoint(c echo.Context) error {
 	if !validate.NotEmpty(prod, location) {
 		return api.ErrorResponse(c, http.StatusBadRequest, errordef.ErrInvalidRoute)
 	}
-	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, prod); err != nil {
+	if err := apiv1.AuthorizeAccessProduction(ctx, c, authentication.ScopeAPIAdmin, prod); err != nil {
 		// validate against production only, the resource is already gone by now
 		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}

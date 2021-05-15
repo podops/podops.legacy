@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/txsvc/platform/v2/auth"
+	"github.com/txsvc/platform/v2/authentication"
 
 	"github.com/podops/podops/internal/messagedef"
 
@@ -24,7 +24,7 @@ func LoginCommand(c *cli.Context) error {
 	email := c.Args().First()
 
 	if email != "" {
-		loginRequest := auth.AuthorizationRequest{
+		loginRequest := authentication.AuthorizationRequest{
 			Realm:  client.Realm(),
 			UserID: email,
 		}
@@ -62,12 +62,12 @@ func AuthCommand(c *cli.Context) error {
 		return nil
 	}
 
-	authRequest := auth.AuthorizationRequest{
+	authRequest := authentication.AuthorizationRequest{
 		Realm:  client.Realm(),
 		UserID: c.Args().Get(0),
 		Token:  c.Args().Get(1),
 	}
-	response := auth.AuthorizationRequest{}
+	response := authentication.AuthorizationRequest{}
 
 	status, err := post(client.APIEndpoint()+authEndpoint, &authRequest, &response)
 	if err != nil {
@@ -101,7 +101,7 @@ func LogoutCommand(c *cli.Context) error {
 	if m == nil {
 		return fmt.Errorf(messagedef.MsgClientError)
 	}
-	request := auth.AuthorizationRequest{
+	request := authentication.AuthorizationRequest{
 		Realm:  client.Realm(),
 		UserID: m.Login,
 	}

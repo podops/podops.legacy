@@ -10,7 +10,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/txsvc/platform/v2"
-	"github.com/txsvc/platform/v2/auth"
+	"github.com/txsvc/platform/v2/authentication"
 	"github.com/txsvc/platform/v2/pkg/api"
 
 	"github.com/podops/podops"
@@ -37,7 +37,7 @@ func ImportTaskEndpoint(c echo.Context) error {
 
 	ctx := platform.NewHttpContext(c.Request())
 
-	if err := apiv1.AuthorizeAccessProduction(ctx, c, auth.ScopeAPIAdmin, req.GUID); err != nil {
+	if err := apiv1.AuthorizeAccessProduction(ctx, c, authentication.ScopeAPIAdmin, req.GUID); err != nil {
 		return api.ErrorResponse(c, http.StatusUnauthorized, err)
 	}
 

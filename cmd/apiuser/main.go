@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/txsvc/platform/v2/auth"
+	"github.com/txsvc/platform/v2/authentication"
 	"github.com/txsvc/platform/v2/pkg/account"
 	"github.com/txsvc/platform/v2/pkg/id"
 	"github.com/txsvc/platform/v2/pkg/timestamp"
@@ -67,20 +67,20 @@ func main() {
 
 	// create or update the authorization
 
-	ath, err := auth.LookupAuthorization(ctx, acc.Realm, acc.ClientID)
+	ath, err := authentication.LookupAuthorization(ctx, acc.Realm, acc.ClientID)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if ath == nil {
-		req := auth.AuthorizationRequest{
+		req := authentication.AuthorizationRequest{
 			Realm:    realm,
 			UserID:   userID,
 			ClientID: acc.ClientID,
-			Scope:    auth.ScopeAPIAdmin,
+			Scope:    authentication.ScopeAPIAdmin,
 		}
-		ath = auth.NewAuthorization(acc, &req, expires)
+		ath = authentication.NewAuthorization(acc, &req, expires)
 	}
-	ath.Token = auth.CreateSimpleToken()
+	ath.Token = authentication.CreateSimpleToken()
 	ath.TokenType = "api"
 	if expires != 0 {
 		ath.Expires = now + (int64(expires) * 86400)
@@ -89,7 +89,7 @@ func main() {
 	}
 	ath.Updated = now
 
-	err = auth.CreateAuthorization(ctx, ath)
+	err = authentication.CreateAuthorization(ctx, ath)
 	if err != nil {
 		log.Fatal(err)
 	}

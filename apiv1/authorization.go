@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/txsvc/platform/v2/auth"
+	"github.com/txsvc/platform/v2/authentication"
 
 	"github.com/podops/podops/backend"
 	"github.com/podops/podops/internal/errordef"
@@ -21,7 +21,7 @@ const (
 
 // AuthorizeAccess verifies that the user has the required roles in her authorization
 func AuthorizeAccess(ctx context.Context, c echo.Context, scope string) error {
-	_, err := auth.CheckAuthorization(ctx, c, scope)
+	_, err := authentication.CheckAuthorization(ctx, c, scope)
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func AuthorizeAccess(ctx context.Context, c echo.Context, scope string) error {
 // AuthorizeAccessProduction verifies that the user has the required roles in
 // her authorization and can access the production.
 func AuthorizeAccessProduction(ctx context.Context, c echo.Context, scope, claim string) error {
-	auth, err := auth.CheckAuthorization(ctx, c, scope)
+	auth, err := authentication.CheckAuthorization(ctx, c, scope)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func AuthorizeAccessProduction(ctx context.Context, c echo.Context, scope, claim
 // AuthorizeAccessResource verifies that the user has the required roles in
 // her authorization and can access the resource.
 func AuthorizeAccessResource(ctx context.Context, c echo.Context, scope, claim string) error {
-	auth, err := auth.CheckAuthorization(ctx, c, scope)
+	auth, err := authentication.CheckAuthorization(ctx, c, scope)
 	if err != nil {
 		return err
 	}
