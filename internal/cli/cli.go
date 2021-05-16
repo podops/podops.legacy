@@ -190,5 +190,4 @@ func printError(c *cli.Context, err error) {
 // printMsg is used for all the cli output
 func printMsg(format string, a ...interface{}) {
 	fmt.Printf(format+"\n", a...)
-	//fmt.Println(fmt.Sprintf(format, a...))
 }

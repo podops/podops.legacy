@@ -45,7 +45,8 @@ func LoginCommand(c *cli.Context) error {
 
 		status, err := post(client.APIEndpoint()+loginEndpoint, &loginRequest, nil)
 		if err != nil {
-			return err
+			printError(c, err)
+			return nil
 		}
 
 		switch status {
@@ -75,7 +76,8 @@ func LoginCommand(c *cli.Context) error {
 
 		status, err := post(client.APIEndpoint()+authEndpoint, &authRequest, &response)
 		if err != nil {
-			return err
+			printError(c, err)
+			return nil
 		}
 
 		switch status {
@@ -117,7 +119,8 @@ func LogoutCommand(c *cli.Context) error {
 
 	status, err := post(client.APIEndpoint()+logoutEndpoint, &request, nil)
 	if err != nil {
-		return err
+		printError(c, err)
+		return nil
 	}
 
 	if status == http.StatusNoContent {
