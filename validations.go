@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	nameRegex = regexp.MustCompile(`^[a-z]+[a-z0-9_-]`)
+	nameRegex  = regexp.MustCompile(`^[a-z]+[a-z0-9_-]`)
+	emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 )
 
 // Validate verifies the integrity of struct Show
@@ -158,4 +159,12 @@ func ValidResourceName(name string) bool {
 		return false
 	}
 	return nameRegex.MatchString(name)
+}
+
+// ValidEmail checks if the email provided passes the required structure and length.
+func ValidEmail(e string) bool {
+	if len(e) < 3 && len(e) > 254 {
+		return false
+	}
+	return emailRegex.MatchString(e)
 }

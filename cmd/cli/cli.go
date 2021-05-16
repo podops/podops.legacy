@@ -131,7 +131,7 @@ func setupCommands() []*cli.Command {
 		{
 			Name:      "login",
 			Usage:     "Log in to the service",
-			UsageText: "login EMAIL",
+			UsageText: loginUsageText,
 			Category:  SettingsCmdGroup,
 			Action:    cmd.LoginCommand,
 		},
@@ -140,13 +140,6 @@ func setupCommands() []*cli.Command {
 			Usage:    "Logout and clear all session information",
 			Category: SettingsCmdGroup,
 			Action:   cmd.LogoutCommand,
-		},
-		{
-			Name:      "auth",
-			Usage:     "Exchange the token for the API access key",
-			UsageText: "auth EMAIL TOKEN",
-			Category:  SettingsCmdGroup,
-			Action:    cmd.AuthCommand,
 		},
 	}
 	return c
@@ -233,4 +226,14 @@ To see the full list of supported commands, run 'po help'`
 
 	 # Show details about a resource
 	 po get ID`
+
+	loginUsageText = `login EMAIL [TOKEN]
+
+	 # Login to the service
+	 po login EMAIL
+
+	 Check your email for the temporary authentication token.
+
+	 # Authenticate with the temporary token
+	 po login EMAIL TOKEN`
 )

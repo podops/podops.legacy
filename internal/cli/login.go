@@ -6,6 +6,7 @@ import (
 
 	"github.com/txsvc/platform/v2/pkg/authentication"
 
+	"github.com/podops/podops"
 	"github.com/podops/podops/internal/messagedef"
 
 	"github.com/urfave/cli/v2"
@@ -21,9 +22,20 @@ const (
 
 // LoginCommand logs into the service
 func LoginCommand(c *cli.Context) error {
-	email := c.Args().First()
 
-	if email != "" {
+	if c.Args().Len() == 0 {
+		return fmt.Errorf(messagedef.MsgArgumentMissing, "EMAIL")
+	}
+
+	if c.Args().Len() == 1 {
+
+		// login EMAIL
+		email := c.Args().Get(0)
+
+		if !podops.ValidEmail(email) {
+			return fmt.Errorf(messagedef.MsgLoginInvalidEmail, email)
+		}
+
 		loginRequest := authentication.AuthorizationRequest{
 			Realm:  client.Realm(),
 			UserID: email,
@@ -36,62 +48,51 @@ func LoginCommand(c *cli.Context) error {
 
 		switch status {
 		case http.StatusCreated:
-			fmt.Println(messagedef.MsgLoginNewAccount)
+			printMsg(messagedef.MsgLoginNewAccount)
 			return nil
 		case http.StatusNoContent:
-			fmt.Println(messagedef.MsgLoginVerification)
+			printMsg(messagedef.MsgLoginVerification)
 			return nil
 		case http.StatusForbidden:
-			fmt.Println(messagedef.MsgLoginError)
-			return nil
+			return fmt.Errorf(messagedef.MsgLoginError)
 		default:
-			return fmt.Errorf(messagedef.MsgStatus, status)
+			return fmt.Errorf(messagedef.MsgServerError, status)
 		}
-	} else {
-		fmt.Println(messagedef.MsgArgumentMissing, "EMAIL")
-	}
+	} else if c.Args().Len() == 2 {
 
-	return nil
-}
+		// login EMAIL TOKEN
 
-// AuthCommand logs into the PodOps service and validates the token
-func AuthCommand(c *cli.Context) error {
+		authRequest := authentication.AuthorizationRequest{
+			Realm:  client.Realm(),
+			UserID: c.Args().Get(0),
+			Token:  c.Args().Get(1),
+		}
+		response := authentication.AuthorizationRequest{}
 
-	if c.Args().Len() != 2 {
-		printMsg(messagedef.MsgArgumentCountMismatch, 2, c.Args().Len())
-		return nil
-	}
+		status, err := post(client.APIEndpoint()+authEndpoint, &authRequest, &response)
+		if err != nil {
+			return err
+		}
 
-	authRequest := authentication.AuthorizationRequest{
-		Realm:  client.Realm(),
-		UserID: c.Args().Get(0),
-		Token:  c.Args().Get(1),
-	}
-	response := authentication.AuthorizationRequest{}
-
-	status, err := post(client.APIEndpoint()+authEndpoint, &authRequest, &response)
-	if err != nil {
-		return err
-	}
-
-	switch status {
-	case http.StatusOK:
-		if err := storeLogin(response.UserID, response.Token); err != nil {
-			fmt.Println(messagedef.MsgErrorUpdatingConfig)
+		switch status {
+		case http.StatusOK:
+			if err := storeLogin(response.UserID, response.Token); err != nil {
+				printMsg(messagedef.MsgErrorUpdatingConfig)
+				return nil
+			}
+			fmt.Println(messagedef.MsgLoginSuccess)
 			return nil
+		case http.StatusUnauthorized:
+			return fmt.Errorf(messagedef.MsgAuthenticationTokenExpired)
+		case http.StatusNotFound:
+			return fmt.Errorf(messagedef.MsgAuthenticationTokenInvalid)
+		default:
+			return fmt.Errorf(messagedef.MsgServerError, status)
 		}
-		fmt.Println(messagedef.MsgAuthenticationSuccess)
-		return nil
-	case http.StatusUnauthorized:
-		fmt.Println(messagedef.MsgAuthenticationTokenExpired)
-		return nil
-	case http.StatusNotFound:
-		fmt.Println(messagedef.MsgAuthenticationTokenInvalid)
-		return nil
-	default:
-		return fmt.Errorf(messagedef.MsgStatus, status)
 	}
 
+	printMsg(messagedef.MsgTooManyArguments)
+	return nil
 }
 
 // LogoutCommand clears all session information
@@ -99,7 +100,8 @@ func LogoutCommand(c *cli.Context) error {
 
 	m := loadNetrc().FindMachine(machineEntry)
 	if m == nil {
-		return fmt.Errorf(messagedef.MsgClientError)
+		printMsg(messagedef.MsgNotLoggedIn)
+		return nil
 	}
 	request := authentication.AuthorizationRequest{
 		Realm:  client.Realm(),
@@ -113,9 +115,9 @@ func LogoutCommand(c *cli.Context) error {
 
 	if status == http.StatusNoContent {
 		clearLogin()
-		fmt.Println(messagedef.MsgLogoutSuccess)
+		printMsg(messagedef.MsgLogoutSuccess)
 	} else {
-		return fmt.Errorf(messagedef.MsgStatus, status)
+		return fmt.Errorf(messagedef.MsgServerError, status)
 	}
 
 	return nil

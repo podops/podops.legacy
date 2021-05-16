@@ -19,17 +19,22 @@ const (
 	MsgParameterMismatch  = "parameters mismatch. expected '%s', got '%s'"
 
 	MsgAuthenticationNotFound     = "account '%s' not found"
-	MsgAuthenticationSuccess      = "sucessfully authenticated"
 	MsgAuthenticationTokenExpired = "token expired"
 	MsgAuthenticationTokenInvalid = "token is invalid"
 
-	MsgLoginNewAccount   = "new account created. Check your inbox and confirm the email address."
-	MsgLoginVerification = "login verificaction sent. Check your inbox."
-	MsgLoginError        = "already logged-in, logout first."
-	MsgLogoutSuccess     = "logout successful."
-
 	// CLI
+
+	MsgLoginNewAccount   = "New account created. Check your inbox and confirm the email address."
+	MsgLoginVerification = "Login verificaction sent. Check your inbox."
+	MsgLoginInvalidEmail = "'%s' is not a valid email address"
+	MsgLoginError        = "already logged-in"
+	MsgLoginSuccess      = "Login successful"
+	MsgLogoutSuccess     = "Logout successful."
+	MsgNotLoggedIn       = "Not logged in."
+	MsgServerError       = "something went wrong: [%d]"
+
 	MsgArgumentMissing       = "missing argument '%s'"
+	MsgTooManyArguments      = "too many arguments"
 	MsgArgumentCountMismatch = "argument mismatch: expected %d, got %d"
 
 	MsgResourceCreated       = "created resource '%s'"
