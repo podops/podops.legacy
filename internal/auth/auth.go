@@ -12,6 +12,7 @@ import (
 	"github.com/txsvc/platform/v2/pkg/env"
 
 	"github.com/podops/podops"
+	"github.com/podops/podops/internal/messagedef"
 )
 
 const (
@@ -77,6 +78,11 @@ func (a *authProviderImpl) Options() *provider.AuthenticationProviderConfig {
 }
 
 func SendEmail(sender, recipient, subject, body string) error {
+
+	if !podops.ValidEmail(recipient) {
+		return fmt.Errorf(messagedef.MsgLoginInvalidEmail, recipient)
+	}
+
 	domain := env.GetString("EMAIL_DOMAIN", "")
 	apiKey := env.GetString("EMAIL_API_KEY", "")
 
