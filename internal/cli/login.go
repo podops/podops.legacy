@@ -24,7 +24,8 @@ const (
 func LoginCommand(c *cli.Context) error {
 
 	if c.Args().Len() == 0 {
-		return fmt.Errorf(messagedef.MsgArgumentMissing, "EMAIL")
+		printError(c, fmt.Errorf(messagedef.MsgArgumentMissing, "EMAIL"))
+		return nil
 	}
 
 	if c.Args().Len() == 1 {
@@ -33,7 +34,8 @@ func LoginCommand(c *cli.Context) error {
 		email := c.Args().Get(0)
 
 		if !podops.ValidEmail(email) {
-			return fmt.Errorf(messagedef.MsgLoginInvalidEmail, email)
+			printError(c, fmt.Errorf(messagedef.MsgLoginInvalidEmail, email))
+			return nil
 		}
 
 		loginRequest := authentication.AuthorizationRequest{
@@ -54,9 +56,11 @@ func LoginCommand(c *cli.Context) error {
 			printMsg(messagedef.MsgLoginVerification)
 			return nil
 		case http.StatusForbidden:
-			return fmt.Errorf(messagedef.MsgLoginError)
+			printError(c, fmt.Errorf(messagedef.MsgLoginError))
+			return nil
 		default:
-			return fmt.Errorf(messagedef.MsgServerError, status)
+			printError(c, fmt.Errorf(messagedef.MsgServerError, status))
+			return nil
 		}
 	} else if c.Args().Len() == 2 {
 
@@ -77,17 +81,20 @@ func LoginCommand(c *cli.Context) error {
 		switch status {
 		case http.StatusOK:
 			if err := storeLogin(response.UserID, response.Token); err != nil {
-				printMsg(messagedef.MsgErrorUpdatingConfig)
+				printError(c, fmt.Errorf(messagedef.MsgErrorUpdatingConfig))
 				return nil
 			}
 			fmt.Println(messagedef.MsgLoginSuccess)
 			return nil
 		case http.StatusUnauthorized:
-			return fmt.Errorf(messagedef.MsgAuthenticationTokenExpired)
+			printError(c, fmt.Errorf(messagedef.MsgAuthenticationTokenExpired))
+			return nil
 		case http.StatusNotFound:
-			return fmt.Errorf(messagedef.MsgAuthenticationTokenInvalid)
+			printError(c, fmt.Errorf(messagedef.MsgAuthenticationTokenInvalid))
+			return nil
 		default:
-			return fmt.Errorf(messagedef.MsgServerError, status)
+			printError(c, fmt.Errorf(messagedef.MsgServerError, status))
+			return nil
 		}
 	}
 
@@ -117,7 +124,7 @@ func LogoutCommand(c *cli.Context) error {
 		clearLogin()
 		printMsg(messagedef.MsgLogoutSuccess)
 	} else {
-		return fmt.Errorf(messagedef.MsgServerError, status)
+		printError(c, fmt.Errorf(messagedef.MsgServerError, status))
 	}
 
 	return nil

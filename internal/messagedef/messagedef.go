@@ -24,14 +24,15 @@ const (
 
 	// CLI
 
-	MsgLoginNewAccount   = "New account created. Check your inbox and confirm the email address."
-	MsgLoginVerification = "Login verificaction sent. Check your inbox."
-	MsgLoginInvalidEmail = "'%s' is not a valid email address"
-	MsgLoginError        = "already logged-in"
-	MsgLoginSuccess      = "Login successful"
-	MsgLogoutSuccess     = "Logout successful."
-	MsgNotLoggedIn       = "Not logged in."
-	MsgServerError       = "something went wrong: [%d]"
+	MsgLoginNewAccount     = "New account created. Check your inbox and confirm the email address."
+	MsgLoginVerification   = "Login verificaction sent. Check your inbox."
+	MsgLoginInvalidEmail   = "'%s' is not a valid email address"
+	MsgLoginError          = "already logged-in"
+	MsgLoginSuccess        = "Login successful"
+	MsgLogoutSuccess       = "Logout successful."
+	MsgNotLoggedIn         = "Not logged in."
+	MsgServerError         = "something went wrong: [%d]"
+	MsgErrorUpdatingConfig = "error updating config"
 
 	MsgArgumentMissing       = "missing argument '%s'"
 	MsgTooManyArguments      = "too many arguments"
@@ -47,7 +48,6 @@ const (
 	MsgNoProductionsFound = "production(s) not found"
 	MsgNoResourcesFound   = "resource(s) not found"
 
-	MsgErrorUpdatingConfig      = "error updating config."
 	MsgErrorNoProduction        = "no production set. Use 'po show [ID|name]' first"
 	MsgErrorCanNotSetProduction = "no production set. Use 'po shows' to find available productions"
 

@@ -184,11 +184,11 @@ func assetListing(guid, name, kind string) string {
 
 // printError formats a CLI error and prints it
 func printError(c *cli.Context, err error) {
-	msg := fmt.Sprintf("%s: %v", c.Command.Name, strings.ToLower(err.Error()))
-	fmt.Println(msg)
+	fmt.Printf("%s: %v\n", c.Command.Name, strings.ToLower(err.Error()))
 }
 
 // printMsg is used for all the cli output
 func printMsg(format string, a ...interface{}) {
-	fmt.Println(fmt.Sprintf(format, a...))
+	fmt.Printf(format+"\n", a...)
+	//fmt.Println(fmt.Sprintf(format, a...))
 }
