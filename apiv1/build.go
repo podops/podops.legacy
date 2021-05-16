@@ -9,8 +9,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/txsvc/platform/v2"
 	"github.com/txsvc/platform/v2/pkg/api"
+	"github.com/txsvc/platform/v2/pkg/apis/provider"
 	"github.com/txsvc/platform/v2/pkg/env"
-	"github.com/txsvc/platform/v2/tasks"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/backend"
@@ -22,23 +22,23 @@ var (
 	// full canonical route
 	syncTaskEndpoint string = podops.DefaultCDNEndpoint + "/_w/sync"
 
-	tp tasks.HttpTaskProvider
+	tp provider.HttpTaskProvider
 )
 
 // implements lazy loading to give other parts of the code time to initialize the platform
 // before a first call to the authentication provider is made. This is why init() would not work.
 
-func background() tasks.HttpTaskProvider {
+func background() provider.HttpTaskProvider {
 	if tp != nil {
 		return tp
 	}
-	p, ok := platform.Provider(platform.ProviderTypeTask)
+	p, ok := platform.Provider(provider.TypeTask)
 	if !ok {
-		err := fmt.Errorf(platform.MsgMissingProvider, platform.ProviderTypeTask.String())
+		err := fmt.Errorf(platform.MsgMissingProvider, provider.TypeTask.String())
 		platform.ReportError(err)
 		log.Fatal(err) // this halts the process but there is no point because it would just crash later anyways
 	}
-	tp = p.(tasks.HttpTaskProvider)
+	tp = p.(provider.HttpTaskProvider)
 
 	return tp
 }
@@ -79,8 +79,8 @@ func BuildFeedEndpoint(c echo.Context) error {
 			Source: "feed.xml",
 		}
 
-		task := tasks.HttpTask{
-			Method:  tasks.HttpMethodPost,
+		task := provider.HttpTask{
+			Method:  provider.HttpMethodPost,
 			Request: syncTaskEndpoint,
 			Token:   env.GetString("PODOPS_API_KEY", ""),
 			Payload: &ir,

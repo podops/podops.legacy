@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/txsvc/platform/v2/authentication"
+	"github.com/txsvc/platform/v2/pkg/authentication"
 
 	"github.com/podops/podops/internal/messagedef"
 

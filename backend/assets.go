@@ -8,9 +8,9 @@ import (
 	"net/url"
 
 	"github.com/txsvc/platform/v2"
+	"github.com/txsvc/platform/v2/pkg/apis/provider"
 	"github.com/txsvc/platform/v2/pkg/env"
 	"github.com/txsvc/platform/v2/pkg/timestamp"
-	"github.com/txsvc/platform/v2/tasks"
 
 	"github.com/podops/podops"
 	"github.com/podops/podops/internal/messagedef"
@@ -19,23 +19,23 @@ import (
 )
 
 var (
-	tp tasks.HttpTaskProvider
+	tp provider.HttpTaskProvider
 )
 
 // implements lazy loading to give other parts of the code time to initialize the platform
 // before a first call to the authentication provider is made. This is why init() would not work.
 
-func background() tasks.HttpTaskProvider {
+func background() provider.HttpTaskProvider {
 	if tp != nil {
 		return tp
 	}
-	p, ok := platform.Provider(platform.ProviderTypeTask)
+	p, ok := platform.Provider(provider.TypeTask)
 	if !ok {
-		err := fmt.Errorf(platform.MsgMissingProvider, platform.ProviderTypeTask.String())
+		err := fmt.Errorf(platform.MsgMissingProvider, provider.TypeTask.String())
 		platform.ReportError(err)
 		log.Fatal(err) // this halts the process but there is no point because it would just crash later anyways
 	}
-	tp = p.(tasks.HttpTaskProvider)
+	tp = p.(provider.HttpTaskProvider)
 
 	return tp
 }
@@ -96,8 +96,8 @@ func RemoveAsset(ctx context.Context, prod, location string) error {
 
 	//uri := fmt.Sprintf("%s/%s?l=%s", syncTaskEndpoint, prod, url.QueryEscape(location))
 	// dispatch a request for background deletion
-	task := tasks.HttpTask{
-		Method:  tasks.HttpMethodDelete,
+	task := provider.HttpTask{
+		Method:  provider.HttpMethodDelete,
 		Request: fmt.Sprintf("%s/%s?l=%s", syncTaskEndpoint, prod, url.QueryEscape(location)),
 		Token:   env.GetString("PODOPS_API_KEY", ""),
 		Payload: nil,
@@ -136,8 +136,8 @@ func EnsureAsset(ctx context.Context, production string, rsrc *podops.Asset) err
 			Source: rsrc.URI,
 		}
 
-		task := tasks.HttpTask{
-			Method:  tasks.HttpMethodPost,
+		task := provider.HttpTask{
+			Method:  provider.HttpMethodPost,
 			Request: importTaskEndpoint,
 			Token:   env.GetString("PODOPS_API_KEY", ""),
 			Payload: &ir,

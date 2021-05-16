@@ -7,14 +7,14 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/txsvc/platform/v2"
-	authapi "github.com/txsvc/platform/v2/pkg/api"
+	"github.com/txsvc/platform/v2/pkg/authentication"
 	"github.com/txsvc/platform/v2/pkg/env"
 	"github.com/txsvc/platform/v2/pkg/httpserver"
 	"github.com/txsvc/platform/v2/provider/google"
 
 	"github.com/podops/podops/apiv1"
 	"github.com/podops/podops/graphql"
-	"github.com/podops/podops/internal/provider"
+	"github.com/podops/podops/internal/auth"
 )
 
 // ShutdownDelay is the delay before exiting the process
@@ -29,13 +29,13 @@ func setup() *echo.Echo {
 	e.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig)) // needed for the GraphQL endpoints
 
 	// admin endpoints
-	e.GET(apiv1.LoginConfirmationRoute, authapi.LoginConfirmationEndpoint)
-	e.POST(apiv1.LogoutRequestRoute, authapi.LogoutRequestEndpoint)
+	e.GET(apiv1.LoginConfirmationRoute, authentication.LoginConfirmationEndpoint)
+	e.POST(apiv1.LogoutRequestRoute, authentication.LogoutRequestEndpoint)
 
 	admin := e.Group(apiv1.AdminNamespacePrefix)
-	admin.POST(apiv1.LoginRequestRoute, authapi.LoginRequestEndpoint)
+	admin.POST(apiv1.LoginRequestRoute, authentication.LoginRequestEndpoint)
 	//admin.POST(apiv1.LoginRequestRoute, hack.HackEndpoint)
-	admin.POST(apiv1.GetAuthorizationRoute, authapi.GetAuthorizationEndpoint)
+	admin.POST(apiv1.GetAuthorizationRoute, authentication.GetAuthorizationEndpoint)
 
 	// FIXME check this !
 	//admin.GET(apiv1.LoginConfirmationRoute, authapi.LoginConfirmationEndpoint)
@@ -87,7 +87,7 @@ func init() {
 	}
 
 	google.InitGoogleCloudPlatformProviders()
-	platform.DefaultPlatform().RegisterProviders(true, provider.PodopsAuthConfig)
+	platform.DefaultPlatform().RegisterProviders(true, auth.PodopsAuthConfig)
 }
 
 func main() {

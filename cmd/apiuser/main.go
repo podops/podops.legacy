@@ -7,8 +7,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/txsvc/platform/v2/authentication"
 	"github.com/txsvc/platform/v2/pkg/account"
+	"github.com/txsvc/platform/v2/pkg/authentication"
 	"github.com/txsvc/platform/v2/pkg/id"
 	"github.com/txsvc/platform/v2/pkg/timestamp"
 )

@@ -9,8 +9,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/txsvc/platform/v2"
-	"github.com/txsvc/platform/v2/authentication"
 	"github.com/txsvc/platform/v2/pkg/api"
+	"github.com/txsvc/platform/v2/pkg/authentication"
 	ds "github.com/txsvc/platform/v2/pkg/datastore"
 	"github.com/txsvc/platform/v2/pkg/validate"
 
